@@ -17,7 +17,7 @@ ul li {
 }
 ul.nav.nav-pills li a {
     padding: 5px;
-    font-size: 15px;
+    font-size: 20;
 }
 a:hover {
     outline: none;
@@ -518,14 +518,39 @@ ul.sub-menu {
 }
 
 .footer-widget {
-    margin-bottom: 68px;
+    display: flex;
+    justify-content: center; /* Canh giữa toàn bộ footer */
+    padding: 20px 0; /* Khoảng cách trên và dưới */
+    background-color: #f8f8f8; /* Màu nền nếu cần */
 }
 
 .footer-widget .container {
-    border-top: 1px solid #ffffff;
-    padding-top: 15px;
+    display: flex;
+    justify-content: center; /* Canh giữa nội dung */
+    width: 100%; /* Đảm bảo container chiếm toàn bộ chiều rộng */
 }
 
+.footer-widget .row {
+    display: flex; /* Sử dụng Flexbox cho hàng */
+    justify-content: center; /* Canh giữa các cột */
+    flex-wrap: wrap; /* Cho phép các cột xuống dòng nếu không đủ không gian */
+}
+
+.footer-widget .col-sm-2,
+.footer-widget .col-sm-3 {
+    display: flex; /* Biến các cột thành flex item */
+    flex-direction: column; /* Cho phép nội dung trong cột xếp theo chiều dọc */
+    align-items: center; /* Canh giữa nội dung trong cột */
+    margin: 0 10px; /* Khoảng cách giữa các cột */
+}
+
+.single-widget {
+    text-align: center; /* Canh giữa nội dung trong từng widget */
+}
+
+.footer-widget .col-sm-3 {
+    align-self: center; /* Giữ cho cột Cập nhật thông tin ở giữa */
+}
 .single-widget h2 {
     color: #666663;
     font-family: "Roboto", sans-serif;
@@ -1442,6 +1467,12 @@ h2.title {
 
 .logo-404 {
     margin-top: 60px;
+}
+
+.logo {
+    width: 139px;  /* Chiều rộng */
+    height: 39px;  /* Chiều dài */
+    object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
 }
 
 .content-404 h1 {

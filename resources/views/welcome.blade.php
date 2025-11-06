@@ -29,8 +29,8 @@
 					<div class="col-sm-6">
 						<div class="contactinfo">
 							<ul class="nav nav-pills">
-								<li><a href="#"><i class="fa fa-phone"></i> +84 325 91 00 45</a></li>
-								<li><a href="#"><i class="fa fa-envelope"></i> info@domain.com</a></li>
+								<li><a href="#"><i class="fa fa-phone"></i> +84 983 567 891</a></li>
+								<li><a href="#"><i class="fa fa-envelope"></i> unkstore@gmail.com</a></li>
 							</ul>
 						</div>
 					</div>
@@ -50,49 +50,25 @@
 		</div><!--/header_top-->
 		
 		<div class="header-middle"><!--header-middle-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-4">
-						<div class="logo pull-left">
-							<a href="index.html"><img src="images/home/logo.png" alt="" /></a>
-						</div>
-						<div class="btn-group pull-right">
-							<div class="btn-group">
-								<button type="button" class="btn btn-default dropdown-toggle usa" data-toggle="dropdown">
-									VND
-									<span class="caret"></span>
-								</button>
-								<ul class="dropdown-menu">
-									<li><a href="#">Viet Nam</a></li>
-									
-								</ul>
-							</div>
-							
-							<div class="btn-group">
-								<button type="button" class="btn btn-default dropdown-toggle usa" data-toggle="dropdown">
-									DOLLAR
-									<span class="caret"></span>
-								</button>
-								<ul class="dropdown-menu">
-									<li><a href="#">USA</a></li>
-									
-								</ul>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-8">
-						<div class="shop-menu pull-right">
-							<ul class="nav navbar-nav">
-								<li><a href="#"><i class="fa fa-user"></i> Tài Khoản</a></li>
-								<li><a href="#"><i class="fa fa-star"></i> Yêu Thích</a></li>
-								<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-								<li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Đơn Hàng</a></li>
-								<li><a href="login.html"><i class="fa fa-lock"></i> Login</a></li>
-							</ul>
-						</div>
-					</div>
-				</div>
-			</div>
+		<div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="logo pull-left">
+                    <a href="index.html"><img src="http://127.0.0.1:8000/frontend/images/logodh.png" alt="" class="logo"></a>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="shop-menu pull-right">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#"><i class="fa fa-user"></i> Tài Khoản</a></li>
+                        <li><a href="#"><i class="fa fa-star"></i> Yêu Thích</a></li>
+                        <li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Đơn Hàng</a></li>
+                        <li><a href="login.html"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 		</div><!--/header-middle-->
 	
 		<div class="header-bottom"><!--header-bottom-->
@@ -125,7 +101,7 @@
 										<li><a href="blog-single.html">Blog Single</a></li>
                                     </ul>
                                 </li> 
-								<li><a href="404.html">404</a></li>
+								<li><a href="404.html">Sales</a></li>
 								<li><a href="contact-us.html">Contact</a></li>
 							</ul>
 						</div>
@@ -217,7 +193,7 @@
 									<h4 class="panel-title">
 										<a data-toggle="collapse" data-parent="#accordian" href="#sportswear">
 											<span class="badge pull-right"><i class="fa fa-plus"></i></span>
-											Luxury
+											Đồng Hồ Cơ
 										</a>
 									</h4>
 								</div>
@@ -235,7 +211,7 @@
 									<h4 class="panel-title">
 										<a data-toggle="collapse" data-parent="#accordian" href="#mens">
 											<span class="badge pull-right"><i class="fa fa-plus"></i></span>
-											Mens
+											Đồng Hồ Pin
 										</a>
 									</h4>
 								</div>
@@ -259,7 +235,7 @@
 									<h4 class="panel-title">
 										<a data-toggle="collapse" data-parent="#accordian" href="#womens">
 											<span class="badge pull-right"><i class="fa fa-plus"></i></span>
-											Womens
+											Đồng Hồ Thể Thao
 										</a>
 									</h4>
 								</div>
@@ -276,10 +252,8 @@
 									</div>
 								</div>
 							</div>
-							
-							
-							
-							
+
+				
 						</div><!--/category-products-->
 					
 						<div class="brands_products"><!--brands_products-->
@@ -293,6 +267,9 @@
 									<li><a href="#"> <span class="pull-right">(5)</span>Puma</a></li>
 									<li><a href="#"> <span class="pull-right">(9)</span>Casio</a></li>
 									<li><a href="#"> <span class="pull-right">(4)</span>Adidas</a></li>
+									<li><a href="#"> <span class="pull-right">(5)</span>BaBy-G</a></li>
+									<li><a href="#"> <span class="pull-right">(6)</span>G-Shock</a></li>
+									<li><a href="#"> <span class="pull-right">(10)</span>Hublot</a></li>
 								</ul>
 							</div>
 						</div><!--/brands_products-->
@@ -789,74 +766,7 @@
 	<footer id="footer"><!--Footer-->
 		<div class="footer-top">
 			<div class="container">
-				<div class="row">
-					<div class="col-sm-2">
-						<div class="companyinfo">
-							<h2><span>UnK</span>-STORE</h2>
-							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit,sed do eiusmod tempor</p>
-						</div>
-					</div>
-					<div class="col-sm-7">
-						<div class="col-sm-3">
-							<div class="video-gallery text-center">
-								<a href="#">
-									<div class="iframe-img">
-										<img src="{{ asset('frontend/images/iframe1.png')}}" alt="" />
-									</div>
-									<div class="overlay-icon">
-										<i class="fa fa-play-circle-o"></i>
-									</div>
-								</a>
-								<p>Circle of Hands</p>
-								<h2>24 DEC 2014</h2>
-							</div>
-						</div>
 						
-						<div class="col-sm-3">
-							<div class="video-gallery text-center">
-								<a href="#">
-									<div class="iframe-img">
-										<img src="{{ asset('frontend/images/iframe2.png')}}" alt="" />
-									</div>
-									<div class="overlay-icon">
-										<i class="fa fa-play-circle-o"></i>
-									</div>
-								</a>
-								<p>Circle of Hands</p>
-								<h2>24 DEC 2014</h2>
-							</div>
-						</div>
-						
-						<div class="col-sm-3">
-							<div class="video-gallery text-center">
-								<a href="#">
-									<div class="iframe-img">
-										<img src="{{ asset('frontend/images/iframe3.png')}}" alt="" />
-									</div>
-									<div class="overlay-icon">
-										<i class="fa fa-play-circle-o"></i>
-									</div>
-								</a>
-								<p>Circle of Hands</p>
-								<h2>24 DEC 2014</h2>
-							</div>
-						</div>
-						
-						<div class="col-sm-3">
-							<div class="video-gallery text-center">
-								<a href="#">
-									<div class="iframe-img">
-										<img src="{{ asset('frontend/images/iframe4.png')}}" alt="" />
-									</div>
-									<div class="overlay-icon">
-										<i class="fa fa-play-circle-o"></i>
-									</div>
-								</a>
-								<p>Circle of Hands</p>
-								<h2>24 DEC 2014</h2>
-							</div>
-						</div>
-					</div>
 					<div class="col-sm-3">
 						<div class="address">
 							<img src="images/home/map.png" alt="" />
@@ -872,59 +782,47 @@
 				<div class="row">
 					<div class="col-sm-2">
 						<div class="single-widget">
-							<h2>Service</h2>
+							<h2>VỀ CHÚNG TÔI</h2>
 							<ul class="nav nav-pills nav-stacked">
-								<li><a href="#">Online Help</a></li>
-								<li><a href="#">Contact Us</a></li>
-								<li><a href="#">Order Status</a></li>
-								<li><a href="#">Change Location</a></li>
-								<li><a href="#">FAQ’s</a></li>
+								<li><a href="#">Giới thiệu về UnK STORE</a></li>
+								<li><a href="#">Quy chế hoạt động</a></li>
+								<li><a href="#">Chất lượng dịch vụ</a></li>
+								<li><a href="#">Góp ý - Khiếu nại</a></li>								
 							</ul>
 						</div>
 					</div>
 					<div class="col-sm-2">
 						<div class="single-widget">
-							<h2>Quock Shop</h2>
+							<h2>CHÍNH SÁCH CHUNG</h2>
 							<ul class="nav nav-pills nav-stacked">
-								<li><a href="#">T-Shirt</a></li>
-								<li><a href="#">Mens</a></li>
-								<li><a href="#">Womens</a></li>
-								<li><a href="#">Gift Cards</a></li>
-								<li><a href="#">Shoes</a></li>
+								<li><a href="#">Điều khoản thanh toán</a></li>
+								<li><a href="#">Chính sách bảo hành</a></li>
+								<li><a href="#">Chính sách đổi trả</a></li>
+								<li><a href="#">Chính sách bảo mật</a></li>
+								
 							</ul>
 						</div>
 					</div>
+					
 					<div class="col-sm-2">
 						<div class="single-widget">
-							<h2>Policies</h2>
+							<h2>LIÊN HỆ HỖ TRỢ</h2>
 							<ul class="nav nav-pills nav-stacked">
-								<li><a href="#">Terms of Use</a></li>
-								<li><a href="#">Privecy Policy</a></li>
-								<li><a href="#">Refund Policy</a></li>
-								<li><a href="#">Billing System</a></li>
-								<li><a href="#">Ticket System</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="col-sm-2">
-						<div class="single-widget">
-							<h2>About Shopper</h2>
-							<ul class="nav nav-pills nav-stacked">
-								<li><a href="#">Company Information</a></li>
-								<li><a href="#">Careers</a></li>
-								<li><a href="#">Store Location</a></li>
-								<li><a href="#">Affillate Program</a></li>
-								<li><a href="#">Copyright</a></li>
+								<li><a href="#">Hotline 1: 0983 567 891</a></li>
+								<li><a href="#">Hotline 2: 0983 567 892</a></li>
+								<li><a href="#">Hotline 3: 0983 567 893</a></li>
+								<li><a href="#">Email: unkstore@gmail.com</a></li>
+		
 							</ul>
 						</div>
 					</div>
 					<div class="col-sm-3 col-sm-offset-1">
 						<div class="single-widget">
-							<h2>About Shopper</h2>
+							<h2>CẬP NHẬT THÔNG TIN</h2>
 							<form action="#" class="searchform">
 								<input type="text" placeholder="Your email address" />
 								<button type="submit" class="btn btn-default"><i class="fa fa-arrow-circle-o-right"></i></button>
-								<p>Get the most recent updates from <br />our site and be updated your self...</p>
+								<p>Nhận những cập nhật mới nhất từ trang của chúng tôi và luôn bắt kịp xu hướng!</p>
 							</form>
 						</div>
 					</div>
