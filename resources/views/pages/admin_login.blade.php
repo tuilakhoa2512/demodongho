@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-image: url('https://wallpapers-clan.com/wp-content/uploads/2024/07/sneaker-collage-colorful-desktop-wallpaper-preview.jpg'); /* Thay đường dẫn này bằng ảnh nền thực tế */
+            background-image: url('https://revolutionwatch.com/wp-content/uploads/2023/04/01-Art-of-Watch-Collecting-2048x1365.jpg'); /* Thay đường dẫn này bằng ảnh nền thực tế */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;

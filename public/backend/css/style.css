@@ -219,7 +219,7 @@ ul.sidebar-menu li a.active i {
     left:0;
     right:0;
     z-index:1002;
-    background:rgb(240, 188, 180);
+    background:rgb(105, 147, 211);
     -webkit-transition:all .3s ease-in-out;
     -moz-transition:all .3s ease-in-out;
     -o-transition:all .3s ease-in-out;
@@ -239,7 +239,7 @@ ul.sidebar-menu li a.active i {
     width:100%;
 }
 .brand {
-    background:#8b5c7e;
+    background:#3e4478;
     float:left;
     width:240px;
     height:80px;
@@ -250,7 +250,6 @@ a.logo {
     color:#fff;
     float:left;
     margin:20px 0 0 25px;
-    text-transform:uppercase;
 }
 a.logo:hover,a.logo:focus {
     text-decoration:none;
@@ -506,8 +505,8 @@ ul.top-menu>li>a:hover,ul.top-menu>li>a:focus {
     padding: 0px;
     background: none;
     margin-right: 0;
-    border: 1px solid #8b5c7e;
-    background: #8b5c7e;
+
+    background: rgb(62, 68, 120);
 }
 .top-nav ul.top-menu>li.language>a {
     margin-top:-2px;
@@ -572,9 +571,8 @@ ul.top-menu>li>a:hover,ul.top-menu>li>a:focus {
     -ms-transition: all .3s ease;
     -o-transition: all .3s ease;
     transition: all .3s ease;
-    border: 1px solid #8b5c7e;
     box-shadow: none;
-    background: #8b5c7e url(../images/search-icon.png) no-repeat 10px 8px;
+    background: rgb(62, 68, 120) url(../images/search-icon.png) no-repeat 10px 8px;
     padding: 0 5px 0 30px;
     color: #fff;
     border-radius: 100px;
@@ -583,7 +581,6 @@ ul.top-menu>li>a:hover,ul.top-menu>li>a:focus {
 }
 .search:focus {
     width:180px;
-    border:1px solid #8b5c7e;
     box-shadow:none;
     -webkit-transition:all .3s ease;
     -moz-transition:all .3s ease;
@@ -601,7 +598,7 @@ ul.top-menu>li>a:hover,ul.top-menu>li>a:focus {
     float:left;
     margin-top:23px;
     margin-left:-15px;
-    background:#8b5c7e;
+    background:#3e4478;
     border-radius:50%;
     -webkit-border-radius:50%;
     width:32px;
@@ -614,10 +611,10 @@ ul.top-menu>li>a:hover,ul.top-menu>li>a:focus {
     display:inline-block;
     font-size:15px;
     padding:8px 8px 8px 9px;
-    color:#fff;
+    color:rgb(255, 255, 255);
 }
 .sidebar-toggle-box:hover {
-    background:#fa9fa4;
+    background:rgb(105, 147, 211);
 }
 .hide-left-bar {
     margin-left:-240px !important;

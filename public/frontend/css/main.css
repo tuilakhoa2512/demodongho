@@ -211,7 +211,7 @@ a#scrollUp i {
 }
 
 .shop-menu ul li a {
-    color: #696763;
+    color: #4b4b4a;
     font-family: "Roboto", sans-serif;
     font-size: 14px;
     font-weight: 300;
@@ -1470,8 +1470,8 @@ h2.title {
 }
 
 .logo {
-    width: 35px;  /* Chiều rộng */
-    height: 39px;  /* Chiều dài */
+    width: 50px;  /* Chiều rộng */
+    height: 49px;  /* Chiều dài */
     object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
 }
 
@@ -2613,12 +2613,12 @@ ul.nav.nav-pills.nav-justified i {
 .store-name-main {
     font-size: 28px; /* Kích thước chữ cho UnK */
     font-weight: bold; /* Đậm */
-    color: #db4e58; /* Màu chữ */
+    color: #ac131d; /* Màu chữ */
 }
 
 .store-name-sub {
     font-size: 28px; /* Kích thước chữ cho STORE */
     font-weight: normal; /* Không đậm */
-    color: #797878; /* Màu chữ */
+    color: #696767; /* Màu chữ */
     margin-left: 5px; /* Khoảng cách giữa UnK và STORE */
 }
