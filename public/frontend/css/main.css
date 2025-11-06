@@ -1470,7 +1470,7 @@ h2.title {
 }
 
 .logo {
-    width: 139px;  /* Chiều rộng */
+    width: 35px;  /* Chiều rộng */
     height: 39px;  /* Chiều dài */
     object-fit: contain; /* Đảm bảo hình ảnh không bị méo */
 }
@@ -2602,4 +2602,23 @@ ul.nav.nav-pills.nav-justified i {
 .button_wishlist:focus {
     border: none;
     outline: none;
+}
+
+.store-name {
+    margin-left: 10px; /* Khoảng cách giữa logo và tên cửa hàng */
+    display: flex; /* Sử dụng flexbox để căn chỉnh */
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.store-name-main {
+    font-size: 28px; /* Kích thước chữ cho UnK */
+    font-weight: bold; /* Đậm */
+    color: #db4e58; /* Màu chữ */
+}
+
+.store-name-sub {
+    font-size: 28px; /* Kích thước chữ cho STORE */
+    font-weight: normal; /* Không đậm */
+    color: #797878; /* Màu chữ */
+    margin-left: 5px; /* Khoảng cách giữa UnK và STORE */
 }

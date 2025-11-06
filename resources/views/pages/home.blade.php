@@ -53,8 +53,12 @@
 		<div class="container">
         <div class="row">
             <div class="col-sm-4">
-                <div class="logo pull-left">
-                    <a href="index.html"><img src="http://127.0.0.1:8000/frontend/images/logodh.png" alt="" class="logo"></a>
+                <div class="logo pull-left" style="display: flex; align-items: center;">
+                    <a href="index.html"><img src="http://127.0.0.1:8000/frontend/images/logodh2.png" alt="" class="logo"></a>
+					<span class="store-name">
+					<span class="store-name-main">UnK</span>
+					<span class="store-name-sub">STORE</span>
+        </span>
                 </div>
             </div>
             <div class="col-sm-8">
