@@ -271,6 +271,9 @@ a#scrollUp i {
     position: relative;
     /* Needed for submenu positioning */
 }
+.mainmenu ul.nav li {
+    margin-right: 20px;
+}
 
 .cate_sub {
     list-style: none;
@@ -324,6 +327,7 @@ a#scrollUp i {
     background-image: url(../images/home/searchicon.png);
     background-repeat: no-repeat;
     background-position: 130px;
+    margin:top;
 }
 
 /*  Dropdown menu*/
@@ -932,6 +936,9 @@ h2.title {
     position: absolute;
     top: 0;
     right: 0;
+}
+.btn.get {
+    visibility: hidden; /* ẩn nút nhưng vẫn giữ không gian chiếm chỗ */
 }
 .btn-default {
     color: #333;

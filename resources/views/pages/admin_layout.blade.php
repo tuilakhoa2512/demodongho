@@ -168,6 +168,7 @@ body {
 <!--main content start-->
 <section id="main-content">
 	<section class="wrapper">
+		@yield('admin_content');
 		<!-- //market-->
 		<div class="market-updates">
 			<div class="col-md-3 market-update-gd">
@@ -542,7 +543,7 @@ body {
  <!-- footer -->
 		  <div class="footer">
 			<div class="wthree-copyright">
-			  <p>© 2017 Visitors. All rights reserved | Design by <a href="http://w3layouts.com">W3layouts</a></p>
+			  <p>© 2025. All rights reserved | Design by UnK STORE</a></p>
 			</div>
 		  </div>
   <!-- / footer -->

@@ -74,50 +74,57 @@
         </div>
     </div>
 		</div><!--/header-middle-->
-	
-		<div class="header-bottom"><!--header-bottom-->
-			<div class="container">
-				<div class="row">
-					<div class="col-sm-9">
-						<div class="navbar-header">
-							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-								<span class="sr-only">Toggle navigation</span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-								<span class="icon-bar"></span>
-							</button>
-						</div>
-						<div class="mainmenu pull-left">
-							<ul class="nav navbar-nav collapse navbar-collapse">
-								<li><a href="{{ URL::to('/trang-chu') }}" class="active">Home</a></li>
-								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
-                                    <ul role="menu" class="sub-menu">
-                                        <li><a href="shop.html">Products</a></li>
-										<li><a href="product-details.html">Product Details</a></li> 
-										<li><a href="checkout.html">Checkout</a></li> 
-										<li><a href="cart.html">Cart</a></li> 
-										<li><a href="login.html">Login</a></li> 
-                                    </ul>
-                                </li> 
-								<li class="dropdown"><a href="#">Blog<i class="fa fa-angle-down"></i></a>
-                                    <ul role="menu" class="sub-menu">
-                                        <li><a href="blog.html">Blog List</a></li>
-										<li><a href="blog-single.html">Blog Single</a></li>
-                                    </ul>
-                                </li> 
-								<li><a href="404.html">Sales</a></li>
-								<li><a href="contact-us.html">Contact</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="col-sm-3">
-						<div class="search_box pull-right">
-							<input type="text" placeholder="Search"/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--/header-bottom-->
+
+	<!--header-bottom-->
+	<div class="header-bottom">
+    <div class="container">
+        <div class="row" style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="col-sm-9">
+                <div class="mainmenu">
+                    <ul class="nav navbar-nav collapse navbar-collapse">
+                        <li><a href="http://127.0.0.1:8000/trang-chu" class="active">Trang Chủ</a></li>
+                        <li class="dropdown"><a href="#">Loại <i class="fa fa-angle-down"></i></a>
+                            <ul role="menu" class="sub-menu">
+                                <li><a href="shop.html">Đồn Hồ Cơ</a></li>
+                                <li><a href="product-details.html">Đồng Hồ Pin</a></li>
+                                <li><a href="cart.html">Đồng Hồ Thể Thao</a></li>                               
+                            </ul>
+                        </li>
+                        <li class="dropdown"><a href="#">Thương Hiệu <i class="fa fa-angle-down"></i></a>
+                            <ul role="menu" class="sub-menu">
+                                <li><a href="shop.html">Rolex</a></li>
+                                <li><a href="product-details.html">Cartier</a></li>
+                                <li><a href="cart.html">Patek Philippe</a></li>
+                                <li><a href="login.html">Breitling</a></li>
+								<li><a href="login.html">Puma</a></li>
+								<li><a href="login.html">Casio</a></li>
+								<li><a href="login.html">Adidas</a></li>
+								<li><a href="login.html">Baby-G</a></li>
+								<li><a href="login.html">G-Shock</a></li>
+								<li><a href="login.html">Hublot</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown"><a href="#">Blog <i class="fa fa-angle-down"></i></a>
+                            <ul role="menu" class="sub-menu">
+                                <li><a href="blog.html">Danh Sách Blog</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="404.html">Đang Khuyến Mãi</a></li>
+                        <li><a href="contact-us.html">Liên Hệ</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="search_box">
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+		<!--/header-bottom-->
 	</header><!--/header-->
 	
 	<section id="slider"><!--slider-->
@@ -135,7 +142,7 @@
 							<div class="item active">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>Free E-Commerce Template</h2>
+									<h2>Mỗi Giây Phút - Một Câu Chuyện</h2>
 									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
@@ -147,7 +154,7 @@
 							<div class="item">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>100% Responsive Design</h2>
+									<h2>Từng Phút Giây Định Hình Đẳng Cấp</h2>
 									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
@@ -160,7 +167,7 @@
 							<div class="item">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>Free Ecommerce Template</h2>
+									<h2>Từng Khoảnh Khắc - Một Bản Sắc</h2>
 									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
@@ -190,7 +197,7 @@
 			<div class="row">
 				<div class="col-sm-3">
 					<div class="left-sidebar">
-						<h2>Category</h2>
+						<h2>Danh Mục</h2>
 						<div class="panel-group category-products" id="accordian"><!--category-productsr-->
 							<div class="panel panel-default">
 								<div class="panel-heading">
@@ -261,28 +268,30 @@
 						</div><!--/category-products-->
 					
 						<div class="brands_products"><!--brands_products-->
-							<h2>Brands</h2>
+							<h2>Thương Hiệu Nổi Bật</h2>
 							<div class="brands-name">
 								<ul class="nav nav-pills nav-stacked">
 									<li><a href="#"> <span class="pull-right">(50)</span>Rolex</a></li>
 									<li><a href="#"> <span class="pull-right">(56)</span>Cartier</a></li>
-									<li><a href="#"> <span class="pull-right">(27)</span>Patek Philippe</a></li>
-									<li><a href="#"> <span class="pull-right">(32)</span>Breitling</a></li>
-									<li><a href="#"> <span class="pull-right">(5)</span>Puma</a></li>
+									<li><a href="#"> <span class="pull-right">(27)</span>Patek Philippe</a></li>													
 									<li><a href="#"> <span class="pull-right">(9)</span>Casio</a></li>
-									<li><a href="#"> <span class="pull-right">(4)</span>Adidas</a></li>
-									<li><a href="#"> <span class="pull-right">(5)</span>BaBy-G</a></li>
-									<li><a href="#"> <span class="pull-right">(6)</span>G-Shock</a></li>
+									<li><a href="#"> <span class="pull-right">(4)</span>Adidas</a></li>									
 									<li><a href="#"> <span class="pull-right">(10)</span>Hublot</a></li>
 								</ul>
 							</div>
 						</div><!--/brands_products-->
 						
 						<div class="price-range"><!--price-range-->
-							<h2>Price Range</h2>
+							<h2>Tầm Giá</h2>
 							<div class="well text-center">
-								 <input type="text" class="span2" value="" data-slider-min="0" data-slider-max="600" data-slider-step="5" data-slider-value="[250,450]" id="sl2" ><br />
-								 <b class="pull-left">$ 0</b> <b class="pull-right">$ 600</b>
+							<input type="text" class="span2" value="" 
+								data-slider-min="0" 
+								data-slider-max="50000000" 
+								data-slider-step="100000" 
+								data-slider-value="[0,50000000]" 
+								id="sl2">
+							<br />
+								 <b class="pull-left">0 VND</b> <b class="pull-right">50.000.000 VND</b>
 							</div>
 						</div><!--/price-range-->
 						
@@ -295,7 +304,7 @@
 				
 				<div class="col-sm-9 padding-right">
 					<div class="features_items"><!--features_items-->
-						<h2 class="title text-center">Features Items</h2>
+						<h2 class="title text-center">Sản Phẩm Nổi Bật</h2>
 						<div class="col-sm-4">
 							<div class="product-image-wrapper">
 								<div class="single-products">
@@ -666,7 +675,7 @@
 					</div><!--/category-tab-->
 					
 					<div class="recommended_items"><!--recommended_items-->
-						<h2 class="title text-center">recommended items</h2>
+						<h2 class="title text-center">Sản Phẩm Bán Chạy</h2>
 						
 						<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
 							<div class="carousel-inner">
