@@ -60,7 +60,8 @@
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="login-container">
             <h2 class="text-center mb-4" style="font-weight: bold;">ĐĂNG NHẬP ADMIN</h2>
-            <form action="login.php" method="POST">
+            <form action="{{ URL::to('/admin-dashboard') }}" method="post">
+            {{ csrf_field() }}
                 <?php if (isset($error)): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
                 <?php endif; ?>
