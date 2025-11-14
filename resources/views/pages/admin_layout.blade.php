@@ -72,7 +72,7 @@ body {
         <!-- user login dropdown start-->
         <li class="dropdown">
             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                <img alt="" src="images/2.png">
+                <img alt="" src="{{asset('backend/images/2.png')}}">
                 <span class="username">Admin</span>
                 <b class="caret"></b>
             </a>
