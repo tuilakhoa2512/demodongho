@@ -60,6 +60,13 @@
     <div class="d-flex justify-content-center align-items-center vh-100">
         <div class="login-container">
             <h2 class="text-center mb-4" style="font-weight: bold;">ĐĂNG NHẬP ADMIN</h2>
+            <?php
+                $message = Session::get('message');
+                if($message){
+                    echo '<span class-a="text-alert">',$message.'</span>';
+                    Session::put('message',null);
+                }
+            ?>
             <form action="{{ URL::to('/admin-dashboard') }}" method="post">
             {{ csrf_field() }}
                 <?php if (isset($error)): ?>
