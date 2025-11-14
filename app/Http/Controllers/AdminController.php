@@ -18,5 +18,6 @@ class AdminController extends Controller
 
         // $result = DB::table('users')->where('email',$email)>where('password',$password)->first();
         // return view('admin.dashboard')
+        echo'123';
     }
 }
