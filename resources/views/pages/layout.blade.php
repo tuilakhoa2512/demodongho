@@ -67,7 +67,7 @@
                         <li><a href="#"><i class="fa fa-user"></i> Tài Khoản</a></li>
                         <li><a href="#"><i class="fa fa-star"></i> Yêu Thích</a></li>
                         <li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Đơn Hàng</a></li>
-                        <li><a href="login.html"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+                        <li><a href="{{ URL::to('/') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
                     </ul>
                 </div>
             </div>
