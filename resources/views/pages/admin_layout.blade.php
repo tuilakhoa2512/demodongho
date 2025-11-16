@@ -116,6 +116,10 @@ body {
                         <i class="fa fa-th"></i>
                         <span>Loại Sản Phẩm</span>
                     </a>
+                    <ul class="sub">
+                                <li><a href="{{ URL::to('/add-product-type') }}">Thêm Loại Sản Phẩm</a></li>
+                                <li><a href="{{ URL::to('/all-product-type') }}">Liệt kê Loại Sản Phẩm</a></li>                           
+                    </ul>
                 </li>
 
 
