@@ -51,7 +51,9 @@
             <td>{{ $cate_pro->name }}</td>
             
             <td><span class="text-ellipsis">đẹp</span></td>
-            <td><span class="text-ellipsis"></span></td>
+            <td>
+            <img src="{{ asset('backend/images/' . $cate_pro->image) }}" alt="{{ $cate_pro->name }}" style="width: 50px; height: auto;">
+        </td>
             
             <td>
               <a href="" class="active" ui-toggle-class=""><i class="fa fa-pencil-square-o text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
