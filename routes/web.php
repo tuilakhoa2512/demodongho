@@ -1,21 +1,17 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ProductTypeController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ProductTypeController;
+use App\Http\Controllers\Admin\StorageController;
 
-//Frontend
+// ================= FRONTEND =================
+
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 
-
-//Backend
-// Route::get('/admin', [AdminController::class, 'index']);
-// Route::get('/dashboard', [AdminController::class, 'show_dashboard']);
-// Route::get('/logout', [AdminController::class, 'logout']);
-// Route::post('/admin-dashboard', [AdminController::class, 'dashboard']);
-
+// ================= BACKEND - AUTH ADMIN =================
 
 // Form đăng nhập admin
 Route::get('/admin', [AdminController::class, 'index'])->name('admin.login');
@@ -29,7 +25,30 @@ Route::get('/dashboard', [AdminController::class, 'show_dashboard'])->name('admi
 // Đăng xuất
 Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
-//Product Type
-Route::get('/add-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'add_product_type'])->name('admin.addproducttype');
-Route::get('/all-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'all_product_type'])->name('admin.allproducttype');
-Route::post('/save-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
+// ================= PRODUCT TYPE =================
+
+Route::get('/add-product-type', [ProductTypeController::class, 'add_product_type'])
+    ->name('admin.addproducttype');
+
+Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type'])
+    ->name('admin.allproducttype');
+
+Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])
+    ->name('admin.saveproducttype');
+
+// ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
+
+Route::prefix('admin')->name('admin.')->group(function () {
+
+    // KHO NHẬP
+    Route::get('/storages', [StorageController::class, 'index'])
+        ->name('storages.index');
+
+    Route::get('/storages/create', [StorageController::class, 'create'])
+        ->name('storages.create');
+
+    Route::post('/storages', [StorageController::class, 'store'])
+        ->name('storages.store');
+
+    // sau này thêm: products, orders, discounts...
+});

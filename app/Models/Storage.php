@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Storage extends Model
 {
 
-    // gán các cột này bằng mass assignment (create/update)
+    
     protected $fillable = [
         'product_name',      
         'supplier_name',     

@@ -45,7 +45,7 @@ body {
 <header class="header fixed-top clearfix">
 <!--logo start-->
 <div class="brand">
-    <a href="{{ URL::to('/trang-chu') }}" class="logo">
+    <a href="index.html" class="logo">
         UnK STORE
     </a>
     <div class="sidebar-toggle-box">
@@ -114,34 +114,34 @@ body {
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-th"></i>
-                        <span>Loại Sản Phẩm</span>										
+                        <span>Loại Sản Phẩm</span>
                     </a>
-					<ul class="sub">
-						<li><a href="{{ URL::to('/add-product-type') }}">Thêm Loại Sản Phẩm</a></li>
-                        <li><a href="{{ URL::to('/all-product-type') }}">Liệt kê loại sản phẩm</a></li>
-                    </ul>							                  	
                 </li>
+
+
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-tasks"></i>
                         <span>Thương Hiệu</span>
                     </a>
                 </li>
+
+
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-envelope"></i>
                         <span>Sản Phẩm</span>
                     </a>
-                    <li class="sub-menu">
-                    <a href="javascript:;">
-                        <i class="fa fa-envelope"></i>
-                        <span>Kho Nhập</span>
-                    </a>
-                    <!-- <ul class="sub">
-                        <li><a href="mail.html">Inbox</a></li>
-                        <li><a href="mail_compose.html">Compose Mail</a></li>
-                    </ul> -->
-                </li>
+				</li>
+
+
+              <li>
+  				  <a href="{{ URL::to('/admin/storages') }}">
+						<i class="fa fa-envelope"></i>
+						<span>Kho Nhập</span>
+					</a>
+				</li>
+
                 <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class=" fa fa-bar-chart-o"></i>
@@ -153,7 +153,6 @@ body {
                         <li><a href="mail_compose.html">Đơn Hàng Thành Công</a></li>
                         <li><a href="mail_compose.html">Đơn Bị Huỷ</a></li>
                     </ul>
-                
                 </li>
                 <li class="sub-menu">
                     <a href="javascript:;">
@@ -173,8 +172,8 @@ body {
 <section id="main-content">
 	<section class="wrapper">
 		@yield('admin_content')
-        
-	</section>
+
+</section>
  <!-- footer -->
 		  <div class="footer">
 			<div class="wthree-copyright">
@@ -280,5 +279,8 @@ body {
 		});
 	</script>
 	<!-- //calendar -->
+
+	
+
 </body>
 </html>

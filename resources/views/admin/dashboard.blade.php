@@ -1,5 +1,7 @@
 @extends('pages.admin_layout')
 @section('admin_content')
+
+
 <!-- //market-->
 <div class="market-updates">
 			<div class="col-md-3 market-update-gd">
