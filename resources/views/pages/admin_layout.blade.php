@@ -34,8 +34,9 @@ body {
             background-position: center;
             background-repeat: no-repeat;
             height: 100vh;
-            color: #fff;
+            color: #000000;
         }
+      
 </style>
 </head>
 <body>

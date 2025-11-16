@@ -32,3 +32,4 @@ Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 //Product Type
 Route::get('/add-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'add_product_type'])->name('admin.addproducttype');
 Route::get('/all-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'all_product_type'])->name('admin.allproducttype');
+Route::post('/save-product-type', [\App\Http\Controllers\Admin\ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
