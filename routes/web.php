@@ -27,28 +27,22 @@ Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 // ================= PRODUCT TYPE =================
 
-Route::get('/add-product-type', [ProductTypeController::class, 'add_product_type'])
-    ->name('admin.addproducttype');
+Route::get('/add-product-type', [ProductTypeController::class, 'add_product_type'])->name('admin.addproducttype');
 
-Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type'])
-    ->name('admin.allproducttype');
+Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type'])->name('admin.allproducttype');
 
-Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])
-    ->name('admin.saveproducttype');
+Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
 
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
     // KHO NHẬP
-    Route::get('/storages', [StorageController::class, 'index'])
-        ->name('storages.index');
+Route::get('/storages', [StorageController::class, 'index'])->name('storages.index');
 
-    Route::get('/storages/create', [StorageController::class, 'create'])
-        ->name('storages.create');
+Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
 
-    Route::post('/storages', [StorageController::class, 'store'])
-        ->name('storages.store');
+Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
 
-    // sau này thêm: products, orders, discounts...
+
 });
