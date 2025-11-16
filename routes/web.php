@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProductTypeController;
 use Illuminate\Support\Facades\Route;
 
 //Frontend
@@ -27,3 +28,7 @@ Route::get('/dashboard', [AdminController::class, 'show_dashboard'])->name('admi
 
 // Đăng xuất
 Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');
+
+//Product Type
+Route::get('/add-product-type', [ProductTypeController::class, 'add_product_type'])->name('admin.addproducttype');
+Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type'])->name('admin.allproducttype');
