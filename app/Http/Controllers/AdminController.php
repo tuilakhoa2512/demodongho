@@ -14,7 +14,7 @@ class AdminController extends Controller
     // GET /admin  → Hiện form đăng nhập admin
     public function index()
     {
-        return view('admin_login'); // resources/views/pages/admin_login.blade.php
+        return view('pages.admin_login'); // resources/views/pages/admin_login.blade.php
     }
 
     // GET /dashboard → Trang dashboard (chỉ vào được khi đã đăng nhập)
@@ -26,7 +26,7 @@ class AdminController extends Controller
         }
 
         // Ở đây bạn load view admin_layout
-        return view('admin_layout');
+        return view('pages.admin_layout');
     }
 
     // POST /admin-dashboard → Xử lý login
