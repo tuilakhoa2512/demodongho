@@ -31,14 +31,14 @@
                                     <label for="exampleInputFile">Hình</label>
                                     <input type="file" name="product_type_image" class="form-control-file" id="exampleInputFile">
                                 </div>
-                                <div class="form-group">
+                                <!-- <div class="form-group">
                                 <label for="exampleInputEmail1">Hiển Thị</label>
                                 <select name="status" class="form-control input-lg m-bot15">
                                     <option value="0">Ẩn</option>
                                     <option value="1">Hiển Thị</option>
                                     
                                 </select>                      
-                                </div>
+                                </div> -->
                                 
                                 <button type="submit" name="add_product_type" class="btn btn-info">Thêm loại</button>
                             </form>

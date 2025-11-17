@@ -45,7 +45,7 @@ body {
 <header class="header fixed-top clearfix">
 <!--logo start-->
 <div class="brand">
-    <a href="index.html" class="logo">
+    <a href="{{ URL::to('trang-chu') }}" class="logo">
         UnK STORE
     </a>
     <div class="sidebar-toggle-box">
@@ -128,6 +128,10 @@ body {
                         <i class="fa fa-tasks"></i>
                         <span>Thương Hiệu</span>
                     </a>
+                    <ul class="sub">
+                                <li><a href="{{ URL::to('/add-brand-product') }}">Thêm Thương hiệu Sản Phẩm</a></li>
+                                <li><a href="{{ URL::to('/all-brand-product') }}">Liệt kê Thương hiệu Sản Phẩm</a></li>                           
+                    </ul>
                 </li>
 
 
