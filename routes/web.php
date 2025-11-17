@@ -33,6 +33,13 @@ Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type
 
 Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
 
+Route::get('/edit-product-type/{id}', [ProductTypeController::class, 'edit_product_type'])->name('admin.editproducttype');
+
+Route::get('/delete-product-type/{id}', [ProductTypeController::class, 'delete_product_type'])->name('admin.deleteproducttype');
+
+Route::post('/update-product-type/{id}', [ProductTypeController::class, 'update_product_type'])->name('admin.updateproducttype');
+
+
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -43,6 +50,4 @@ Route::get('/storages', [StorageController::class, 'index'])->name('storages.ind
 Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
 
 Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
-
-
 });

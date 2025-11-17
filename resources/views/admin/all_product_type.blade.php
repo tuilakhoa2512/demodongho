@@ -37,7 +37,6 @@
               </label>
             </th>
             <th>Tên loại</th>
-            
             <th>Mô tả</th>
             <th>Hình</th>
             <th style="width:30px;"></th>
@@ -50,13 +49,17 @@
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
             <td>{{ $cate_pro->name }}</td>
             
-            <td><span class="text-ellipsis">đẹp</span></td>
+            <td>{{ $cate_pro->description }}</td>
+            
             <td>
             <img src="{{ asset('backend/images/' . $cate_pro->image) }}" alt="{{ $cate_pro->name }}" style="width: 50px; height: auto;">
         </td>
             
             <td>
-              <a href="" class="active" ui-toggle-class=""><i class="fa fa-pencil-square-o text-success text-active"></i><i class="fa fa-times text-danger text"></i></a>
+              <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
+                <i class="fa fa-pencil-square-o text-success text-active"></i></a>
+                <a href="{{ URL::to('/delete-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
+                <i class="fa fa-times text-danger text"></i></a>
             </td>
           </tr>
                    

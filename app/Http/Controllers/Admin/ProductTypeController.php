@@ -30,4 +30,19 @@ class ProductTypeController extends Controller
        Session::put('message','Thêm loại sản phẩm thành công');
        return Redirect::to('add-product-type');
     }
+    public function edit_product_type($id){
+        $edit_product_type = DB::table('categories')->where('id',$id)->get();
+        $manager_product_type = view('admin.edit_product_type')->with('edit_product_type',$edit_product_type);
+        return view('pages.admin_layout')->with('admin.edit_product_type',$manager_product_type);
+    }
+    public function update_product_type(Request $request,$id){
+        $data = array();
+        $data['name'] = $request->product_type_name;
+        $data['image'] = $request->product_type_image;
+        $data['description'] = $request->product_type_desc;
+
+        DB::table('categories')->where('id',$id)->update($data);
+        Session::put('message','Cập nhật loại sản phẩm thành công');
+        return Redirect::to('all-product-type');
+    }
 }
