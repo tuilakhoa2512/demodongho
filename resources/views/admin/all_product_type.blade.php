@@ -58,7 +58,7 @@
             <td>
               <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
                 <i class="fa fa-pencil-square-o text-success text-active"></i></a>
-                <a href="{{ URL::to('/delete-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
+                <a onclick="return confirm('Bạn có chắc muốn xoá loại sản phẩm này ko?')"href="{{ URL::to('/delete-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
                 <i class="fa fa-times text-danger text"></i></a>
             </td>
           </tr>

@@ -45,4 +45,10 @@ class ProductTypeController extends Controller
         Session::put('message','Cập nhật loại sản phẩm thành công');
         return Redirect::to('all-product-type');
     }
+
+    public function delete_product_type($id){
+        DB::table('categories')->where('id',$id)->delete();
+        Session::put('message','Xoá loại sản phẩm thành công');
+        return Redirect::to('all-product-type');
+    }
 }
