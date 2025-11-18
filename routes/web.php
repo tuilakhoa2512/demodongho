@@ -62,21 +62,25 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // KHO NHẬP
 
-    Route::get('/storages', [StorageController::class, 'index'])
-        ->name('storages.index');
-    Route::get('/storages/create', [StorageController::class, 'create'])
-        ->name('storages.create');
-    Route::post('/storages', [StorageController::class, 'store'])
-        ->name('storages.store');
+    Route::get('/storages', [StorageController::class, 'index'])->name('storages.index');
+
+    Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
+
+    Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
 
     
     // QUẢN LÝ SẢN PHẨM
-    Route::get('/products', [ProductController::class, 'index'])
-        ->name('products.index');
-    Route::get('/products/create', [ProductController::class, 'create'])
-        ->name('products.create');
-    Route::post('/products', [ProductController::class, 'store'])
-        ->name('products.store');
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+
+    Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
+
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+
+    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+
+});
+
 
     
-});
+

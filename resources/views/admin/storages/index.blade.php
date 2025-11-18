@@ -39,6 +39,7 @@
                 <input type="checkbox"><i></i>
               </label>
             </th>
+            <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Nhà cung cấp</th>
             <th>Ngày nhập</th>
@@ -56,6 +57,8 @@
                   <input type="checkbox" name="storage_ids[]" value="{{ $storage->id }}"><i></i>
                 </label>
               </td>
+
+              <td>{{ $storage->id }}</td>
 
               <td>{{ $storage->product_name }}</td>
 
