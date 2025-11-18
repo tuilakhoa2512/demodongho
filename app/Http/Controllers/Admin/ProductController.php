@@ -46,7 +46,7 @@ class ProductController extends Controller
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'gender'       => 'nullable|string|max:20',
-            'dial_size' => 'nullable|numeric|min:0',
+            'dial_size'      => 'nullable|numeric|min:0',
             'strap_material' => 'nullable|string|max:100',
             'price'        => 'required|numeric|min:0',
         ]);
