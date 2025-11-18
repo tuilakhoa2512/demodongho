@@ -14,7 +14,7 @@
                     <form role="form" method="POST" action="{{ URL::to('/admin/products') }}">
                         @csrf
 
-                        {{-- CHỌN LÔ HÀNG --}}
+                       
                         <div class="form-group">
                             <label for="storage_id">Chọn lô hàng từ Kho</label>
                             <select name="storage_id" id="storage_id" class="form-control" required style="color:black;">
@@ -28,13 +28,13 @@
                             </select>
                         </div>
 
-                        {{-- SỐ LƯỢNG (readonly) --}}
+                       
                         <div class="form-group">
                             <label for="quantity">Số lượng (từ kho)</label>
                             <input type="number" id="quantity" class="form-control" readonly style="color:black;">
                         </div>
 
-                        {{-- CATEGORY --}}
+                       
                         <div class="form-group">
                             <label for="category_id">Loại sản phẩm</label>
                             <select name="category_id" id="category_id" class="form-control" required style="color:black;">
@@ -45,7 +45,7 @@
                             </select>
                         </div>
 
-                        {{-- BRAND --}}
+                       
                         <div class="form-group">
                             <label for="brand_id">Thương hiệu</label>
                             <select name="brand_id" id="brand_id" class="form-control" required style="color:black;">
@@ -56,14 +56,12 @@
                             </select>
                         </div>
 
-                        {{-- TÊN SẢN PHẨM --}}
                         <div class="form-group">
                             <label for="name">Tên sản phẩm</label>
                             <input type="text" name="name" class="form-control" placeholder="VD: Rolex DateJust 41mm"
                                    required style="color:black;">
                         </div>
 
-                        {{-- MÔ TẢ --}}
                         <div class="form-group">
                             <label for="description">Mô tả sản phẩm</label>
                             <textarea name="description" rows="5" class="form-control" style="resize:none; color:black;"
@@ -79,7 +77,6 @@
                             </select>
                         </div>
 
-                        {{-- KÍCH THƯỚC MẶT --}}
                         <div class="form-group">
                             <label for="dial_size">Kích thước mặt (mm)</label>
                             <input type="number"
@@ -93,15 +90,13 @@
                         </div>
 
 
-
-                        {{-- CHẤT LIỆU DÂY --}}
                         <div class="form-group">
                             <label for="strap_material">Chất liệu dây</label>
                             <input type="text" name="strap_material" class="form-control" style="color:black;"
                                    placeholder="VD: Da, Cao su, Thép không gỉ">
                         </div>
 
-                        {{-- GIÁ BÁN --}}
+                  
                         <div class="form-group">
                             <label for="price">Giá bán (VNĐ)</label>
                             <input type="number" name="price" min="0" class="form-control"

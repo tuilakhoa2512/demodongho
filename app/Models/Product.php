@@ -11,6 +11,7 @@ class Product extends Model
         'name',
         'description',
         'strap_material',
+        'dial_size', 
         'gender',
         'category_id',
         'brand_id',
