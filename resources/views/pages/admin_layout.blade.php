@@ -136,15 +136,25 @@ body {
                         <i class="fa fa-envelope"></i>
                         <span>Sản Phẩm</span>
                     </a>
-				</li>
+                    <ul class="sub">
+                        <li><a href="{{ URL::to('/admin/products') }}">Danh sách sản phẩm</a></li>
+                        <li><a href="{{ URL::to('/admin/products/create') }}">Thêm sản phẩm mới</a></li>
+                    </ul>
+                </li>
 
 
-              <li>
-  				  <a href="{{ URL::to('/admin/storages') }}">
-						<i class="fa fa-envelope"></i>
-						<span>Kho Nhập</span>
-					</a>
-				</li>
+
+              <li class="sub-menu">
+                    <a href="javascript:;">
+                        <i class="fa fa-envelope"></i>
+                        <span>Kho Nhập</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="{{ URL::to('/admin/storages') }}">Danh sách lô hàng</a></li>                                                  
+                        <li><a href="{{ URL::to('/admin/storages/create') }}">Thêm lô hàng mới</a> </li>                                                
+                    </ul>
+                </li>
+
 
                 <li class="sub-menu">
                     <a href="javascript:;">	

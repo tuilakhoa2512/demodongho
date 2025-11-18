@@ -4,7 +4,7 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
     <div class="panel-heading">
-      Liệt kê lô hàng trong kho
+      Liệt kê sản phẩm
     </div>
 
     <div class="row w3-res-tb">
@@ -12,7 +12,8 @@
         <select class="input-sm form-control w-sm inline v-middle">
           <option value="0">Thao tác</option>
           <option value="1">Xoá đã chọn</option>
-          <option value="2">Xuất Excel</option>
+          <option value="2">Ẩn đã chọn</option>
+          <option value="3">Hiển thị đã chọn</option>
         </select>
         <button class="btn btn-sm btn-default">Áp dụng</button>
       </div>
@@ -40,36 +41,47 @@
               </label>
             </th>
             <th>Tên sản phẩm</th>
-            <th>Nhà cung cấp</th>
-            <th>Ngày nhập</th>
-            <th>SL nhập</th>
-            <th>Giá nhập (1 SP)</th>
-            <th>Tổng tiền nhập</th>
+            <th>Lô hàng</th>
+            <th>Giới tính</th>
+            <th>Kích thước mặt</th>
+            <th>Chất liệu dây</th>
+            <th>Giá bán</th>
+            <th>Trạng thái</th>
             <th style="width:80px;">Thao tác</th>
           </tr>
         </thead>
         <tbody>
-          @foreach ($storages as $storage)
+          @foreach ($products as $product)
             <tr>
               <td>
                 <label class="i-checks m-b-none">
-                  <input type="checkbox" name="storage_ids[]" value="{{ $storage->id }}"><i></i>
+                  <input type="checkbox" name="product_ids[]" value="{{ $product->id }}"><i></i>
                 </label>
               </td>
 
-              <td>{{ $storage->product_name }}</td>
-
-              <td>{{ $storage->supplier_name ?? '—' }}</td>
+              <td>{{ $product->name }}</td>
 
               <td>
-                {{ \Carbon\Carbon::parse($storage->import_date)->format('d/m/Y') }}
+                @if($product->storage)
+                  Lô #{{ $product->storage->id }} - {{ $product->storage->product_name }}
+                @else
+                  —
+                @endif
               </td>
 
-              <td>{{ number_format($storage->import_quantity) }}</td>
+              <td>{{ $product->gender ?? '—' }}</td>
+              <td>{{ $product->dial_size ?? '—' }}</td>
+              <td>{{ $product->strap_material ?? '—' }}</td>
 
-              <td>{{ number_format($storage->unit_import_price, 0, ',', '.') }} đ</td>
+              <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
 
-              <td>{{ number_format($storage->total_import_price, 0, ',', '.') }} đ</td>
+              <td>
+                @if($product->status == 1)
+                  <span class="text-success">Hiển thị</span>
+                @else
+                  <span class="text-danger">Ẩn</span>
+                @endif
+              </td>
 
               <td>
                 <a href="#" class="active" ui-toggle-class="">
@@ -87,15 +99,20 @@
       <div class="row">
 
         <div class="col-sm-5 text-center">
-          <small class="text-muted inline m-t-sm m-b-sm">
-            Hiển thị {{ $storages->firstItem() }} - {{ $storages->lastItem() }}
-            / {{ $storages->total() }} lô hàng
-          </small>
+          @if ($products->total() > 0)
+            <small class="text-muted inline m-t-sm m-b-sm">
+              Hiển thị {{ $products->firstItem() }} - {{ $products->lastItem() }}
+              / {{ $products->total() }} sản phẩm
+            </small>
+          @else
+            <small class="text-muted inline m-t-sm m-b-sm">
+              Chưa có sản phẩm nào.
+            </small>
+          @endif
         </div>
 
         <div class="col-sm-7 text-right text-center-xs">
-          {{-- Phân trang --}}
-          {{ $storages->links('pagination::bootstrap-4') }}
+          {{ $products->links('pagination::bootstrap-4') }}
         </div>
 
       </div>
