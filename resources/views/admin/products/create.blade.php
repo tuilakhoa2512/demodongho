@@ -1,28 +1,5 @@
 @extends('pages.admin_layout')
 @section('admin_content')
-
-<style>
-    .form-control {
-        background-color: #fff !important;
-        color: #000 !important;
-        border: 1px solid #ccc !important;
-    }
-    .form-control:focus {
-        border-color: #66afe9 !important;
-        box-shadow: 0 0 5px rgba(102, 175, 233, 0.6) !important;
-    }
-    label {
-        color: #000;
-        font-weight: 500;
-    }
-    section.panel {
-        background: #fff !important;
-        color: #000 !important;
-        border-radius: 6px;
-        padding: 20px;
-    }
-</style>
-
 <div class="row">
     <div class="col-lg-12">
         <section class="panel">

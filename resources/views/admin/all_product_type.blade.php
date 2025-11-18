@@ -36,6 +36,7 @@
                 <input type="checkbox"><i></i>
               </label>
             </th>
+            <th>ID</th>
             <th>Tên loại</th>
             <th>Mô tả</th>
             <th>Hình</th>
@@ -47,6 +48,7 @@
 
           <tr>
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
+            <td>{{ $cate_pro->id }}</td>
             <td>{{ $cate_pro->name }}</td>
             
             <td>{{ $cate_pro->description }}</td>

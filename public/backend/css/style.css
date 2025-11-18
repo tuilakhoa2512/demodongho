@@ -10,11 +10,26 @@ ul, ol {margin: 0;}
 p {margin: 0;}
 
 html, body{
-	font-family: 'Roboto', sans-serif;
+    height: 100%; /* Đảm bảo body và html chiếm toàn bộ chiều cao */
+    font-family: 'Roboto', sans-serif;
     font-size: 100%;
     overflow-x: hidden;
     background: url(../images/bg.jpg) no-repeat 0px 0px;
-	background-size:cover;
+    background-size: cover;
+    margin: 0; /* Xóa margin mặc định */
+    display: flex;
+    flex-direction: column; /* Thiết lập chiều dọc */
+}
+.wrapper {
+    display:inline-block;
+    margin-top:80px;
+    padding:15px;
+    width:100%;
+}
+.footer {
+    background: rgb(64, 111, 182);
+    padding: 20px;
+    margin-top: auto;
 }
 body a{
 	transition: 0.5s all ease;
@@ -202,10 +217,7 @@ ul.sidebar-menu li a.active i {
     -o-transition:all .3s ease-in-out;
     transition:all .3s ease-in-out;
 }
-.footer {
-    background: #d19a98;
-    padding: 20px;
-}
+
 .footer p {
     color: #fff;
     letter-spacing: 1px;
@@ -233,12 +245,7 @@ ul.sidebar-menu li a.active i {
     position:fixed;
     box-shadow:1px 0 3px rgba(0,0,0,.15);
 }
-.wrapper {
-    display:inline-block;
-    margin-top:80px;
-    padding:15px;
-    width:100%;
-}
+
 .brand {
     background:#3e4478;
     float:left;
