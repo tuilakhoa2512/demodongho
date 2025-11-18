@@ -12,7 +12,7 @@ class StorageController extends Controller
     public function index()
     {
         $storages = Storage::with('product')
-            ->orderBy('id', 'desc')
+            ->orderBy('id', 'asc')
             ->paginate(10);
 
         return view('admin.storages.index', compact('storages'));

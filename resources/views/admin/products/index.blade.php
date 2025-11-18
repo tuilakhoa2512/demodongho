@@ -3,27 +3,39 @@
 
 <div class="table-agile-info">
   <div class="panel panel-default">
-    <div class="panel-heading">
-      Liệt kê sản phẩm
+
+    <div class="panel-heading" style="font-size: 18px; font-weight: 600;">
+      Danh Sách Sản Phẩm
     </div>
+
+      @if (session('success'))
+        <script>
+            Swal.fire({
+                title: "Thành công!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                confirmButtonText: "OK",
+                timer: 2000
+            });
+        </script>
+        @endif
 
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
-          <option value="0">Thao tác</option>
-          <option value="1">Xoá đã chọn</option>
-          <option value="2">Ẩn đã chọn</option>
-          <option value="3">Hiển thị đã chọn</option>
+          <option value="0">Bulk action</option>
+          <option value="1">Delete selected</option>
+          <option value="2">Bulk edit</option>
+          <option value="3">Export</option>
         </select>
-        <button class="btn btn-sm btn-default">Áp dụng</button>
+        <button class="btn btn-sm btn-default">Apply</button>
       </div>
+
+      <div class="col-sm-3"></div>
 
       <div class="col-sm-4">
-      </div>
-
-      <div class="col-sm-3">
         <div class="input-group">
-          <input type="text" class="input-sm form-control" placeholder="Tìm theo tên sản phẩm...">
+          <input type="text" class="input-sm form-control" placeholder="Search">
           <span class="input-group-btn">
             <button class="btn btn-sm btn-default" type="button">Go!</button>
           </span>
@@ -33,6 +45,7 @@
 
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
+
         <thead>
           <tr>
             <th style="width:20px;">
@@ -40,58 +53,73 @@
                 <input type="checkbox"><i></i>
               </label>
             </th>
+            <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Lô hàng</th>
+            <th>Loại</th>
+            <th>Thương hiệu</th>
             <th>Giới tính</th>
-            <th>Kích thước mặt</th>
+            <th>Kích thước</th>
             <th>Chất liệu dây</th>
             <th>Giá bán</th>
-            <th>Trạng thái</th>
             <th style="width:80px;">Thao tác</th>
           </tr>
         </thead>
+
         <tbody>
-          @foreach ($products as $product)
-            <tr>
-              <td>
-                <label class="i-checks m-b-none">
-                  <input type="checkbox" name="product_ids[]" value="{{ $product->id }}"><i></i>
-                </label>
-              </td>
 
-              <td>{{ $product->name }}</td>
+          @foreach($products as $product)
+          <tr>
 
-              <td>
-                @if($product->storage)
-                  Lô #{{ $product->storage->id }} - {{ $product->storage->product_name }}
-                @else
-                  —
-                @endif
-              </td>
+            <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
 
-              <td>{{ $product->gender ?? '—' }}</td>
-              <td>{{ $product->dial_size ?? '—' }}</td>
-              <td>{{ $product->strap_material ?? '—' }}</td>
+            <td>{{ $product->id }}</td>
 
-              <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+            <td>{{ $product->name }}</td>
 
-              <td>
-                @if($product->status == 1)
-                  <span class="text-success">Hiển thị</span>
-                @else
-                  <span class="text-danger">Ẩn</span>
-                @endif
-              </td>
+            <td>Lô #{{ $product->storage->id }}</td>
 
-              <td>
-                <a href="#" class="active" ui-toggle-class="">
-                  <i class="fa fa-pencil-square-o text-success text-active"></i>
-                  <i class="fa fa-times text-danger text"></i>
+            <td>{{ $product->category->name }}</td>
+
+            <td>{{ $product->brand->name }}</td>
+
+            <td>{{ $product->gender }}</td>
+
+            <td>
+                {{ $product->dial_size !== null ? $product->dial_size . ' mm' : '-' }}
+            </td>
+
+
+
+            <td>{{ $product->strap_material }}</td>
+
+            <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+
+           <td>
+                <a href="#" class="active">
+                    <i class="fa fa-pencil-square-o text-success text-active"></i>
                 </a>
-              </td>
-            </tr>
+
+                <form action="{{ route('admin.products.destroy', $product->id) }}"
+                    method="POST"
+                    style="display:inline-block"
+                    class="form-delete-product">
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="button" class="btn-delete-product" style="border:none; background:none; padding:0; margin-left:5px;">
+                        <i class="fa fa-times text-danger"></i>
+                    </button>
+                </form>
+
+
+            </td>
+
+          </tr>
           @endforeach
+
         </tbody>
+
       </table>
     </div>
 
@@ -99,16 +127,9 @@
       <div class="row">
 
         <div class="col-sm-5 text-center">
-          @if ($products->total() > 0)
-            <small class="text-muted inline m-t-sm m-b-sm">
-              Hiển thị {{ $products->firstItem() }} - {{ $products->lastItem() }}
-              / {{ $products->total() }} sản phẩm
-            </small>
-          @else
-            <small class="text-muted inline m-t-sm m-b-sm">
-              Chưa có sản phẩm nào.
-            </small>
-          @endif
+          <small class="text-muted inline m-t-sm m-b-sm">
+            Showing {{ count($products) }} items
+          </small>
         </div>
 
         <div class="col-sm-7 text-right text-center-xs">
@@ -117,7 +138,36 @@
 
       </div>
     </footer>
+
   </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete-product');
+
+        deleteButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const form = this.closest('form');
+
+                Swal.fire({
+                    title: 'Bạn chắc chắn?',
+                    text: 'Sản phẩm sẽ bị xoá và không thể khôi phục!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Vâng, xoá',
+                    cancelButtonText: 'Huỷ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();   // gửi request DELETE /admin/products/{id}
+                    }
+                });
+            });
+        });
+    });
+</script>
+
 
 @endsection
