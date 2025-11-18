@@ -48,6 +48,7 @@ body a:hover{
     -o-transition:all .3s ease-in-out;
     transition:all .3s ease-in-out;
 }
+
 #sidebar ul li {
     position: relative;
 }

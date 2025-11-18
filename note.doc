@@ -8,3 +8,21 @@ VAN UYEN: 14/11 - 16h
 
 
 UPDATE 16/11 !!!!!!!!!!!!!
+update 16/11 lần 2
+
+<<<<<<< HEAD
+=======
+//Thêm user
+B1: php artisan tinker
+B2: 
+    use App\Models\User;
+
+    // Thêm một user admin
+    User::create([
+        'role_id' => 1,
+        'fullname' => 'Khoane',
+        'email' => 'admin1@gmail.com',
+        'password' => bcrypt('061002'),
+        'status' => 1,
+    ]);
+>>>>>>> admin1

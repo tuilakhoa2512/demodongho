@@ -11,6 +11,14 @@ use App\Models\User;
 
 class AdminController extends Controller
 {
+    public function AuthLogin(){
+        $id = Session::get('id');
+            if($id){
+                return Redirect::to('dashboard');
+            }else{
+                return Redirect::to('admin')->send();
+            }
+        }    
     // GET /admin  → Hiện form đăng nhập admin
     public function index()
     {
@@ -64,6 +72,7 @@ class AdminController extends Controller
     // GET /logout → Đăng xuất admin
     public function logout()
     {
+        $this->AuthLogin();
         Session::forget('admin_id');
         Session::forget('admin_name');
         Session::flush(); // xóa hết session nếu muốn
