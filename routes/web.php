@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\BrandProductController;
+use App\Http\Controllers\ProductController;
 // ================= FRONTEND =================
 
 Route::get('/', [HomeController::class, 'index']);
@@ -52,6 +53,18 @@ Route::get('/delete-brand-product/{id}', [BrandProductController::class, 'delete
 
 Route::post('/update-brand-product/{id}', [BrandProductController::class, 'update_brand_product'])->name('admin.updatebrandproduct');
 
+// ================= Product =================
+Route::get('/add-product', [ProductController::class, 'add_product'])->name('admin.addproduct');
+
+Route::get('/all-product', [ProductController::class, 'all_product'])->name('admin.allproduct');
+
+Route::post('/save-product', [ProductController::class, 'save_product'])->name('admin.saveproduct');
+
+Route::get('/edit-product/{id}', [ProductController::class, 'edit_product'])->name('admin.editproduct');
+
+Route::get('/delete-product/{id}', [ProductController::class, 'delete_product'])->name('admin.deleteproduct');
+
+Route::post('/update-product/{id}', [ProductController::class, 'update_product'])->name('admin.updateproduct');
 
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
