@@ -55,7 +55,6 @@ Route::get('/delete-brand-product/{id}', [BrandProductController::class, 'delete
 
 Route::post('/update-brand-product/{id}', [BrandProductController::class, 'update_brand_product'])->name('admin.updatebrandproduct');
 
-
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
