@@ -5,7 +5,8 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
-
+use App\Http\Controllers\Admin\BrandProductController;
+use App\Http\Controllers\ProductController;
 // ================= FRONTEND =================
 
 Route::get('/', [HomeController::class, 'index']);
@@ -33,6 +34,38 @@ Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type
 
 Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
 
+Route::get('/edit-product-type/{id}', [ProductTypeController::class, 'edit_product_type'])->name('admin.editproducttype');
+
+Route::get('/delete-product-type/{id}', [ProductTypeController::class, 'delete_product_type'])->name('admin.deleteproducttype');
+
+Route::post('/update-product-type/{id}', [ProductTypeController::class, 'update_product_type'])->name('admin.updateproducttype');
+
+// ================= Brand Product =================
+Route::get('/add-brand-product', [BrandProductController::class, 'add_brand_product'])->name('admin.addbrandproduct');
+
+Route::get('/all-brand-product', [BrandProductController::class, 'all_brand_product'])->name('admin.allbrandproduct');
+
+Route::post('/save-brand-product', [BrandProductController::class, 'save_brand_product'])->name('admin.savebrandproduct');
+
+Route::get('/edit-brand-product/{id}', [BrandProductController::class, 'edit_brand_product'])->name('admin.editbrandproduct');
+
+Route::get('/delete-brand-product/{id}', [BrandProductController::class, 'delete_brand_product'])->name('admin.deletebrandproduct');
+
+Route::post('/update-brand-product/{id}', [BrandProductController::class, 'update_brand_product'])->name('admin.updatebrandproduct');
+
+// ================= Product =================
+Route::get('/add-product', [ProductController::class, 'add_product'])->name('admin.addproduct');
+
+Route::get('/all-product', [ProductController::class, 'all_product'])->name('admin.allproduct');
+
+Route::post('/save-product', [ProductController::class, 'save_product'])->name('admin.saveproduct');
+
+Route::get('/edit-product/{id}', [ProductController::class, 'edit_product'])->name('admin.editproduct');
+
+Route::get('/delete-product/{id}', [ProductController::class, 'delete_product'])->name('admin.deleteproduct');
+
+Route::post('/update-product/{id}', [ProductController::class, 'update_product'])->name('admin.updateproduct');
+
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -43,6 +76,4 @@ Route::get('/storages', [StorageController::class, 'index'])->name('storages.ind
 Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
 
 Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
-
-
 });

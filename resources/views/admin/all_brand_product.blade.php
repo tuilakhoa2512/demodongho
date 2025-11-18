@@ -4,7 +4,7 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
     <div class="panel-heading">
-      Liệt Kê Loại Sản Phẩm
+      Liệt Kê Thương Hiệu Sản Phẩm
     </div>
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
@@ -36,29 +36,29 @@
                 <input type="checkbox"><i></i>
               </label>
             </th>
-            <th>Tên loại</th>
+            <th>Tên thương hiệu</th>
             <th>Mô tả</th>
             <th>Hình</th>
             <th style="width:30px;"></th>
           </tr>
         </thead>
         <tbody>
-          @foreach ($all_product_type as $key => $cate_pro)
+          @foreach ($all_brand_product as $key => $brand_pro)
 
           <tr>
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
-            <td>{{ $cate_pro->name }}</td>
+            <td>{{ $brand_pro->name }}</td>
             
-            <td>{{ $cate_pro->description }}</td>
+            <td>{{ $brand_pro->description }}</td>
             
             <td>
-            <img src="{{ asset('backend/images/' . $cate_pro->image) }}" alt="{{ $cate_pro->name }}" style="width: 50px; height: auto;">
+            <img src="{{ asset('backend/images/' . $brand_pro->image) }}" alt="{{ $brand_pro->name }}" style="width: 50px; height: auto;">
         </td>
             
             <td>
-              <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
+              <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit" ui-toggle-class="">
                 <i class="fa fa-pencil-square-o text-success text-active"></i></a>
-                <a onclick="return confirm('Bạn có chắc muốn xoá loại sản phẩm này ko?')"href="{{ URL::to('/delete-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
+                <a onclick="return confirm('Bạn có chắc muốn xoá loại sản phẩm này ko?')"href="{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}" class="active styling edit" ui-toggle-class="">
                 <i class="fa fa-times text-danger text"></i></a>
             </td>
           </tr>
