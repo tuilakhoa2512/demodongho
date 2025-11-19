@@ -15,10 +15,9 @@
           <option value="2">Bulk edit</option>
           <option value="3">Export</option>
         </select>
-        <button class="btn btn-sm btn-default">Apply</button>                
+        <button class="btn btn-sm btn-default">Apply</button>
       </div>
-      <div class="col-sm-4">
-      </div>
+      <div class="col-sm-4"></div>
       <div class="col-sm-3">
         <div class="input-group">
           <input type="text" class="input-sm form-control" placeholder="Search">
@@ -70,16 +69,13 @@
             </td>
 
             <td>
-              <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}"
-                 class="active styling edit" ui-toggle-class="">
-                <i class="fa fa-pencil-square-o text-success text-active"></i>
-              </a>
-
-              <a onclick="return confirm('Bạn có chắc muốn xoá thương hiệu này không?')"
-                 href="{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}"
-                 class="active styling edit" ui-toggle-class="">
-                <i class="fa fa-times text-danger text"></i>
-              </a>
+                            <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">
+                                <i class="fa fa-pencil-square-o text-success text-active"></i>
+                            </a>
+                            <a href="#" class="active styling edit" onclick="confirmDelete('{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}')">
+                                <i class="fa fa-times text-danger text"></i>
+                            </a>
+                        </td>
             </td>
           </tr>
           @endforeach
@@ -94,7 +90,7 @@
             showing 20-30 of 50 items
           </small>
         </div>
-        <div class="col-sm-7 text-right text-center-xs">                
+        <div class="col-sm-7 text-right text-center-xs">
           <ul class="pagination pagination-sm m-t-none m-b-none">
             <li><a href=""><i class="fa fa-chevron-left"></i></a></li>
             <li><a href="">1</a></li>
@@ -109,31 +105,25 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.btn-delete-product');
-
-        deleteButtons.forEach(function (btn) {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                const form = this.closest('form');
-
-                Swal.fire({
-                    title: 'Bạn chắc chắn?',
-                    text: 'Sản phẩm sẽ bị xoá và không thể khôi phục!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Vâng, xoá',
-                    cancelButtonText: 'Huỷ'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();   // gửi request DELETE /admin/products/{id}
-                    }
-                });
-            });
+    function confirmDelete(url) {
+        Swal.fire({
+            title: 'Bạn chắc chắn?',
+            text: "Thương hiệu phẩm sẽ bị xóa và không thể khôi phục!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Vâng, xóa!',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Chuyển hướng đến URL xóa
+                window.location.href = url;
+            }
         });
-    });
+    }
 </script>
-@endsection
 
+@endsection

@@ -28,10 +28,7 @@
                                     <label for="exampleInputPassword1">Mô tả Loại sản phẩm</label>
                                     <textarea style="resize: none" rows="5" name="product_type_desc" class="form-control" id="exampleInputPassword1" >{{ $edit_value->description }}</textarea>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputFile">Hình</label>
-                                    <input type="file" name="product_type_image" class="form-control-file" id="exampleInputFile">{{ $edit_value->image }}
-                                </div>                           
+                                                     
                                 <button type="submit" name="update_product_type" class="btn btn-info">Cập nhật loại</button>
                             </form>
                             </div>

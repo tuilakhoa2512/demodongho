@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Models\Brand;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
@@ -133,5 +134,16 @@ class BrandProductController extends Controller
 
         Session::put('message', 'Xoá thương hiệu sản phẩm thành công');
         return Redirect::to('all-brand-product');
+    }
+    public function destroy($id)
+    {
+        // tim, ko co thi bao 404
+        $product = Brand::findOrFail($id);
+
+        $product->delete();
+
+        // qlai dq
+        return redirect()->to('/admin/brands')
+                        ->with('success', 'Xoá sản phẩm thành công!');
     }
 }
