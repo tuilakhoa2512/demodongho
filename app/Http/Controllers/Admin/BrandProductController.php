@@ -118,10 +118,19 @@ class BrandProductController extends Controller
         return Redirect::to('all-brand-product');
     }
 
-    public function delete_brand_product($id)
+   public function delete_brand_product($id)
     {
         // $this->AuthLogin();
+
+        
+        $brand = DB::table('brands')->where('id', $id)->first();
+
+        if ($brand && $brand->image) {
+            Storage::disk('public')->delete($brand->image);
+        }
+
         DB::table('brands')->where('id', $id)->delete();
+
         Session::put('message', 'Xoá thương hiệu sản phẩm thành công');
         return Redirect::to('all-brand-product');
     }
