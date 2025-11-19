@@ -7,6 +7,18 @@
         <div class="panel-heading">
             Liệt Kê Loại Sản Phẩm
         </div>
+        @if (session('message'))
+                            <script>
+                                $(document).ready(function() {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: 'Xoá loại sản phẩm thành công!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                            </script>
+                        @endif
         <div class="row w3-res-tb">
             <div class="col-sm-5 m-b-xs">
                 <select class="input-sm form-control w-sm inline v-middle">
@@ -88,12 +100,11 @@
     function confirmDelete(url) {
         Swal.fire({
             title: 'Bạn chắc chắn?',
-            text: "Loại sản phẩm sẽ bị xóa và không thể khôi phục!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Vâng, xóa!',
-            cancelButtonText: 'Hủy',
-            reverseButtons: true
+                    text: 'Loại Sản phẩm sẽ bị xoá và không thể khôi phục!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Vâng, xoá',
+                    cancelButtonText: 'Huỷ'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Chuyển hướng đến URL xóa

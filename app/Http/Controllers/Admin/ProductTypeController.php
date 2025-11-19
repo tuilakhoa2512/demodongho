@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Models\Category;
+use App\Models\ProductImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
@@ -32,12 +34,16 @@ class ProductTypeController extends Controller
     }
     public function save_product_type(Request $request){
         // $this->AuthLogin();
+        $request->validate([
+            'product_type_name' => 'required|max:255',
+            'product_type_desc' => 'nullable|string|max:255' // Có thể tùy chỉnh theo yêu cầu
+        ]);
         $data = array();
         $data['name'] = $request->product_type_name;
         $data['description'] = $request->product_type_desc;
 
        DB::table('categories')->insert($data);
-       Session::put('message','Thêm loại sản phẩm thành công');
+       session()->flash('message', 'Thêm loại sản phẩm thành công');
        return Redirect::to('add-product-type');
     }
 
@@ -47,21 +53,36 @@ class ProductTypeController extends Controller
         $manager_product_type = view('admin.edit_product_type')->with('edit_product_type',$edit_product_type);
         return view('pages.admin_layout')->with('admin.edit_product_type',$manager_product_type);
     }
-    public function update_product_type(Request $request,$id){
-        // $this->AuthLogin();
+    public function update_product_type(Request $request, $id) {
+        // Xác thực dữ liệu
+        $request->validate([
+            'product_type_name' => 'required|max:255',
+            'product_type_desc' => 'nullable|string|max:255',
+        ]);
+    
+        // Cập nhật sản phẩm
         $data = array();
         $data['name'] = $request->product_type_name;
         $data['description'] = $request->product_type_desc;
-
-        DB::table('categories')->where('id',$id)->update($data);
-        Session::put('message','Cập nhật loại sản phẩm thành công');
-        return Redirect::to('all-product-type');
+    
+        DB::table('categories')->where('id', $id)->update($data);
+        
+        // Thêm thông báo thành công vào session
+        session()->flash('message');
+        
+        return redirect()->back();
     }
 
     public function delete_product_type($id){
         // $this->AuthLogin();
-        DB::table('categories')->where('id',$id)->delete();
-        Session::put('message','Xoá loại sản phẩm thành công');
-        return Redirect::to('all-product-type');
+        $productType = Category::find($id);
+    
+    if ($productType) {
+        $productType->delete();
+        return redirect()->back()->with('message', 'Xóa sản phẩm thành công!');
+    } else {
+        return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
+    }
+        
     }
 }

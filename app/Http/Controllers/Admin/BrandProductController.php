@@ -66,7 +66,7 @@ class BrandProductController extends Controller
 
         DB::table('brands')->insert($data);
 
-        Session::put('message', 'Thêm thương hiệu sản phẩm thành công');
+        session()->flash('message', 'Thêm thương hiệu sản phẩm thành công');
         return Redirect::to('add-brand-product');
     }
 
@@ -115,8 +115,8 @@ class BrandProductController extends Controller
 
         DB::table('brands')->where('id', $id)->update($data);
 
-        Session::put('message', 'Cập nhật thương hiệu sản phẩm thành công');
-        return Redirect::to('all-brand-product');
+        session()->flash('message');
+        return redirect()->back();
     }
 
    public function delete_brand_product($id)
@@ -130,9 +130,15 @@ class BrandProductController extends Controller
             Storage::disk('public')->delete($brand->image);
         }
 
-        DB::table('brands')->where('id', $id)->delete();
-
-        Session::put('message', 'Xoá thương hiệu sản phẩm thành công');
+        $brand = Brand::find($id);
+    
+        if ($brand) {
+            $brand->delete();
+            return redirect()->back()->with('message', 'Xóa sản phẩm thành công!');
+        } else {
+            return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
+        }
+        
         return Redirect::to('all-brand-product');
     }
     public function destroy($id)

@@ -6,6 +6,18 @@
     <div class="panel-heading">
       Liệt Kê Thương Hiệu Sản Phẩm
     </div>
+          @if (session('message'))
+                            <script>
+                                $(document).ready(function() {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: 'Xoá thương hiệu sản phẩm thành công!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                            </script>
+                        @endif
 
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
@@ -110,13 +122,12 @@
 <script>
     function confirmDelete(url) {
         Swal.fire({
-            title: 'Bạn chắc chắn?',
-            text: "Thương hiệu phẩm sẽ bị xóa và không thể khôi phục!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Vâng, xóa!',
-            cancelButtonText: 'Hủy',
-            reverseButtons: true
+          title: 'Bạn chắc chắn?',
+                    text: 'Thương hiệu Sản phẩm sẽ bị xoá và không thể khôi phục!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Vâng, xoá',
+                    cancelButtonText: 'Huỷ'
         }).then((result) => {
             if (result.isConfirmed) {
                 // Chuyển hướng đến URL xóa

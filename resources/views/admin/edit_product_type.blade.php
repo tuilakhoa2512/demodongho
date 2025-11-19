@@ -7,14 +7,20 @@
                         <header class="panel-heading">
                             Cập nhật loại sản phẩm
                         </header>
-                        <?php
-                            $message = Session::get('message');
-                            if($message){
-                                echo '<span class="text-alert">'.$message.'</span>';
-                                Session::put('message',null);
-                            }
-                            ?>
+
                         <div class="panel-body">
+                        @if (session('message'))
+                            <script>
+                                $(document).ready(function() {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công!',
+                                        text: 'Cập nhật loại sản phẩm thành công!',
+                                        confirmButtonText: 'OK'
+                                    });
+                                });
+                            </script>
+                        @endif
                             @foreach ($edit_product_type as $key => $edit_value)
 
                             <div class="position-center">
@@ -36,7 +42,7 @@
                             @endforeach
                         </div>
                     </section>
-
+            </div>
             </div>
             
 @endsection

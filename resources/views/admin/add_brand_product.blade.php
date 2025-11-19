@@ -9,6 +9,18 @@
             </header>
 
             <div class="panel-body">
+            @if (session('message'))
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Thêm brand sản phẩm thành công!',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    </script>
+                @endif
                 <div class="position-center">
                     
                     <form action="{{ URL::to('/save-brand-product') }}" method="post" enctype="multipart/form-data">
