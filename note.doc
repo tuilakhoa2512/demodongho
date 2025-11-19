@@ -10,8 +10,7 @@ VAN UYEN: 14/11 - 16h
 UPDATE 16/11 !!!!!!!!!!!!!
 update 16/11 lần 2
 
-<<<<<<< HEAD
-=======
+
 //Thêm user
 B1: php artisan tinker
 B2: 
@@ -25,4 +24,5 @@ B2:
         'password' => bcrypt('061002'),
         'status' => 1,
     ]);
->>>>>>> admin1
+
+Hiển thị trang index khi thêm Category vào DB (27,10:23)

@@ -54,6 +54,7 @@
               </label>
             </th>
             <th>ID</th>
+            <th>Hình</th>
             <th>Tên sản phẩm</th>
             <th>Lô hàng</th>
             <th>Loại</th>
@@ -74,6 +75,16 @@
             <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
 
             <td>{{ $product->id }}</td>
+
+            <td>
+              @if ($product->productImage && $product->productImage->image_1)
+                  <img src="{{ asset('storage/' . $product->productImage->image_1) }}"
+                      alt="{{ $product->name }}"
+                      style="width: 60px; height: 60px; object-fit: cover;">
+              @else
+                  <span>Không có ảnh</span>
+              @endif
+          </td>
 
             <td>{{ $product->name }}</td>
 

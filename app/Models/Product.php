@@ -41,4 +41,9 @@ class Product extends Model
     {
         return $this->belongsTo(Storage::class, 'storage_id', 'id');
     }
+
+     public function productImage()
+    {
+        return $this->hasOne(ProductImage::class);
+    }
 }

@@ -14,6 +14,15 @@ class HomeController extends Controller
     public function index(){
         $cate_pro = DB::table('categories')->orderby('id','asc')->get();
         $brand_pro = DB::table('brands')->orderby('id','asc')->get();
-        return view('pages.home')->with('category',$cate_pro)->with('brand',$brand_pro);  
+
+        // $all_product = DB::('products')
+        // ->john('categories','categories.id','=','products.id')
+        // ->john('brands','brands.id','=','products.id')
+        // ->orderBy('products.id','desc')->get();
+
+        $all_product = DB::table('products')->orderby('id', 'asc')->get();
+
+
+        return view('pages.home')->with('category',$cate_pro)->with('brand',$brand_pro)->with('all_product',$all_product);
     }
 }

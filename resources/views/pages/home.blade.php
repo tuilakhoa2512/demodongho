@@ -4,6 +4,9 @@
 
 <div class="features_items"><!--features_items-->
 						<h2 class="title text-center">Sản Phẩm Mới Nhất</h2>
+						<!-- @foreach ($all_product as $key => $product) -->
+						
+						
 						<div class="col-sm-4">
 							<div class="product-image-wrapper">
 								<div class="single-products">
@@ -82,7 +85,7 @@
 								</div>
 							</div>
 						</div>
-						
+						<!-- @endforeach -->
 					</div><!--features_items-->
 					
 					<div class="category-tab"><!--category-tab-->
