@@ -60,7 +60,6 @@ Route::post('/update-brand-product/{id}', [BrandProductController::class, 'updat
 Route::prefix('admin')->name('admin.')->group(function () {
 
     // KHO NHẬP
-
     Route::get('/storages', [StorageController::class, 'index'])->name('storages.index');
 
     Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
@@ -76,6 +75,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit']);
+
+    Route::post('/products/{id}/update', [ProductController::class, 'update']);
+
 
 
 });
