@@ -26,20 +26,6 @@
                     </form>
                 </div>
 
-                <?php
-                $message = Session::get('message');
-                if ($message) {
-                    echo '<script>
-                            Swal.fire({
-                                icon: "success",
-                                title: "Thành công!",
-                                text: "'.$message.'",
-                                confirmButtonText: "Đóng"
-                            });
-                          </script>';
-                    Session::put('message', null);
-                }
-                ?>
             </div>
         </section>
     </div>
