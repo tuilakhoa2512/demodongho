@@ -34,13 +34,13 @@ class ProductTypeController extends Controller
         // $this->AuthLogin();
         $data = array();
         $data['name'] = $request->product_type_name;
-        $data['image'] = $request->product_type_image;
         $data['description'] = $request->product_type_desc;
 
        DB::table('categories')->insert($data);
        Session::put('message','Thêm loại sản phẩm thành công');
        return Redirect::to('add-product-type');
     }
+
     public function edit_product_type($id){
         // $this->AuthLogin();
         $edit_product_type = DB::table('categories')->where('id',$id)->get();
@@ -51,7 +51,6 @@ class ProductTypeController extends Controller
         // $this->AuthLogin();
         $data = array();
         $data['name'] = $request->product_type_name;
-        $data['image'] = $request->product_type_image;
         $data['description'] = $request->product_type_desc;
 
         DB::table('categories')->where('id',$id)->update($data);

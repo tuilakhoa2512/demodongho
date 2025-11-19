@@ -14,7 +14,7 @@ html, body{
     font-family: 'Roboto', sans-serif;
     font-size: 100%;
     overflow-x: hidden;
-    background: url(../images/bg.jpg) no-repeat 0px 0px;
+    
     background-size: cover;
     margin: 0; /* Xóa margin mặc định */
     display: flex;

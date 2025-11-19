@@ -89,4 +89,31 @@
     </footer>
   </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteButtons = document.querySelectorAll('.btn-delete-product');
+
+        deleteButtons.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const form = this.closest('form');
+
+                Swal.fire({
+                    title: 'Bạn chắc chắn?',
+                    text: 'Sản phẩm sẽ bị xoá và không thể khôi phục!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Vâng, xoá',
+                    cancelButtonText: 'Huỷ'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();   // gửi request DELETE /admin/products/{id}
+                    }
+                });
+            });
+        });
+    });
+</script>
 @endsection

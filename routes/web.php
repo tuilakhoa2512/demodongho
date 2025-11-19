@@ -38,7 +38,7 @@ Route::post('/save-product-type', [ProductTypeController::class, 'save_product_t
 
 Route::get('/edit-product-type/{id}', [ProductTypeController::class, 'edit_product_type'])->name('admin.editproducttype');
 
-Route::get('/delete-product-type/{id}', [ProductTypeController::class, 'delete_product_type'])->name('admin.deleteproducttype');
+Route::get('/delete-product-type/{id}', [ProductTypeController::class, 'delete_product_type'])->name('destroy');
 
 Route::post('/update-product-type/{id}', [ProductTypeController::class, 'update_product_type'])->name('admin.updateproducttype');
 
