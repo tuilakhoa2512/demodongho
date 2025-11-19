@@ -107,9 +107,9 @@
             <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
 
            <td>
-                <a href="#" class="active">
-                    <i class="fa fa-pencil-square-o text-success text-active"></i>
-                </a>
+               <a href="{{ URL::to('/admin/products/'.$product->id.'/edit') }}">
+                  <i class="fa fa-pencil-square-o text-success text-active"></i>
+              </a>
 
                 <form action="{{ route('admin.products.destroy', $product->id) }}"
                     method="POST"

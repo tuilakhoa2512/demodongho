@@ -37,4 +37,6 @@ class ProductImage extends Model
     {
         return $this->image_1 ?? $this->images[0] ?? null;
     }
+
+  
 }
