@@ -11,7 +11,10 @@
             <div class="panel-body">
                 <div class="position-center">
 
-                    <form role="form" method="POST" action="{{ URL::to('/admin/products') }}">
+                    <form role="form"
+                        method="POST"
+                        action="{{ URL::to('/admin/products') }}"
+                        enctype="multipart/form-data">
                         @csrf
 
                        
@@ -102,6 +105,27 @@
                             <input type="number" name="price" min="0" class="form-control"
                                    placeholder="VD: 2500000" required style="color:black;">
                         </div>
+
+                        <div class="form-group">
+                            <label>Ảnh 1 (ảnh chính)</label>
+                            <input type="file" name="image_1" accept="image/*" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ảnh 2</label>
+                            <input type="file" name="image_2" accept="image/*" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ảnh 3</label>
+                            <input type="file" name="image_3" accept="image/*" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ảnh 4</label>
+                            <input type="file" name="image_4" accept="image/*" class="form-control">
+                        </div>
+
 
                         <button type="submit" class="btn btn-info">Thêm sản phẩm</button>
 
