@@ -39,7 +39,6 @@
             <th>ID</th>
             <th>Tên loại</th>
             <th>Mô tả</th>
-            <th>Hình</th>
             <th style="width:30px;"></th>
           </tr>
         </thead>
@@ -53,9 +52,6 @@
             
             <td>{{ $cate_pro->description }}</td>
             
-            <td>
-            <img src="{{ asset('backend/images/' . $cate_pro->image) }}" alt="{{ $cate_pro->name }}" style="width: 50px; height: auto;">
-        </td>
             
             <td>
               <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit" ui-toggle-class="">
