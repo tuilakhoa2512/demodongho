@@ -6,6 +6,7 @@
     <div class="panel-heading">
       Liệt Kê Thương Hiệu Sản Phẩm
     </div>
+
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
@@ -27,6 +28,7 @@
         </div>
       </div>
     </div>
+
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
         <thead>
@@ -40,40 +42,57 @@
             <th>Tên thương hiệu</th>
             <th>Mô tả</th>
             <th>Hình</th>
+            <th>Thao tác</th>
             <th style="width:30px;"></th>
           </tr>
         </thead>
         <tbody>
           @foreach ($all_brand_product as $key => $brand_pro)
-
           <tr>
-            <td><label class="i-checks m-b-none"><input type="checkbox" name="post[]"><i></i></label></td>
+            <td>
+              <label class="i-checks m-b-none">
+                <input type="checkbox" name="post[]"><i></i>
+              </label>
+            </td>
+
             <td>{{ $brand_pro->id }}</td>
             <td>{{ $brand_pro->name }}</td>
-            
             <td>{{ $brand_pro->description }}</td>
-            
+
             <td>
-            <img src="{{ asset('backend/images/' . $brand_pro->image) }}" alt="{{ $brand_pro->name }}" style="width: 50px; height: auto;">
-        </td>
-            
+              @if ($brand_pro->image)
+                <img src="{{ asset('storage/' . $brand_pro->image) }}"
+                     alt="{{ $brand_pro->name }}"
+                     style="width: 50px; height: 50px; object-fit: cover;">
+              @else
+                <span>Chưa có ảnh</span>
+              @endif
+            </td>
+
             <td>
-              <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit" ui-toggle-class="">
-                <i class="fa fa-pencil-square-o text-success text-active"></i></a>
-                <a onclick="return confirm('Bạn có chắc muốn xoá loại sản phẩm này ko?')"href="{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}" class="active styling edit" ui-toggle-class="">
-                <i class="fa fa-times text-danger text"></i></a>
+              <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}"
+                 class="active styling edit" ui-toggle-class="">
+                <i class="fa fa-pencil-square-o text-success text-active"></i>
+              </a>
+
+              <a onclick="return confirm('Bạn có chắc muốn xoá thương hiệu này không?')"
+                 href="{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}"
+                 class="active styling edit" ui-toggle-class="">
+                <i class="fa fa-times text-danger text"></i>
+              </a>
             </td>
           </tr>
-                   
           @endforeach
         </tbody>
       </table>
     </div>
+
     <footer class="panel-footer">
       <div class="row">
-        
         <div class="col-sm-5 text-center">
-          <small class="text-muted inline m-t-sm m-b-sm">showing 20-30 of 50 items</small>
+          <small class="text-muted inline m-t-sm m-b-sm">
+            showing 20-30 of 50 items
+          </small>
         </div>
         <div class="col-sm-7 text-right text-center-xs">                
           <ul class="pagination pagination-sm m-t-none m-b-none">
@@ -89,6 +108,7 @@
     </footer>
   </div>
 </div>
+<<<<<<< HEAD
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -117,3 +137,6 @@
     });
 </script>
 @endsection
+=======
+@endsection
+>>>>>>> 04378521ae1f8ea04432408efc8e81018de55c99
