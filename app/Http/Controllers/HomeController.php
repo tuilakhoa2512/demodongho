@@ -19,10 +19,13 @@ class HomeController extends Controller
         // ->john('categories','categories.id','=','products.id')
         // ->john('brands','brands.id','=','products.id')
         // ->orderBy('products.id','desc')->get();
-
+        
         // $all_product = DB::table('products')->orderby('id', 'asc')->get();
+        $latestProduct = DB::table('products')->orderBy('created_at', 'desc')->first();
 
-
-        return view('pages.home')->with('category',$cate_pro)->with('brand',$brand_pro);
+        return view('pages.home')
+            ->with('category', $cate_pro)
+            ->with('brand', $brand_pro)
+            ->with('latestProduct', $latestProduct);
     }
 }

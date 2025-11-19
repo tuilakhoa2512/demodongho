@@ -108,7 +108,6 @@
     </footer>
   </div>
 </div>
-<<<<<<< HEAD
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -137,6 +136,4 @@
     });
 </script>
 @endsection
-=======
-@endsection
->>>>>>> 04378521ae1f8ea04432408efc8e81018de55c99
+

@@ -7,10 +7,7 @@ use App\Models\Product;
 use App\Models\Storage;
 use App\Models\Category;
 use App\Models\Brand;
-use App\Models\ProductImage;
 use Illuminate\Http\Request;
-
-
 
 class ProductController extends Controller
 {
@@ -52,49 +49,12 @@ class ProductController extends Controller
             'dial_size'      => 'nullable|numeric|min:0',
             'strap_material' => 'nullable|string|max:100',
             'price'        => 'required|numeric|min:0',
-
-            'image_1'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'image_2'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'image_3'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'image_4'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
  
         $storage = Storage::findOrFail($request->storage_id);
         $validated['quantity'] = $storage->import_quantity;
       
-        // Product::create($validated);
-
-        $product = Product::create($validated);
-
-        $productImage = new ProductImage();
-        $productImage->product_id = $product->id;
-
-            // tạo thư mục theo product_id
-            // products/5/xxx.jpg
-            if ($request->hasFile('image_1')) {
-                $path1 = $request->file('image_1')->store('products/' . $product->id, 'public');
-                $productImage->image_1 = $path1;
-            }
-
-            if ($request->hasFile('image_2')) {
-                $path2 = $request->file('image_2')->store('products/' . $product->id, 'public');
-                $productImage->image_2 = $path2;
-            }
-
-            if ($request->hasFile('image_3')) {
-                $path3 = $request->file('image_3')->store('products/' . $product->id, 'public');
-                $productImage->image_3 = $path3;
-            }
-
-            if ($request->hasFile('image_4')) {
-                $path4 = $request->file('image_4')->store('products/' . $product->id, 'public');
-                $productImage->image_4 = $path4;
-            }
-
-            // save khi có ít nhất 1 ảnh
-            if ($productImage->image_1 || $productImage->image_2 || $productImage->image_3 || $productImage->image_4) {
-                $productImage->save();
-            }
+        Product::create($validated);
 
         return redirect()->to('/admin/products')
                         ->with('success', 'Thêm sản phẩm thành công!');
