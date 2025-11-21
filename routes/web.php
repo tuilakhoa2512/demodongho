@@ -7,9 +7,16 @@ use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
-
+use App\Http\Controllers\CheckoutController;
 
 // ================= FRONTEND =================
+  // Checkout
+Route::get('/login-checkout', [CheckoutController::class, 'login_checkout'])->name('admin.logincheckout');
+Route::post('/login-user', [CheckoutController::class, 'login_user'])->name('admin.loginuser');
+Route::get('/logout-checkout', [CheckoutController::class, 'logout_checkout'])->name('admin.logoutcheckout');
+Route::post('/add-user', [CheckoutController::class, 'add_user'])->name('admin.adduser');
+Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('admin.checkout');
+Route::post('/save-checkout-user', [CheckoutController::class, 'save-checkout-user'])->name('admin.checkout');
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
@@ -55,6 +62,7 @@ Route::get('/delete-brand-product/{id}', [BrandProductController::class, 'delete
 
 Route::post('/update-brand-product/{id}', [BrandProductController::class, 'update_brand_product'])->name('admin.updatebrandproduct');
 
+
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -80,9 +88,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/products/{id}/update', [ProductController::class, 'update']);
 
-
+  
 
 });
+
 
 
     

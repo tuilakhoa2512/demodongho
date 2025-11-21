@@ -65,10 +65,37 @@
 					<div class="col-sm-8">
 						<div class="shop-menu pull-right">
 							<ul class="nav navbar-nav">
-								<li><a href="#"><i class="fa fa-user"></i> Tài Khoản</a></li>
+								<!-- <li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-user"></i> Tài Khoản</a></li> -->
 								<li><a href="#"><i class="fa fa-star"></i> Yêu Thích</a></li>
-								<li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Đơn Hàng</a></li>
-								<li><a href="{{ URL::to('/') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+								<?php
+									$id = Session::get('id');
+									if($id!=null){ 	
+								?>
+								<li><a href="{{ URL::to('/checkout') }}"><i class="fa fa-crosshairs"></i>Thanh toán</a></li>
+								
+								<?php
+								 }else{
+									?>
+									<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Thanh Toán</a></li>
+									<?php
+								 }
+								?>
+								
+								<li><a href="{{ URL::to('/show-cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
+								<?php
+									$id = Session::get('id');
+									if($id!=null){ 	
+								?>
+								<li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-lock"></i> Đăng Xuất</a></li>
+								
+								<?php
+								 }else{
+									?>
+									<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+									<?php
+								 }
+								?>
+								
 							</ul>
 						</div>
 					</div>
