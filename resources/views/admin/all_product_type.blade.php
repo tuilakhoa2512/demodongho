@@ -51,6 +51,7 @@
                         <th>ID</th>
                         <th>Tên loại</th>
                         <th>Mô tả</th>
+                        <th>Thao tác</th>
                         <th style="width:30px;"></th>
                     </tr>
                 </thead>
