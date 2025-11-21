@@ -38,11 +38,7 @@ class User extends Authenticatable
         ];
     }
     
-    // Phương thức để mã hóa mật khẩu trước khi lưu vào CSDL
-    public function setPasswordAttribute($password)
-    {
-        $this->attributes['password'] = Hash::make($password);
-    }
+
   
     public function role()
     {
