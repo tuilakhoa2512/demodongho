@@ -221,6 +221,9 @@
             }
             $(".leftside-navigation").getNiceScroll().show();
             $('#main-content').toggleClass('merge-left');
+            $('.footer').toggleClass('merge-left');
+            
+
             e.stopPropagation();
             if ($('#container').hasClass('open-right-panel')) {
                 $('#container').removeClass('open-right-panel')

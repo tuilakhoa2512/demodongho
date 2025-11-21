@@ -66,6 +66,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
 
+    Route::delete('/storages/{id}', [StorageController::class, 'destroy']);
+
+    Route::get('/storages/{id}/edit', [StorageController::class, 'edit']);
+
+    Route::put('/storages/{id}',      [StorageController::class, 'update']);
+
     
     // QUẢN LÝ SẢN PHẨM
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
