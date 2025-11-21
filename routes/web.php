@@ -11,16 +11,23 @@ use App\Http\Controllers\CheckoutController;
 
 // ================= FRONTEND =================
   // Checkout
-Route::get('/login-checkout', [CheckoutController::class, 'login_checkout'])->name('admin.logincheckout');
-Route::post('/login-user', [CheckoutController::class, 'login_user'])->name('admin.loginuser');
-Route::get('/logout-checkout', [CheckoutController::class, 'logout_checkout'])->name('admin.logoutcheckout');
-Route::post('/add-user', [CheckoutController::class, 'add_user'])->name('admin.adduser');
-Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('admin.checkout');
-Route::post('/save-checkout-user', [CheckoutController::class, 'save-checkout-user'])->name('admin.checkout');
 
+Route::get('/login-checkout', [CheckoutController::class, 'login_checkout'])->name('admin.logincheckout');
+
+Route::get('/logout-checkout', [CheckoutController::class, 'logout_checkout'])->name('admin.logoutcheckout');
+
+Route::post('/add-user', [CheckoutController::class, 'add_user'])->name('admin.adduser');
+
+Route::post('/login-user', [CheckoutController::class, 'login_user'])->name('admin.loginuser');
+
+Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('admin.checkout');
+
+Route::post('/save-checkout-user', [CheckoutController::class, 'save-checkout-user'])->name('admin.savecheckoutuser');
+
+//Trang chu
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
-
+Route::post('/tim-kiem', [HomeController::class, 'search']);
 // ================= BACKEND - AUTH ADMIN =================
 
 // Form đăng nhập admin
