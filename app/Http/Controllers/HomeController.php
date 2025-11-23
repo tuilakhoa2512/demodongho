@@ -20,12 +20,25 @@ class HomeController extends Controller
         // ->john('brands','brands.id','=','products.id')
         // ->orderBy('products.id','desc')->get();
         
-        // $all_product = DB::table('products')->orderby('id', 'asc')->get();
-        $latestProduct = DB::table('products')->orderBy('created_at', 'desc')->first();
+        $all_product = DB::table('products')->orderby('id', 'asc')->get();
+        
 
         return view('pages.home')
             ->with('category', $cate_pro)
             ->with('brand', $brand_pro)
-            ->with('latestProduct', $latestProduct);
+            ->with('all_product', $all_product);
     }
+    public function search(Request $request){
+        $keywords = $request->keywords_submit;
+        $cate_pro = DB::table('categories')->orderby('id','asc')->get();
+        $brand_pro = DB::table('brands')->orderby('id','asc')->get();
+
+        $search_product = DB::table('products')->where('name','like','%'.$keywords.'%')->get();
+        
+        return view('admin.products.search')
+            ->with('category', $cate_pro)
+            ->with('brand', $brand_pro)
+            ->with('search_product',$search_product);
+            
+    } 
 }

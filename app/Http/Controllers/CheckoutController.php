@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
@@ -43,16 +43,28 @@ class CheckoutController extends Controller
         return Redirect::to('/login-checkout');
     }
     public function login_user(Request $request){
-        $email = $request->email;
-        $password = bcrypt($request->password);
-        $result = DB::table('users')->where('email',$email)->where('password',$password)->first();
-        
-        if($result){
-            Session::put('id',$result->id);
-            return Redirect::to('/checkout');
-        }else{
-            return Redirect::to('/login-checkout');
+        // Kiểm tra dữ liệu đầu vào
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
+
+    // Tìm người dùng trong cơ sở dữ liệu theo email
+    $user = DB::table('users')->where('email', $request->email)->first();
+
+    // Kiểm tra xem người dùng có tồn tại và mật khẩu có khớp không
+    if ($user) {
+        if (Hash::check($request->password, $user->password)) {
+            // Lưu ID người dùng vào session
+            Session::put('id', $user->id);
+            return redirect()->route('admin.checkout');
+        } else {
+            // Mật khẩu không khớp
+            return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Thông tin đăng nhập không chính xác.']);
         }
-        
+    } else {
+        // Không tìm thấy người dùng
+        return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Thông tin đăng nhập không chính xác.']);
     }
+}
 }
