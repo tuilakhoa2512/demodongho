@@ -84,17 +84,26 @@
 								<li><a href="{{ URL::to('/show-cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
 								<?php
 									$id = Session::get('id');
-									if($id!=null){ 	
-								?>
-								<li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-lock"></i> Đăng Xuất</a></li>
-								
-								<?php
-								 }else{
+									$fullname = Session::get('fullname'); // Lấy tên người dùng
+									$image = Session::get('images');
 									?>
-									<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
-									<?php
-								 }
-								?>
+
+									@if($id != null)
+										<li class="dropdown user-menu">
+											<a href="#" class="dropdown-toggle">
+												<i class="fa fa-user"></i> {{ $fullname }}
+											</a>
+
+											<ul class="dropdown-menu user-dropdown">
+												<li><a href="{{ URL::to('/profile') }}"><i class="fa fa-info-circle"></i> Thông tin cá nhân</a></li>
+												<li><a href="{{ URL::to('/my-orders') }}"><i class="fa fa-list-alt"></i> Đơn hàng</a></li>
+												<li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
+											</ul>
+										</li>
+									@else
+										<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+									@endif
+
 								
 							</ul>
 						</div>

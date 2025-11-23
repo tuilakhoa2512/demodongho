@@ -39,7 +39,20 @@ class User extends Authenticatable
     }
     
 
-  
+    public function getUserInfo()
+    {
+        $id = Session::get('id');
+        
+        if ($id) {
+            $user = User::find($id);
+            if ($user) {
+                // Lưu thông tin người dùng vào session
+                
+                Session::put('images', $user->image);
+                Session::put('fullname', $user->fullname);
+            }
+        }
+    }
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');

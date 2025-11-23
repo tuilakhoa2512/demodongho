@@ -2629,3 +2629,37 @@ ul.nav.nav-pills.nav-justified i {
     color: #696767; /* Màu chữ */
     margin-left: 5px; /* Khoảng cách giữa UnK và STORE */
 }
+.user-menu {
+    position: relative;
+}
+
+.user-menu .dropdown-toggle {
+    cursor: pointer;
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #fff;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.user-dropdown li a {
+    display: block;
+    padding: 10px 15px;
+    color: #333 !important;
+    text-decoration: none;
+}
+
+.user-dropdown li a:hover {
+    background: #f5f5f5;
+}
+
+.user-menu:hover .user-dropdown {
+    display: block;
+}

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 
 // ================= FRONTEND =================
@@ -23,6 +24,11 @@ Route::post('/login-user', [CheckoutController::class, 'login_user'])->name('adm
 Route::get('/checkout', [CheckoutController::class, 'checkout'])->name('admin.checkout');
 
 Route::post('/save-checkout-user', [CheckoutController::class, 'save-checkout-user'])->name('admin.savecheckoutuser');
+
+Route::get('/profile', [UserController::class, 'profile'])->name('profile');
+
+Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('profile.update');
+
 
 //Trang chu
 Route::get('/', [HomeController::class, 'index']);
