@@ -22,20 +22,21 @@ class HomeController extends Controller
             ->orderBy('id', 'asc')
             ->get();
 
-        $all_product = Product::with('productImage')->get();
+       $all_product = Product::with('productImage')->get();
 
         foreach ($all_product as $p) {
-            $p->main_image_url = $p->productImage->image_1
-                ? asset('storage/products/'.$p->id.'/'.$p->productImage->image_1)
+            $image = $p->productImage; 
+
+        
+            $p->main_image_url = $image && $image->image_1
+                ? asset('storage/products/'.$p->id.'/'.$image->image_1)
                 : asset('frontend/images/noimage.jpg');
 
-            // ảnh 2
-            $p->hover_image_url = $p->productImage->image_2
-                ? asset('storage/products/'.$p->id.'/'.$p->productImage->image_2)
-                : $p->main_image_url;   // nếu ko có ảnh 2 thì dùng lại ảnh 1
+            $p->hover_image_url = $image && $image->image_2
+                ? asset('storage/products/'.$p->id.'/'.$image->image_2)
+                : $p->main_image_url; // nếu không có ảnh 2 thì dùng lại ảnh 1
 }
-
-     
+ 
         return view('pages.home')
             ->with('category', $cate_pro)
             ->with('brand', $brand_pro)
