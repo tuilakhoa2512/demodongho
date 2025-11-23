@@ -24,15 +24,19 @@ class HomeController extends Controller
 
         $all_product = Product::with('productImage')->get();
 
+
         foreach ($all_product as $p) {
-            $p->main_image_url = $p->productImage->image_1
-                ? asset('storage/products/'.$p->id.'/'.$p->productImage->image_1)
+            $image = $p->productImage; // có thể là null
+
+            // ảnh 1 (main)
+            $p->main_image_url = $image && $image->image_1
+                ? asset('storage/products/'.$p->id.'/'.$image->image_1)
                 : asset('frontend/images/noimage.jpg');
 
-            // ảnh 2
-            $p->hover_image_url = $p->productImage->image_2
-                ? asset('storage/products/'.$p->id.'/'.$p->productImage->image_2)
-                : $p->main_image_url;   // nếu ko có ảnh 2 thì dùng lại ảnh 1
+            // ảnh 2 (hover)
+            $p->hover_image_url = $image && $image->image_2
+                ? asset('storage/products/'.$p->id.'/'.$image->image_2)
+                : $p->main_image_url; // nếu không có ảnh 2 thì dùng lại ảnh 1
 }
 
      
