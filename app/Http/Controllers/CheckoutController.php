@@ -52,8 +52,13 @@ class CheckoutController extends Controller
     // Tìm người dùng trong cơ sở dữ liệu theo email
     $user = DB::table('users')->where('email', $request->email)->first();
 
-    // Kiểm tra xem người dùng có tồn tại và mật khẩu có khớp không
+    // Kiểm tra xem người dùng có tồn tại, có role_id khác 1, và mật khẩu có khớp không
     if ($user) {
+        // Kiểm tra role_id
+        if ($user->role_id == 1) {
+            return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Tài khoản này không được phép đăng nhập.']);
+        }
+
         if (Hash::check($request->password, $user->password)) {
             // Lưu ID người dùng vào session
             Session::put('id', $user->id);
