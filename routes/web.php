@@ -35,6 +35,8 @@ Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
+Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
+
 
 // Danh mục sản phẩm trang chủ
 Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
