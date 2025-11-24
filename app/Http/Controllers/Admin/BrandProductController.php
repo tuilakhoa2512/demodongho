@@ -152,4 +152,37 @@ class BrandProductController extends Controller
         return redirect()->to('/admin/brands')
                         ->with('success', 'Xoá sản phẩm thành công!');
     }
+    public function show_brand_home($id)
+{
+    // Lấy tất cả categories để render menu
+    $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
+
+    // Lấy tất cả brands để render menu
+    $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
+
+    // Lấy tên thương hiệu được click
+    $brand_name = DB::table('brands')->where('id', $id)->value('name');
+
+    // Lấy sản phẩm theo brand_id
+    $brand_by_id = DB::table('products')
+        ->join('brands', 'products.brand_id', '=', 'brands.id')
+        ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
+        ->where('products.brand_id', $id)
+        ->select(
+            'products.*',
+            'brands.name as brand_name',
+            'product_images.image_1',
+            'product_images.image_2',
+            'product_images.image_3',
+            'product_images.image_4'
+        )
+        ->get();
+
+    return view('pages.brand.show_brand')
+        ->with('category', $cate_pro)
+        ->with('brand', $brand_pro)
+        ->with('brand_name', $brand_name)
+        ->with('brand_by_id', $brand_by_id);
+}
+
 }

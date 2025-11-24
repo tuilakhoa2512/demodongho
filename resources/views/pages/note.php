@@ -1,30 +1,59 @@
-<?php
-$id = Session::get('id');
+<div class="features_items">
+    <h2 class="title text-center">Sản Phẩm Mới Nhất</h2>
 
-// Lấy thông tin người dùng từ session
-$image = Session::get('images'); // Trả về giá trị của thuộc tính 'image'
-$fullname = Session::get('fullname');
-?>
+    @forelse($all_product as $product)
+        <div class="col-sm-4">
+            <div class="product-image-wrapper">
+                <div class="single-products">
 
-@if($id != null)
-    <li class="dropdown user-menu">
-        <a href="#" class="dropdown-toggle">
-            <div class="profile-image">
-                @if($image)
-                    <img src="{{ asset('uploads/users/'.$image) }}" alt="User Image" class="user-image">
-                @else
-                    <img src="{{ asset('frontend/images/default_user.png') }}" alt="User Image" class="user-image">
-                @endif
-                <span>{{ $fullname }}</span> <!-- Hiển thị tên đầy đủ -->
+                    <div class="productinfo text-center">
+                        
+                    
+                        <div class="product-img-box">
+                            
+                            <img class="img-main"
+                                 src="{{ $product->main_image_url }}"
+                                 alt="{{ $product->name }}">
+                        </div>
+                      
+                        <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
+                        <p>{{ $product->name }}</p>
+                    </div>
+
+                  
+                    <div class="product-overlay">
+                    
+                        <img class="overlay-img"
+                             src="{{ $product->hover_image_url }}"
+                             alt="{{ $product->name }}">
+
+                        <div class="overlay-content">
+                            <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
+                            <p>{{ $product->name }}</p>
+                            <a href="#" class="btn btn-default add-to-cart">
+                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+              
+                <div class="choose">
+                    <ul class="nav nav-pills nav-justified">
+                        <li>
+                            <a href="#"><i class="fa fa-heart"></i> Yêu Thích</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="fa fa-plus-square"></i> So Sánh</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </a>
+        </div>
+    @empty
+        <p class="text-center">Hiện chưa có sản phẩm nào được đăng bán.</p>
+    @endforelse
 
-        <ul class="dropdown-menu user-dropdown">
-            <li><a href="{{ URL::to('/profile') }}"><i class="fa fa-info-circle"></i> Thông tin cá nhân</a></li>
-            <li><a href="{{ URL::to('/my-orders') }}"><i class="fa fa-list-alt"></i> Đơn hàng</a></li>
-            <li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
-        </ul>
-    </li>
-@else
-    <li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
-@endif
+    <div class="clearfix"></div>
+</div>

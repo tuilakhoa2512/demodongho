@@ -77,6 +77,8 @@ class ProductTypeController extends Controller
             $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
             $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
 
+            $category_name = DB::table('categories')->where('id', $id)->value('name');
+
             $category_by_id = DB::table('products')
                 ->join('categories', 'products.category_id', '=', 'categories.id')
                 ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
@@ -94,6 +96,7 @@ class ProductTypeController extends Controller
             return view('pages.category.show_category')
                 ->with('category', $cate_pro)
                 ->with('brand', $brand_pro)
+                ->with('category_name', $category_name)
                 ->with('category_by_id', $category_by_id);
         }
 

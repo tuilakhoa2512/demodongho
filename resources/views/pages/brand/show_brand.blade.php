@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- CSS dành riêng cho hiệu ứng hover --}}
 <style>
     .product-img-box {
         position: relative;
@@ -48,26 +47,23 @@
     }
 </style>
 
-
 <div class="features_items">
-    
     <h2 class="title text-center">
-        Sản phẩm {{ $category_name }}
+        Sản phẩm hiệu {{ $brand_name }}
     </h2>
 
-    @foreach($category_by_id as $product)
+    @foreach($brand_by_id as $product)
         @php
             // Hình chính
-            $main = $product->image_1
+            $main = $product->image_1 
                     ? asset('storage/' . $product->image_1)
                     : asset('images/no-image.png');
 
             // Hình hover
-            $hover = $product->image_2
+            $hover = $product->image_2 
                      ? asset('storage/' . $product->image_2)
                      : $main;
         @endphp
-
 
         <div class="col-sm-4">
             <div class="product-image-wrapper">
@@ -75,7 +71,6 @@
 
                     <div class="productinfo text-center">
 
-                        {{-- Hình sản phẩm đổi khi hover --}}
                         <div class="product-img-box">
                             <img class="main-img" src="{{ $main }}" alt="{{ $product->name }}">
                             <img class="hover-img" src="{{ $hover }}" alt="{{ $product->name }}">
@@ -115,7 +110,6 @@
                         </li>
                     </ul>
                 </div>
-
             </div>
         </div>
     @endforeach
