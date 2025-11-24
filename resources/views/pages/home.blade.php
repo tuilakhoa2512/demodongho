@@ -32,7 +32,11 @@
 
                         <div class="overlay-content">
                             <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
-                            <p>{{ $product->name }}</p>
+                            <p>
+                                <a href="{{ url('/product/'.$product->id) }}" style="color: #fff;">
+                                    {{ $product->name }}
+                                </a>
+                            </p>
                             <a href="#" class="btn btn-default add-to-cart">
                                 <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
                             </a>
