@@ -3,10 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Storage;
-use App\Models\ProductImage;
+use Illuminate\Support\Facades\Storage as FileStorage;
+use App\Models\Storage as StorageModel;          
 
 class Product extends Model
 {
@@ -23,11 +21,6 @@ class Product extends Model
         'quantity',
     ];
 
-    protected $appends = [
-        'main_image_url',
-    ];
-
-    // QUAN HỆ
     public function brand()
     {
         return $this->belongsTo(Brand::class, 'brand_id', 'id');
@@ -40,7 +33,7 @@ class Product extends Model
 
     public function storage()
     {
-        return $this->belongsTo(Storage::class, 'storage_id', 'id');
+        return $this->belongsTo(StorageModel::class, 'storage_id', 'id');
     }
 
     public function productImage()
@@ -48,23 +41,26 @@ class Product extends Model
         return $this->hasOne(ProductImage::class, 'product_id', 'id');
     }
 
-
     public function getMainImageUrlAttribute()
     {
-        $imageRecord = $this->productImage;
+        $img = $this->productImage;
 
-        if (!$imageRecord || !$imageRecord->main_image) {
-            return asset('frontend/images/rolex1.jpg');
+        if ($img && $img->image_1) {
+            return FileStorage::url($img->image_1);
         }
 
-        $mainImage = $imageRecord->main_image;
+        return asset('frontend/images/noimage.jpg');
+    }
 
-        if (strpos($mainImage, 'products/') === 0) {
-            $relativePath = $mainImage;
-        } else {
-            $relativePath = 'products/' . $this->id . '/' . $mainImage;
+
+    public function getHoverImageUrlAttribute()
+    {
+        $img = $this->productImage;
+
+        if ($img && $img->image_2) {
+            return FileStorage::url($img->image_2);
         }
 
-        return asset('storage/' . $relativePath);
+        return $this->main_image_url;
     }
 }
