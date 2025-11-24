@@ -137,7 +137,7 @@
     </div>
 </div>
 
-{{-- JS để tự động hiển thị số lượng nhập từ kho --}}
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
