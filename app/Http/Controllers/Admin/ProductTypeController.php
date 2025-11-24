@@ -72,6 +72,31 @@ class ProductTypeController extends Controller
         
         return redirect()->back();
     }
+    public function show_category_home($id)
+        {
+            $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
+            $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
+
+            $category_by_id = DB::table('products')
+                ->join('categories', 'products.category_id', '=', 'categories.id')
+                ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
+                ->where('products.category_id', $id)
+                ->select(
+                    'products.*',
+                    'categories.name as category_name',
+                    'product_images.image_1',
+                    'product_images.image_2',
+                    'product_images.image_3',
+                    'product_images.image_4'
+                )
+                ->get();
+
+            return view('pages.category.show_category')
+                ->with('category', $cate_pro)
+                ->with('brand', $brand_pro)
+                ->with('category_by_id', $category_by_id);
+        }
+
 
     public function delete_product_type($id){
         // $this->AuthLogin();

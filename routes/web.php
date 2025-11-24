@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
+use App\Models\Category;
 
 // ================= FRONTEND =================
   // Checkout
@@ -34,6 +35,10 @@ Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
+
+// Danh mục sản phẩm trang chủ
+Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
+
 // ================= BACKEND - AUTH ADMIN =================
 
 // Form đăng nhập admin
