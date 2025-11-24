@@ -38,6 +38,7 @@ Route::post('/tim-kiem', [HomeController::class, 'search']);
 
 // Danh mục sản phẩm trang chủ
 Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
+Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
 
 // ================= BACKEND - AUTH ADMIN =================
 

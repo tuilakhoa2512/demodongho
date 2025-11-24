@@ -252,7 +252,7 @@
 								<ul class="nav nav-pills nav-stacked">
 									@foreach ($brand as $key => $brand)
 									 <li><a href="{{URL::to('/thuong-hieu-san-pham/' .$brand->id)}}">
-									  <span class="pull-right">(50)</span>{{ $brand->name }}</a></li>
+									  <span class="pull-right"></span>{{ $brand->name }}</a></li>
 									<!-- <li><a href="#"> <span class="pull-right">(56)</span>Cartier</a></li>
 									<li><a href="#"> <span class="pull-right">(27)</span>Patek Philippe</a></li>
 									<li><a href="#"> <span class="pull-right">(32)</span>Breitling</a></li>

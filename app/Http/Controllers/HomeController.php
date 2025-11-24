@@ -39,20 +39,23 @@ class HomeController extends Controller
     }
 
     public function search(Request $request)
-    {
-        $keywords = $request->keywords_submit;
+{
+    $keywords = $request->keywords_submit;
 
-        $cate_pro = DB::table('categories')->orderBy('id','asc')->get();
-        $brand_pro = DB::table('brands')->orderBy('id','asc')->get();
+    // Lấy danh mục và thương hiệu để hiển thị sidebar
+    $cate_pro = DB::table('categories')->orderBy('id','asc')->get();
+    $brand_pro = DB::table('brands')->orderBy('id','asc')->get();
 
-        $search_product = Product::where('name','like','%'.$keywords.'%')
-            ->where('quantity','>',0)
-            ->orderBy('id','asc')
-            ->get();
+    // Tìm kiếm sản phẩm có tên chứa keywords và còn hàng
+    $search_product = Product::where('name', 'like', '%' . $keywords . '%')
+        ->where('quantity', '>', 0)
+        ->orderBy('id','asc')
+        ->get();
 
-        return view('admin.products.search')
-            ->with('category',$cate_pro)
-            ->with('brand',$brand_pro)
-            ->with('search_product',$search_product);
-    }
+    // Trả về view frontend
+    return view('admin.products.search')
+        ->with('category', $cate_pro)
+        ->with('brand', $brand_pro)
+        ->with('search_product', $search_product);
+}
 }
