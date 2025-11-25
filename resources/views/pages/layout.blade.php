@@ -84,7 +84,7 @@
 								<li><a href="{{ URL::to('/show-cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
 								<?php
 									$id = Session::get('id');
-									$fullname = Session::get('fullname'); // Lấy tên người dùng
+									$fullname = Session::get('fullname');
 									$image = Session::get('images');
 									?>
 
