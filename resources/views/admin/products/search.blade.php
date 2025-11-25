@@ -1,53 +1,121 @@
 @extends('pages.layout')
 @section('content')
+
 <style>
-.product-hover {
+.product-img-box {
     position: relative;
+    width: 100%;
+    height: 240px;
     overflow: hidden;
 }
 
-.product-hover .hover-img {
+.product-img-box img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: 0.4s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.product-img-box .hover-img {
+    opacity: 0;
+}
+
+.product-img-box:hover .main-img {
+    opacity: 0;
+}
+
+.product-img-box:hover .hover-img {
+    opacity: 1;
+}
+
+.product-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+    height: 280px; /* chiều cao thẻ sản phẩm */
+    background: rgba(0,0,0,0.0);
+    transition: 0.4s ease-in-out;
+}
+
+.product-overlay .overlay-img {
+    width: 100%;
     height: 100%;
-    opacity: 0;
-    transition: all 0.5s ease;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
-.product-hover:hover .hover-img {
-    opacity: 1;
+.product-overlay .overlay-content {
+    position: absolute;
+    bottom: 0; /* cố định chữ & nút dưới cùng */
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    /* background: rgba(0, 0, 0, 0.5); nền mờ để chữ nổi bật */
+    text-align: center;
+    color: #fff;
 }
 
-.product-hover:hover .main-img {
-    opacity: 0;
+.product-overlay:hover {
+    background: rgba(0,0,0,0.3);
 }
 
 </style>
+
 <div class="features_items">
     <h2 class="title text-center">Kết quả tìm kiếm</h2>
 
     @foreach ($search_product as $product)
+        @php
+            $main = $product->main_image_url ?? asset('frontend/images/noimage.jpg');
+            $hover = $product->hover_image_url ?? $main;
+            $product_url = url('product/' . $product->id);
+        @endphp
+
         <div class="col-sm-4">
             <div class="product-image-wrapper">
                 <div class="single-products">
+
                     <div class="productinfo text-center">
-                        <div class="product-hover">
-                            <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}" />
-                            <img class="hover-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}" />
+                        <div class="product-img-box">
+                            <img class="main-img" src="{{ $main }}" alt="{{ $product->name }}">
+                            <img class="hover-img overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
                         </div>
-                        <h2>{{ number_format($product->price) }} VND</h2>
+                        <h2>{{ number_format($product->price,0,',','.') }} VND</h2>
                         <p>{{ $product->name }}</p>
-                        <a href="#" class="btn btn-default add-to-cart">
-                            <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
-                        </a>
+                       
                     </div>
+
+                    <div class="product-overlay">
+                        <img class="overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
+                        <div class="overlay-content">
+                            <h2>{{ number_format($product->price,0,',','.') }} VND</h2>
+                            <p><a href="{{ $product_url }}" style="color:#fff;">{{ $product->name }}</a></p>
+                            <a href="#" class="btn btn-default add-to-cart">
+                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
+
+                <div class="choose">
+                    <ul class="nav nav-pills nav-justified">
+                        <li><a href="#"><i class="fa fa-heart"></i> Yêu Thích</a></li>
+                        <li><a href="#"><i class="fa fa-plus-square"></i> So Sánh</a></li>
+                    </ul>
+                </div>
+
             </div>
         </div>
     @endforeach
-</div>
 
+    <div class="clearfix"></div>
+</div>
 
 @endsection

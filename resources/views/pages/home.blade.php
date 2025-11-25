@@ -1,8 +1,8 @@
 @extends('pages.layout')
 @section('content')
 
-<div class="features_items">
-    <h2 class="title text-center">Sản Phẩm Mới Nhất</h2>
+<div class="features_items"><!--features_items-->
+    <h2 class="title text-center">Tất cả sản phẩm</h2>
 
     @forelse($all_product as $product)
         <div class="col-sm-4">
@@ -10,33 +10,18 @@
                 <div class="single-products">
 
                     <div class="productinfo text-center">
-                        
-                    
                         <div class="product-img-box">
-                            
-                            <img class="img-main"
-                                 src="{{ $product->main_image_url }}"
-                                 alt="{{ $product->name }}">
+                            <img class="img-main" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
                         </div>
-                      
                         <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
                         <p>{{ $product->name }}</p>
                     </div>
 
-                  
                     <div class="product-overlay">
-                    
-                        <img class="overlay-img"
-                             src="{{ $product->hover_image_url }}"
-                             alt="{{ $product->name }}">
-
+                        <img class="overlay-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}">
                         <div class="overlay-content">
                             <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
-                            <p>
-                                <a href="{{ url('/product/'.$product->id) }}" style="color: #fff;">
-                                    {{ $product->name }}
-                                </a>
-                            </p>
+                            <p><a href="{{ url('/product/'.$product->id) }}" style="color: #fff;">{{ $product->name }}</a></p>
                             <a href="#" class="btn btn-default add-to-cart">
                                 <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
                             </a>
@@ -44,15 +29,10 @@
                     </div>
                 </div>
 
-              
                 <div class="choose">
                     <ul class="nav nav-pills nav-justified">
-                        <li>
-                            <a href="#"><i class="fa fa-heart"></i> Yêu Thích</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-plus-square"></i> So Sánh</a>
-                        </li>
+                        <li><a href="#"><i class="fa fa-heart"></i> Yêu Thích</a></li>
+                        <li><a href="#"><i class="fa fa-plus-square"></i> So Sánh</a></li>
                     </ul>
                 </div>
             </div>
@@ -61,298 +41,15 @@
         <p class="text-center">Hiện chưa có sản phẩm nào được đăng bán.</p>
     @endforelse
 
+
     <div class="clearfix"></div>
+    {{-- PHÂN TRANG --}}
+    <div class="pagination-area" style="width:100%; float:left; text-align:center;">
+        {{ $all_product->onEachSide(0)->links('pagination::bootstrap-4') }}
+    </div>
+
 </div>
 
-   
-
-    <div class="category-tab"><!--category-tab-->
-        <div class="col-sm-12">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#tshirt" data-toggle="tab">Men</a></li>
-                <li><a href="#blazers" data-toggle="tab">Womens</a></li>
-                <li><a href="#sunglass" data-toggle="tab">Apple</a></li>
-                <li><a href="#kids" data-toggle="tab">Kids</a></li>
-                <li><a href="#poloshirt" data-toggle="tab">Luxury</a></li>
-            </ul>
-        </div>
-        <div class="tab-content">
-            <div class="tab-pane fade active in" id="tshirt" >
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="blazers" >
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>20.000.000 VND</h2>
-                                <p>Rolex Full Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>10.000.000 VND</h2>
-                                <p>Rolex Yellow</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="sunglass" >
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="kids" >
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane fade" id="poloshirt" >
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-3">
-                    <div class="product-image-wrapper">
-                        <div class="single-products">
-                            <div class="productinfo text-center">
-                                <img src="{{asset('frontend/images/rolex5.jpg')}}" alt="" />
-                                <h2>25.000.000 VND</h2>
-                                <p>Cartier Diamond</p>
-                                <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm vào giỏ</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div><!--/category-tab-->
 
     <div class="recommended_items"><!--recommended_items-->
         <h2 class="title text-center">recommended items</h2>

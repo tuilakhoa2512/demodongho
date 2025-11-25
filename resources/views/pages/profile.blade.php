@@ -1,5 +1,6 @@
 @extends('pages.layout')
 @section('content')
+
 <div class="container" style="margin-top: 40px;">
 
     <h2 style="margin: 0; position: absolute; top: -30px; left: 50%; transform: translateX(-50%);">Thông Tin Cá Nhân</h2>
