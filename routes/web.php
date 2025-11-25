@@ -30,6 +30,8 @@ Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
 Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('profile.update');
 
+Route::get('/register', [CheckoutController::class, 'register'])->name('user.register');
+
 
 //Trang chu
 Route::get('/', [HomeController::class, 'index']);

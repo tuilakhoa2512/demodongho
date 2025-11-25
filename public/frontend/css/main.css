@@ -1528,6 +1528,17 @@ h2.title {
 }
 
 .login-form {
+    display: flex;
+    flex-direction: column; /* Xếp theo cột */
+    align-items: center;    /* Canh giữa theo chiều ngang */
+    padding: 30px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    width: 100%;           /* Chiều rộng của form */
+    margin: auto;           /* Canh giữa trên trang */
+    flex-grow: 1;           /* Để form tràn đầy không gian còn lại */
+    justify-content: center; /* Canh giữa nội dung trong form */           
 }
 
 .signup-form {
@@ -1555,7 +1566,7 @@ h2.title {
     margin-bottom: 10px;
     outline: medium none;
     padding-left: 10px;
-    width: 100%;
+    width: 200%;
 }
 
 .login-form form span {

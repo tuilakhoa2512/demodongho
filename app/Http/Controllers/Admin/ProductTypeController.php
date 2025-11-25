@@ -36,7 +36,7 @@ class ProductTypeController extends Controller
         // $this->AuthLogin();
         $request->validate([
             'product_type_name' => 'required|max:255',
-            'product_type_desc' => 'nullable|string|max:255' // Có thể tùy chỉnh theo yêu cầu
+            'product_type_desc'   => 'nullable|string',
         ]);
         $data = array();
         $data['name'] = $request->product_type_name;
@@ -57,7 +57,7 @@ class ProductTypeController extends Controller
         // Xác thực dữ liệu
         $request->validate([
             'product_type_name' => 'required|max:255',
-            'product_type_desc' => 'nullable|string|max:255',
+            'product_type_desc'   => 'nullable|string',
         ]);
     
         // Cập nhật sản phẩm

@@ -48,6 +48,7 @@ class CheckoutController extends Controller
         'email' => 'required|string|email',
         'password' => 'required|string',
     ]);
+    
 
     // Tìm người dùng trong cơ sở dữ liệu theo email
     $user = DB::table('users')->where('email', $request->email)->first();
@@ -71,5 +72,9 @@ class CheckoutController extends Controller
         // Không tìm thấy người dùng
         return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Thông tin đăng nhập không chính xác.']);
     }
+}
+public function register()
+{
+    return view('pages.checkout.register'); // view mới
 }
 }

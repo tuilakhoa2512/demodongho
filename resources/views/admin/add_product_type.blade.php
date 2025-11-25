@@ -33,7 +33,8 @@
                         
                         <div class="form-group">
                             <label for="productTypeDesc">Mô tả Loại sản phẩm</label>
-                            <textarea style="resize: none" rows="5" name="product_type_desc" class="form-control" id="productTypeDesc" placeholder="Mô tả Loại sản phẩm"></textarea>
+                            <textarea style="resize: vertical; min-height: 150px;" name="product_type_desc" class="form-control" id="productTypeDesc" placeholder="Mô tả Loại sản phẩm"></textarea>
+
                         </div>
 
                         <button type="submit" name="add_product_type" class="btn btn-info">Thêm loại</button>
