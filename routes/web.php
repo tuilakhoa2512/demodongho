@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CartController;
+
 use App\Models\Category;
 
 // ================= FRONTEND =================
@@ -41,6 +43,12 @@ Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class
 // Danh mục sản phẩm trang chủ
 Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
 Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
+
+// Giỏ hàng
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');           
+Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');    
+Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); 
+Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove'); 
 
 // ================= BACKEND - AUTH ADMIN =================
 

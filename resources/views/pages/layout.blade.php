@@ -39,9 +39,7 @@
 						<div class="social-icons pull-right">
 							<ul class="nav navbar-nav">
 								<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-								<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-								<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-								<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+								<li><a href="#"><i class="fa fa-instagram"></i></a></li>
 								<li><a href="#"><i class="fa fa-google-plus"></i></a></li>
 							</ul>
 						</div>
@@ -81,7 +79,7 @@
 								 }
 								?>
 								
-								<li><a href="{{ URL::to('/show-cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
+								<li><a href="{{ URL::to('/cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
 								<?php
 									$id = Session::get('id');
 									$fullname = Session::get('fullname');
@@ -176,8 +174,8 @@
 							<div class="item active">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>Free E-Commerce Template</h2>
-									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
+									<h2>Từng Khoảnh Khắc - Một Bản Sắc</h2>
+									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại UnK STORE! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
 								<div class="col-sm-6">
@@ -188,8 +186,8 @@
 							<div class="item">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>100% Responsive Design</h2>
-									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
+									<h2>Mỗi Giây Phút - Một Câu Chuyện</h2>
+									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại UnK STORE! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
 								<div class="col-sm-6">
@@ -201,8 +199,8 @@
 							<div class="item">
 								<div class="col-sm-6">
 									<h1><span>UnK</span>-STORE</h1>
-									<h2>Free Ecommerce Template</h2>
-									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại [UnK STORE]! </p>
+									<h2>Từng Phút Giây Định Hình Đẳng Cấp</h2>
+									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại UnK STORE! </p>
 									<button type="button" class="btn btn-default get">Get it now</button>
 								</div>
 								<div class="col-sm-6">
@@ -238,7 +236,7 @@
 
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<!-- Cơ, Pin, Thể Thao, Thông minh -->
+									
 									<h4 class="panel-title"><a href="{{URL::to('/danh-muc-san-pham/' .$cate->id)}}">{{ $cate->name }}</a></h4>
 								</div>
 
@@ -268,7 +266,7 @@
 						</div><!--/brands_products-->
 
 						<div class="price-range"><!--price-range-->
-							<h2>Price Range</h2>
+							<h2>Tầm Giá</h2>
 							<div class="well text-center">
 								<input type="text" class="span2" value="" data-slider-min="0" data-slider-max="600" data-slider-step="5" data-slider-value="[250,450]" id="sl2"><br />
 								<b class="pull-left">$ 0</b> <b class="pull-right">$ 600</b>
@@ -297,7 +295,6 @@
 				<div class="col-sm-3">
 					<div class="address">
 						<img src="images/home/map.png" alt="" />
-						<p>505 S Atlantic Ave Virginia Beach, VA(Virginia)</p>
 					</div>
 				</div>
 			</div>
