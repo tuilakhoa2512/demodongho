@@ -69,7 +69,7 @@
 									$id = Session::get('id');
 									if($id!=null){ 		
 								?>
-								<li><a href="{{ URL::to('/checkout') }}"><i class="fa fa-credit-card"></i>Thanh toán</a></li>
+								<li><a href="{{ URL::to('/checkout') }}"><i class="fa fa-credit-card"></i>Thanh toán </a></li>
 								
 								<?php
 								 }else{
@@ -94,7 +94,7 @@
 
 											<ul class="dropdown-menu user-dropdown">
 												<li><a href="{{ URL::to('/profile') }}"><i class="fa fa-info-circle"></i> Thông tin cá nhân</a></li>
-												<li><a href="{{ URL::to('/my-orders') }}"><i class="fa fa-list-alt"></i> Đơn hàng</a></li>
+												<li><a href="{{ URL::to('/cart') }}"><i class="fa fa-list-alt"></i> Đơn hàng</a></li>
 												<li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
 											</ul>
 										</li>
@@ -176,10 +176,10 @@
 									<h1><span>UnK</span>-STORE</h1>
 									<h2>Từng Khoảnh Khắc - Một Bản Sắc</h2>
 									<p>Thời gian của bạn, phong cách của chúng tôi – Khám phá bộ sưu tập đồng hồ đẳng cấp tại UnK STORE! </p>
-									<button type="button" class="btn btn-default get">Get it now</button>
+									<button type="button" class="btn btn-default get">Get it now</button>									
 								</div>
 								<div class="col-sm-6">
-									<img src="images/home/girl1.jpg" class="girl img-responsive" alt="" />
+									<img src="frontend/images/5.jfif" class="girl img-responsive" alt="" />
 									<img src="images/home/pricing.png" class="pricing" alt="" />
 								</div>
 							</div>

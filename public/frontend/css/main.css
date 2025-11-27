@@ -1532,6 +1532,7 @@ h2.title {
     flex-direction: column; /* Xếp theo cột */
     align-items: center;    /* Canh giữa theo chiều ngang */
     padding: 30px;
+    
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;

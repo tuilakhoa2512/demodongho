@@ -34,6 +34,8 @@ Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('
 
 Route::get('/register', [CheckoutController::class, 'register'])->name('user.register');
 
+Route::get('/payment', [CheckoutController::class, 'payment'])->name('user.payment'); 
+
 
 //Trang chu
 Route::get('/', [HomeController::class, 'index']);
@@ -51,7 +53,6 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');    
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); 
 Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove'); 
-
 // ================= BACKEND - AUTH ADMIN =================
 
 // Form đăng nhập admin

@@ -42,36 +42,44 @@ class CheckoutController extends Controller
         Session::flush();
         return Redirect::to('/login-checkout');
     }
-    public function login_user(Request $request){
-        // Kiểm tra dữ liệu đầu vào
+    public function login_user(Request $request)
+{
+    // Validate
     $request->validate([
         'email' => 'required|string|email',
         'password' => 'required|string',
     ]);
-    
 
-    // Tìm người dùng trong cơ sở dữ liệu theo email
+    // Lấy user theo email
     $user = DB::table('users')->where('email', $request->email)->first();
 
-    // Kiểm tra xem người dùng có tồn tại, có role_id khác 1, và mật khẩu có khớp không
-    if ($user) {
-        // Kiểm tra role_id
-        if ($user->role_id == 1) {
-            return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Tài khoản này không được phép đăng nhập.']);
-        }
-
-        if (Hash::check($request->password, $user->password)) {
-            // Lưu ID người dùng vào session
-            Session::put('id', $user->id);
-            return redirect()->route('admin.checkout');
-        } else {
-            // Mật khẩu không khớp
-            return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Thông tin đăng nhập không chính xác.']);
-        }
-    } else {
-        // Không tìm thấy người dùng
-        return redirect()->route('admin.logincheckout')->withErrors(['email' => 'Thông tin đăng nhập không chính xác.']);
+    if (!$user) {
+        return redirect('/login-checkout')->with('error', 'Email hoặc mật khẩu không chính xác.');
     }
+
+    // Không cho admin login vào trang khách hàng
+    if ($user->role_id == 1) {
+        return redirect('/login-checkout')->with('error', 'Tài khản này không được phép đăng nhập.');
+    }
+
+    // Kiểm tra mật khẩu
+    if (!Hash::check($request->password, $user->password)) {
+        return redirect('/login-checkout')->with('error', 'Email hoặc mật khẩu không chính xác.');
+    }
+
+    // Đăng nhập thành công — lưu session khách hàng
+    Session::put('id', $user->id);
+    Session::put('fullname', $user->fullname);
+    Session::put('role_id', $user->role_id);
+
+    // Chuyển sang trang checkout
+    return Redirect::to('/checkout');
+}
+public function payment(){
+    $cate_pro = DB::table('categories')->orderby('id','asc')->get();
+    $brand_pro = DB::table('brands')->orderby('id','asc')->get();
+    return view('pages.checkout.payment')->with('category', $cate_pro)
+    ->with('brand', $brand_pro);    
 }
 public function register()
 {

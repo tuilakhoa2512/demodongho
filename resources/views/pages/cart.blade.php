@@ -83,10 +83,18 @@
                     <button type="submit" class="btn cart-update">
                         Cập nhật giỏ hàng
                     </button>
-
-                    <a href="#" class="btn cart-checkout">
-                        Thanh toán (demo)
-                    </a>
+                    <?php
+							$id = Session::get('id');
+							if($id!=null){ 		
+								?>				
+								    <a href="{{ URL::to('/payment') }}" class="btn cart-checkout">Thanh toán (demo) </a>
+								<?php
+							}else{
+								?>
+                                    <a href="{{ URL::to('/login-checkout') }}" class="btn cart-checkout">Thanh toán </a>
+								<?php
+							}
+					?>
                 </div>
             </div>
         </form>
