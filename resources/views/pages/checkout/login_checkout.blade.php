@@ -32,15 +32,60 @@
                         <a href="{{ url('/quen-mat-khau') }}">Quên mật khẩu?</a>
                     </div>
 
-                    <!-- Button full width -->
-                    <button type="submit" class="btn btn-danger btn-block" style="width: 130%;">Đăng nhập</button>
+                    
+                    <button type="submit" class="btn btn-danger btn-block mb-3" style="width: 130%;">Đăng nhập</button><br>
+                    <div class="mt-3">
+                        <a class="google-button" href="{{ URL::to('login-user-google') }}">
+                            <img class="google-icon" src="{{ asset('frontend/images/google.png') }}" alt="Đăng nhập bằng tài khoản google">
+                            Đăng nhập bằng Google
+                        </a>
+                    </div>
                 </form>
+<style type="text/css">
+    ul.list-login {
+        margin: 10px;
+        padding: 0;
+        text-align: center; 
+    }
+    .list-login {
+        margin: 10px 0;
+        text-align: center; 
+    }
+    ul.list-login li {
+        display: inline-block;
+        margin: 5px;
+    }
 
-                <div class="mt-4 text-center">
-                    <p>Chưa có tài khoản? 
-                    <a href="{{ URL::to('/register') }}" style="color:blue; font-weight:bold;">Đăng ký</a>
-                    </p>
-                </div>
+    .google-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        background-color: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #333;
+        width: 130%;
+        height: 32px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+    .google-button:hover {
+        background-color: #f8f8f8;
+    }
+
+    .google-icon {
+        width: 20px; 
+        margin-right: 10px;
+    }
+</style>
+                
+<br>
+<div class="mt-3 text-center">
+        <p>Chưa có tài khoản? <a href="{{ URL::to('/register') }}" style="color:blue; font-weight:bold;">Đăng ký</a></p>
+    </div>
             </div>
         </div>
     </div>

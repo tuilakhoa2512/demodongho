@@ -73,7 +73,7 @@ class CheckoutController extends Controller
     Session::put('role_id', $user->role_id);
 
     // Chuyển sang trang checkout
-    return Redirect::to('/checkout');
+    return Redirect::to('/trang-chu');
 }
 public function payment(){
     $cate_pro = DB::table('categories')->orderby('id','asc')->get();

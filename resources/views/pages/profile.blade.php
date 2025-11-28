@@ -3,7 +3,7 @@
 
 <div class="container" style="margin-top: 40px;">
 
-    <h2 style="margin: 0; position: absolute; top: -30px; left: 50%; transform: translateX(-50%);">Thông Tin Cá Nhân</h2>
+    <h2 style="margin: 0; position: absolute; top: -30px; left: 50%; transform: translateX(-50%);">Thông Tin Cá Nhân : {{ Session::get('fullname') }}</h2>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
