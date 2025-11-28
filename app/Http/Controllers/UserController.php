@@ -78,7 +78,8 @@ public function profileUpdate(Request $request)
         }    
 
     DB::table('users')->where('id', $id)->update($data);
-
+    Session::put('fullname', $data['fullname']);
+    Session::put('images', $data['image']);
     return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
 }
 

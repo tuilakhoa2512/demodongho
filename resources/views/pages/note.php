@@ -1,5 +1,81 @@
-<h2 class="title text-center">Kết quả tìm kiếm</h2>
+<?php
 
-<h2 class="title text-center">
-        Sản phẩm hiệu {{ $brand_name }}
-    </h2>
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+
+class User extends Authenticatable
+{
+    use HasFactory, Notifiable;
+
+    public $timestamps = false;
+    protected $fillable = [
+        'role_id',
+        'fullname',
+        'email',
+        'password',
+        'phone',
+        'address',
+        'district',
+        'ward',
+        'province',
+        'status',
+        'image',
+    ];
+    protected $primaryKey = 'id';
+    protected $table = 'users';
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+           // 'password' => 'hashed',
+        ];
+    }
+    public function social()
+{
+    return $this->hasMany(Social::class, 'user_id', 'id');
+}
+
+
+    public function getUserInfo()
+    {
+        $id = Session::get('id');
+        
+        if ($id) {
+            $user = User::find($id);
+            if ($user) {
+                // Lưu thông tin người dùng vào session
+                
+                Session::put('images', $user->image);
+                Session::put('fullname', $user->fullname);
+            }
+        }
+    }
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id', 'id');
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'user_id', 'id');
+    }
+
+    public function carts()
+    {
+        return $this->hasMany(Cart::class, 'user_id', 'id');
+    }
+}
