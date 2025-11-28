@@ -41,31 +41,35 @@ class User extends Authenticatable
         ];
     }
 
-    // Quan hệ Role
+
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
+<<<<<<< HEAD
     // Quan hệ cho Google, Social login
+=======
+
+>>>>>>> main
     public function socialAccounts()
     {
         return $this->hasMany(Social::class, 'user_id', 'id');
     }
 
-    // Orders
+
     public function orders()
     {
         return $this->hasMany(Order::class, 'user_id', 'id');
     }
 
-    // Reviews
+
     public function reviews()
     {
         return $this->hasMany(Review::class, 'user_id', 'id');
     }
 
-    // Cart
+
     public function carts()
     {
         return $this->hasMany(Cart::class, 'user_id', 'id');
