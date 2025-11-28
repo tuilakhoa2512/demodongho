@@ -73,7 +73,7 @@ public function profileUpdate(Request $request)
                 Storage::disk('public')->delete($user->image);
             }
         } else {
-            // không upload ảnh mới → giữ nguyên ảnh cũ
+            // không upload ảnh mới, giữ nguyên ảnh cũ
             $data['image'] = $user ? $user->image : null;
         }    
 

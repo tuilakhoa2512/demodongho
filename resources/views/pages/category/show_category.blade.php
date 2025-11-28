@@ -57,7 +57,6 @@
     left: 0;
     width: 100%;
     padding: 15px;
-    /* background: rgba(0, 0, 0, 0.5); nền mờ để chữ nổi bật */
     text-align: center;
     color: #fff;
 }
@@ -78,12 +77,10 @@
 
     @foreach($category_by_id as $product)
         @php
-            // Hình chính
             $main = $product->image_1
                     ? asset('storage/' . $product->image_1)
                     : asset('images/no-image.png');
 
-            // Hình hover
             $hover = $product->image_2
                      ? asset('storage/' . $product->image_2)
                      : $main;
@@ -97,7 +94,6 @@
 
                     <div class="productinfo text-center">
 
-                        {{-- Hình sản phẩm đổi khi hover --}}
                         <div class="product-img-box">
                             <img class="main-img" src="{{ $main }}" alt="{{ $product->name }}">
                             <img class="hover-img" src="{{ $hover }}" alt="{{ $product->name }}">
@@ -108,7 +104,6 @@
                     </div>
 
 
-                    {{-- OVERLAY --}}
                     <div class="product-overlay">
                         <img class="overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
                         <div class="overlay-content">
@@ -122,7 +117,6 @@
 
                 </div>
 
-                {{-- Yêu thích + So sánh --}}
                 <div class="choose">
                     <ul class="nav nav-pills nav-justified">
                         <li>

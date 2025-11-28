@@ -1,7 +1,6 @@
 @extends('pages.layout')
 @section('content')
 
-<section id="login-form">
 <h2 class="title text-center">Đăng Nhập Tài Khoản</h2>
 <div class="container" style="margin-top:50px;">
     <div class="row justify-content-center">

@@ -77,12 +77,10 @@
 
     @foreach($brand_by_id as $product)
         @php
-            // Hình chính
             $main = $product->image_1 
                     ? asset('storage/' . $product->image_1)
                     : asset('images/no-image.png');
 
-            // Hình hover
             $hover = $product->image_2 
                      ? asset('storage/' . $product->image_2)
                      : $main;
@@ -104,8 +102,6 @@
                         <p>{{ $product->name }}</p>
                     </div>
 
-
-                    {{-- OVERLAY --}}
                     <div class="product-overlay">
                         <img class="overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
                         <div class="overlay-content">
@@ -119,7 +115,6 @@
 
                 </div>
 
-                {{-- Yêu thích + So sánh --}}
                 <div class="choose">
                     <ul class="nav nav-pills nav-justified">
                         <li>

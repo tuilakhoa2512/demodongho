@@ -11,7 +11,6 @@ class Category extends Model
         'description',
     ];
 
-    // 1 danh mục có nhiều product
     public function products()
     {
         return $this->hasMany(Product::class, 'category_id', 'id');

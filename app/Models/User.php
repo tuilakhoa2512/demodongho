@@ -47,7 +47,7 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id', 'id');
     }
 
-    // Quan hệ cho Google / Social login
+    // Quan hệ cho Google, Social login
     public function socialAccounts()
     {
         return $this->hasMany(Social::class, 'user_id', 'id');

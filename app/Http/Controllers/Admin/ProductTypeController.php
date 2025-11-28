@@ -54,7 +54,6 @@ class ProductTypeController extends Controller
         return view('pages.admin_layout')->with('admin.edit_product_type',$manager_product_type);
     }
     public function update_product_type(Request $request, $id) {
-        // Xác thực dữ liệu
         $request->validate([
             'product_type_name' => 'required|max:255',
             'product_type_desc'   => 'nullable|string',
@@ -67,7 +66,6 @@ class ProductTypeController extends Controller
     
         DB::table('categories')->where('id', $id)->update($data);
         
-        // Thêm thông báo thành công vào session
         session()->flash('message');
         
         return redirect()->back();

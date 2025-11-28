@@ -96,9 +96,6 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Log lỗi
-            // logger()->error($e->getMessage());
-
             return redirect()
                 ->back()
                 ->with('error', 'Có lỗi xảy ra trong quá trình đặt hàng. Vui lòng thử lại sau.');

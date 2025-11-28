@@ -109,7 +109,7 @@ class BrandProductController extends Controller
                 Storage::disk('public')->delete($brand->image);
             }
         } else {
-            // không upload ảnh mới → giữ nguyên ảnh cũ
+            // không upload ảnh mới mà giữ nguyên ảnh cũ
             $data['image'] = $brand ? $brand->image : null;
         }
 

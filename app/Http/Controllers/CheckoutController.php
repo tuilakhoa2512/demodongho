@@ -67,12 +67,11 @@ class CheckoutController extends Controller
         return redirect('/login-checkout')->with('error', 'Email hoặc mật khẩu không chính xác.');
     }
 
-    // Đăng nhập thành công — lưu session khách hàng
+    // Đăng nhập thành công thì lưu session khách hàng
     Session::put('id', $user->id);
     Session::put('fullname', $user->fullname);
     Session::put('role_id', $user->role_id);
 
-    // Chuyển sang trang checkout
     return Redirect::to('/trang-chu');
 }
 public function payment(){

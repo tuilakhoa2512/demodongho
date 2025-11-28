@@ -69,7 +69,7 @@
 									$id = Session::get('id');
 									if($id!=null){ 		
 								?>
-								<li><a href="{{ URL::to('/checkout') }}"><i class="fa fa-credit-card"></i>Thanh toán </a></li>
+								<li><a href="{{ URL::to('/payment') }}"><i class="fa fa-credit-card"></i>Thanh toán </a></li>
 								
 								<?php
 								 }else{

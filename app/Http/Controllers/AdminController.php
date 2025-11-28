@@ -26,13 +26,12 @@ class AdminController extends Controller
                 return Redirect::to('admin')->send();
             }
         }    
-    // GET /admin  → Hiện form đăng nhập admin
+
     public function index()
     {
-        return view('pages.admin_login'); // resources/views/pages/admin_login.blade.php
+        return view('pages.admin_login'); 
     }
 
-    // GET /dashboard → Trang dashboard (chỉ vào được khi đã đăng nhập)
     public function show_dashboard()
     {
         // Nếu chưa đăng nhập admin, chuyển về trang login
@@ -40,14 +39,12 @@ class AdminController extends Controller
             return Redirect::to('/admin');
         }
 
-        // Ở đây bạn load view admin_layout
         return view('pages.admin_layout');
     }
 
-    // POST /admin-dashboard → Xử lý login
     public function dashboard(Request $request)
     {
-        // Validate cơ bản
+        // Validate
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required',
@@ -60,29 +57,24 @@ class AdminController extends Controller
         if (
             !$user ||
             !Hash::check($request->password, $user->password) ||
-            $user->role_id != 1 // chỉ cho role admin (id = 1) đăng nhập
-        ) {
-            // Gửi thông báo lỗi sang session
+            $user->role_id != 1 // admin là role_id = 1
+        ) {        
             Session::flash('message', 'Tài khoản hoặc mật khẩu sai!');
-            // Quay lại trang /admin, giữ lại email vừa nhập
             return Redirect::to('/admin')->withInput($request->only('email'));
         }
 
-        // Đăng nhập thành công → lưu session
         Session::put('admin_id', $user->id);
         Session::put('admin_name', $user->fullname);
 
-        // Chuyển hướng đến dashboard
         return Redirect::to('/dashboard');
     }
-
-    // GET /logout → Đăng xuất admin
+    //Đăng xuất admin
     public function logout()
     {
         $this->AuthLogin();
         Session::forget('admin_id');
         Session::forget('admin_name');
-        Session::flush(); // xóa hết session nếu muốn
+        Session::flush(); 
 
         return Redirect::to('/admin');
     }
@@ -107,11 +99,10 @@ public function callback_google()
                 'email' => $googleUser->email,
                 'google_id' => $googleUser->id,
                 'password' => bcrypt('google_default'),
-                'role_id' => 2, // user thông thường
+                'role_id' => 2,
             ]);
         }
-
-        // Đăng nhập vào hệ thống Laravel
+       
         Auth::login($user);
 
         // Chỉ user role_id = 2 mới vào client
@@ -154,7 +145,7 @@ public function callback_user_google()
 
 public function findOrCreateUser($googleUser, $provider)
 {
-    // 1. Tìm trong bảng social trước
+    //Tìm trong bảng social trước
     $social = Social::where('provider_user_id', $googleUser->id)
                     ->where('provider', strtoupper($provider))
                     ->first();
@@ -163,20 +154,20 @@ public function findOrCreateUser($googleUser, $provider)
         return $social;
     }
 
-    // 2. Nếu không có thì tìm user theo email
+    //Nếu không có thì tìm user theo email
     $user = User::where('email', $googleUser->email)->first();
 
-    // 3. Nếu user chưa tồn tại → tạo mới
+    //Nếu user chưa tồn tại thì tạo mới
     if (!$user) {
         $user = User::create([
             'fullname' => $googleUser->name,
             'email' => $googleUser->email,
             'role_id' => 2,
-            'password' => '',   // Google login không dùng password
+            'password' => '',
         ]);
     }
 
-    // 4. Tạo tài khoản social mới và liên kết với user
+    // Tạo tài khoản social mới và liên kết với user
     $social = Social::create([
         'provider_user_id'   => $googleUser->id,
         'provider_user_email'=> $googleUser->email,

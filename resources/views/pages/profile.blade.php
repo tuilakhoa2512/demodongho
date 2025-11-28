@@ -20,7 +20,7 @@
     </div>
     
 
-    <!-- Các thông tin khác của người dùng -->
+    
 @endif
 <br><br><br><br><br>
     <div class="row">

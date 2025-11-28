@@ -15,8 +15,7 @@
 
                     <form role="form" method="POST" action="{{ URL::to('/admin/storages') }}">
                         @csrf
-
-                        {{-- TÊN SẢN PHẨM --}}
+                   
                         <div class="form-group">
                             <label for="product_name">Tên sản phẩm</label>
                             <input type="text"
@@ -27,7 +26,6 @@
                                 required>
                         </div>
 
-                        {{-- NHÀ CUNG CẤP --}}
                         <div class="form-group">
                             <label for="supplier_name">Nhà cung cấp</label>
                             <input type="text"
@@ -37,7 +35,6 @@
                                 placeholder="Tên nhà cung cấp (nếu có)">
                         </div>
 
-                        {{-- NGÀY NHẬP --}}
                         <div class="form-group">
                             <label for="import_date">Ngày nhập hàng</label>
                             <input type="date"
@@ -47,7 +44,6 @@
                                 required>
                         </div>
 
-                        {{-- SỐ LƯỢNG --}}
                         <div class="form-group">
                             <label for="import_quantity">Số lượng nhập</label>
                             <input type="number"
@@ -59,7 +55,6 @@
                                 required>
                         </div>
 
-                        {{-- GIÁ NHẬP 1 SP --}}
                         <div class="form-group">
                             <label for="unit_import_price">Giá nhập (1 sản phẩm)</label>
                             <input type="number"
