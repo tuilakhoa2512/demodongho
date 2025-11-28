@@ -11,6 +11,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\LocationController;
+
 
 use App\Models\Category;
 
@@ -46,6 +48,14 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
 Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
+
+
+//Tinh Thanh
+Route::prefix('location')->group(function () {
+    Route::get('/provinces', [LocationController::class, 'provinces'])->name('location.provinces');
+    Route::get('/provinces/{code}/districts', [LocationController::class, 'districts'])->name('location.districts');
+    Route::get('/districts/{code}/wards', [LocationController::class, 'wards'])->name('location.wards');
+});
 
 
 // Danh mục sản phẩm trang chủ

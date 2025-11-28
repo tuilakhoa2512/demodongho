@@ -108,7 +108,6 @@
                     </div>
 
 
-                    {{-- OVERLAY --}}
                     <div class="product-overlay">
                         <img class="overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
                         <div class="overlay-content">
