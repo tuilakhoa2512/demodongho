@@ -56,7 +56,7 @@
                            value="{{ $user->address }}" style="max-width: 800px;">
                 </div>
 
-                {{-- ===== TỈNH / THÀNH PHỐ ===== --}}
+
                 <div class="form-group">
                     <label for="province">Tỉnh / Thành phố</label>
                     <select name="province" id="province" class="form-control" style="max-width: 800px;">
@@ -64,7 +64,6 @@
                     </select>
                 </div>
 
-                {{-- ===== QUẬN / HUYỆN ===== --}}
                 <div class="form-group">
                     <label for="district">Quận / Huyện</label>
                     <select name="district" id="district" class="form-control" style="max-width: 800px;">
@@ -72,7 +71,6 @@
                     </select>
                 </div>
 
-                {{-- ===== PHƯỜNG / XÃ ===== --}}
                 <div class="form-group">
                     <label for="ward">Phường / Xã</label>
                     <select name="ward" id="ward" class="form-control" style="max-width: 800px;">
@@ -91,19 +89,16 @@
     </div>
 </div>
 
-{{-- ================== JS LOAD TỈNH / QUẬN / PHƯỜNG (tinhthanhpho.com) ================== --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const provinceSelect = document.getElementById('province');
     const districtSelect = document.getElementById('district');
     const wardSelect     = document.getElementById('ward');
 
-    // Giá trị hiện đang lưu trong DB
     const currentProvinceName = @json($user->province);
     const currentDistrictName = @json($user->district);
     const currentWardName     = @json($user->ward);
 
-    // ================== 1. LOAD DANH SÁCH TỈNH ==================
     fetch('{{ route('location.provinces') }}')
         .then(response => response.json())
         .then(provinces => {
@@ -116,15 +111,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             provinces.forEach(p => {
                 const opt = document.createElement('option');
-                // Lưu TÊN vào DB => value = name
                 opt.value = p.name;
                 opt.textContent = p.name;
-                // Giữ CODE để gọi quận/huyện
+          
                 opt.dataset.code = p.code;
                 provinceSelect.appendChild(opt);
             });
 
-            // Nếu user đã có province -> chọn sẵn và load quận
             if (currentProvinceName) {
                 provinceSelect.value = currentProvinceName;
                 const selectedProvince = provinceSelect.selectedOptions[0];
@@ -135,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(err => console.error('Lỗi load provinces:', err));
 
-    // Khi đổi tỉnh -> reset quận + phường rồi load quận mới
     provinceSelect.addEventListener('change', function () {
         const selected = this.selectedOptions[0];
         const provinceCode = selected ? selected.dataset.code : null;
@@ -148,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
         loadDistricts(provinceCode);
     });
 
-    // ================== 2. HÀM LOAD QUẬN/HUYỆN ==================
     function loadDistricts(provinceCode) {
         const url = '{{ url('location/provinces') }}/' + provinceCode + '/districts';
 
@@ -164,13 +155,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 districts.forEach(d => {
                     const opt = document.createElement('option');
-                    opt.value = d.name;        // lưu tên vào DB
+                    opt.value = d.name;       
                     opt.textContent = d.name;
-                    opt.dataset.code = d.code; // mã để load phường
+                    opt.dataset.code = d.code; 
                     districtSelect.appendChild(opt);
                 });
 
-                // Nếu user đã có district -> chọn sẵn rồi load phường
                 if (currentDistrictName) {
                     districtSelect.value = currentDistrictName;
                     const selectedDistrict = districtSelect.selectedOptions[0];
@@ -182,7 +172,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error('Lỗi load districts:', err));
     }
 
-    // Khi đổi quận -> reset phường rồi load phường mới
     districtSelect.addEventListener('change', function () {
         const selected = this.selectedOptions[0];
         const districtCode = selected ? selected.dataset.code : null;
@@ -194,7 +183,6 @@ document.addEventListener('DOMContentLoaded', function () {
         loadWards(districtCode);
     });
 
-    // ================== 3. HÀM LOAD PHƯỜNG/XÃ ==================
     function loadWards(districtCode) {
         const url = '{{ url('location/districts') }}/' + districtCode + '/wards';
 
@@ -210,12 +198,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 wards.forEach(w => {
                     const opt = document.createElement('option');
-                    opt.value = w.name;    // lưu tên vào DB
+                    opt.value = w.name; 
                     opt.textContent = w.name;
                     wardSelect.appendChild(opt);
                 });
 
-                // Chọn sẵn ward nếu có
                 if (currentWardName) {
                     wardSelect.value = currentWardName;
                 }
