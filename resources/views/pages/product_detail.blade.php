@@ -3,15 +3,32 @@
 @section('content')
 
 
-
-
 <div class="product-detail-wrapper">
     <h2 class="title text-center">
         Chi Tiết Sản Phẩm
     </h2>
     <div class="row">
 
-  
+@if(session('success'))
+    <div id="cart-alert" 
+         style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px; 
+                margin-bottom:16px; font-weight:500; font-size:15px; text-align:center;">
+        {{ session('success') }}
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const alertBox = document.getElementById('cart-alert');
+            if (alertBox) {
+                alertBox.style.opacity = '0';
+                alertBox.style.transform = 'translateY(-10px)';
+                alertBox.style.transition = '0.5s';
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 1800);
+    </script>
+@endif
+
         <div class="col-sm-5">
 
             @php

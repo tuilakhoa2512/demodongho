@@ -1,9 +1,31 @@
 @extends('pages.layout')
 @section('content')
+<h2 class="title text-center">
+        Tất Cả Sản Phẩm
+</h2>
+
+@if(session('success'))
+    <div id="cart-alert" 
+         style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px; 
+                margin-bottom:16px; font-weight:500; font-size:15px; text-align:center;">
+        {{ session('success') }}
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const alertBox = document.getElementById('cart-alert');
+            if (alertBox) {
+                alertBox.style.opacity = '0';
+                alertBox.style.transform = 'translateY(-10px)';
+                alertBox.style.transition = '0.5s';
+                setTimeout(() => alertBox.remove(), 500);
+            }
+        }, 1800);
+    </script>
+@endif
 
 <div class="features_items"><!--features_items-->
-    <h2 class="title text-center">Tất cả sản phẩm</h2>
-
+ 
     @forelse($all_product as $product)
         <div class="col-sm-4">
             <div class="product-image-wrapper">
@@ -22,9 +44,14 @@
                         <div class="overlay-content">
                             <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
                             <p><a href="{{ url('/product/'.$product->id) }}" style="color: #fff;">{{ $product->name }}</a></p>
-                            <a href="#" class="btn btn-default add-to-cart">
-                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ
-                            </a>
+                            <form action="{{ route('cart.add', $product->id) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                <input type="hidden" name="quantity" value="1">
+
+                                <button type="submit" class="btn btn-default add-to-cart">
+                                    <i class="fa fa-shopping-cart"></i> Thêm Vào Giỏ
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -43,7 +70,8 @@
 
 
     <div class="clearfix"></div>
-    {{-- PHÂN TRANG --}}
+
+
     <div class="pagination-area" style="width:100%; float:left; text-align:center;">
         {{ $all_product->onEachSide(0)->links('pagination::bootstrap-4') }}
     </div>

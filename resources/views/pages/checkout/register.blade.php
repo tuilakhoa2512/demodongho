@@ -13,7 +13,6 @@
 
                 <h2 class="text-center mb-4">Đăng ký</h2>
 
-                {{-- HIỂN THỊ LỖI --}}
                 @if ($errors->any())
                     <div class="alert alert-danger text-center">
                         @foreach ($errors->all() as $err)

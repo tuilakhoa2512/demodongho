@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
@@ -52,7 +53,13 @@ Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_b
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');           
 Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');    
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); 
-Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove'); 
+Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+
+// Order
+Route::get('/payment', [OrderController::class, 'showPaymentForm'])->name('payment.show');
+Route::post('/payment', [OrderController::class, 'placeOrder'])->name('payment.place');
+
+
 // ================= BACKEND - AUTH ADMIN =================
 
 // Form đăng nhập admin

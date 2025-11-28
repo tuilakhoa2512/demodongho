@@ -2,7 +2,9 @@
 
 @section('content')
 
-
+@php
+    $cart = Session::get('cart', []);
+@endphp
 
 <div class="cart-page">
     <h2 class="title text-center">
@@ -12,6 +14,7 @@
     @if(empty($cart) || count($cart) === 0)
         <p class="cart-empty">Hiện chưa có sản phẩm nào trong giỏ hàng.</p>
     @else
+
         <form action="{{ route('cart.update') }}" method="POST">
             @csrf
 
@@ -43,9 +46,11 @@
                                         </div>
                                     </div>
                                 </td>
+
                                 <td class="cart-price">
                                     {{ number_format($item['price'], 0, ',', '.') }} VND
                                 </td>
+
                                 <td>
                                     <input
                                         type="number"
@@ -54,14 +59,22 @@
                                         value="{{ $item['quantity'] }}"
                                         class="cart-qty-input">
                                 </td>
+
                                 <td class="cart-subtotal">
                                     {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }} VND
                                 </td>
+
                                 <td class="cart-remove">
-                                    <a href="{{ route('cart.remove', $item['id']) }}"
-                                       onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?');">
+                                    <button
+                                        type="submit"
+                                        class="cart-remove-btn"
+                                        formaction="{{ route('cart.remove') }}"
+                                        formmethod="POST"
+                                        name="product_id"
+                                        value="{{ $item['id'] }}"
+                                    >
                                         Xóa
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -83,18 +96,20 @@
                     <button type="submit" class="btn cart-update">
                         Cập nhật giỏ hàng
                     </button>
-                    <?php
-							$id = Session::get('id');
-							if($id!=null){ 		
-								?>				
-								    <a href="{{ URL::to('/payment') }}" class="btn cart-checkout">Thanh toán (demo) </a>
-								<?php
-							}else{
-								?>
-                                    <a href="{{ URL::to('/login-checkout') }}" class="btn cart-checkout">Thanh toán </a>
-								<?php
-							}
-					?>
+
+                    @php
+                        $id = Session::get('id');
+                    @endphp
+
+                    @if($id != null)
+                        <a href="{{ URL::to('/payment') }}" class="btn cart-checkout">
+                            Thanh toán (demo)
+                        </a>
+                    @else
+                        <a href="{{ URL::to('/login-checkout') }}" class="btn cart-checkout">
+                            Thanh toán
+                        </a>
+                    @endif
                 </div>
             </div>
         </form>
@@ -151,7 +166,7 @@
     }
 
     .cart-product {
-        white-space: normal; 
+        white-space: normal;
     }
 
     .cart-product-box {
@@ -192,15 +207,6 @@
         border: 1px solid #ccc;
     }
 
-    .cart-remove a {
-        color: #e60012;
-        text-decoration: none;
-    }
-
-    .cart-remove a:hover {
-        text-decoration: underline;
-    }
-
     .cart-footer {
         display: flex;
         flex-wrap: wrap;
@@ -224,16 +230,16 @@
         margin-left: 5px;
     }
 
-    .cart-continue:hover {
-        background: #524e4eff;
-        color: white;
+    .cart-continue {
+        background: #ffffff;
+        border: 1px solid #e60012;
+        color: #e60012;
         border-radius: 4px;
     }
 
-     .cart-continue {
-        background: #ffffffff;
-        border: 1px solid #e60012;
-        color: #e60012;
+    .cart-continue:hover {
+        background: #524e4e;
+        color: white;
         border-radius: 4px;
     }
 
@@ -243,8 +249,6 @@
         color: #fff;
         border-radius: 4px;
     }
-
-    
 
     .cart-update:hover {
         background: #ec971f;
@@ -265,7 +269,6 @@
         color: #fff;
     }
 
-    
     @media (max-width: 767px) {
         .cart-footer {
             flex-direction: column;
@@ -281,6 +284,25 @@
             margin: 5px 0 0 0;
             text-align: center;
         }
+    }
+
+    .cart-remove-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        background: #e60012;
+        padding: 6px 14px;
+        border-radius: 6px;
+        transition: 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .cart-remove-btn:hover {
+        background: #b80010;
     }
 </style>
 

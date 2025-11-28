@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -96,7 +97,7 @@ class CartController extends Controller
             Session::put('cart', $cart);
         }
 
-        return redirect()->back()->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
+        return redirect()->back()->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
     }
 
 
@@ -129,21 +130,22 @@ class CartController extends Controller
     }
 
 
-    public function remove($id)
-    {
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())
-                ->where('product_id', $id)
-                ->delete();
 
-        } else {
-            $cart = Session::get('cart', []);
-            if (isset($cart[$id])) {
-                unset($cart[$id]);
-                Session::put('cart', $cart);
-            }
+    public function remove(Request $request)
+    {
+        $productId = $request->input('product_id');  
+
+        $cart = Session::get('cart', []);
+
+        if (isset($cart[$productId])) {
+            unset($cart[$productId]);
+            Session::put('cart', $cart);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
+        return redirect()
+            ->route('cart.index')
+            ->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
+
+
 }

@@ -37,7 +37,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 280px; /* chiều cao thẻ sản phẩm */
+    height: 280px; 
     background: rgba(0,0,0,0.0);
     transition: 0.4s ease-in-out;
 }
@@ -53,7 +53,7 @@
 
 .product-overlay .overlay-content {
     position: absolute;
-    bottom: 0; /* cố định chữ & nút dưới cùng */
+    bottom: 0;
     left: 0;
     width: 100%;
     padding: 15px;
@@ -68,12 +68,13 @@
 
 </style>
 
+  <h2 class="title text-center">
+        Sản phẩm {{ $category_name }}
+    </h2>
 
 <div class="features_items">
     
-    <h2 class="title text-center">
-        Sản phẩm {{ $category_name }}
-    </h2>
+  
 
     @foreach($category_by_id as $product)
         @php
