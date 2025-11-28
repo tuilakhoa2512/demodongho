@@ -147,7 +147,7 @@ public function callback_user_google()
     Session::put('image', $user->image);
     Session::put('fullname', $user->fullname);
 
-    return redirect('/checkout')
+    return redirect('/trang-chu')
         ->with('message', 'Đăng nhập Google <span style="color:red">'.$user->email.'</span> thành công!');
 }
 
