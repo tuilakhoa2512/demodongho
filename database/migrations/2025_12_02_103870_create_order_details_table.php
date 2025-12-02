@@ -4,23 +4,25 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateOrderDetailsTable extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('order_details', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id');                 // INT(10) UNSIGNED AI
 
-            $table->unsignedInteger('order_id');
-            $table->unsignedInteger('product_id');
-            $table->unsignedInteger('quantity');
-            $table->unsignedInteger('price');        // đơn giá tại thời điểm đặt
+            $table->unsignedInteger('order_id');      // INT(10) UNSIGNED - FK -> orders.id
+            $table->unsignedInteger('product_id');    // INT(10) UNSIGNED - FK -> products.id
+
+            $table->unsignedInteger('quantity');      // Số lượng
+            $table->float('price');                   // Đơn giá tại thời điểm đặt
 
             $table->timestamps();
 
-            // 1 sản phẩm chỉ 1 dòng / 1 order
+            // Ràng buộc duy nhất cho (order_id, product_id)
             $table->unique(['order_id', 'product_id']);
 
+            // Khóa ngoại
             $table->foreign('order_id')
                   ->references('id')->on('orders')
                   ->onDelete('cascade');
@@ -31,8 +33,8 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('order_details');
     }
-};
+}

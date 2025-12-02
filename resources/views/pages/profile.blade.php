@@ -1,10 +1,23 @@
 @extends('pages.layout')
 @section('content')
+@php
+    $fullname = Session::get('fullname');
+    $parts = explode(' ', trim($fullname));
 
+    // Lấy ký tự đầu họ (phần tử đầu)
+    $first = mb_substr($parts[0], 0, 1, 'UTF-8');
+
+    // Lấy ký tự đầu của tên cuối (phần tử cuối)
+    $last = mb_substr(end($parts), 0, 1, 'UTF-8');
+
+    $initials = strtoupper($first . $last);
+@endphp
 <div class="container" style="margin-top: 40px;">
 
     <h2 style="margin: 0; position: absolute; top: -30px; left: 50%; transform: translateX(-50%);">
-        Thông Tin Cá Nhân : {{ Session::get('fullname') }}
+        Thông Tin Cá Nhân : 
+        <!-- {{ Session::get('fullname') }} -->
+        {{ $initials }}
     </h2>
 
     @if(session('success'))
@@ -23,6 +36,8 @@
             @endif
         </div>
     @endif
+
+    
 
     <br><br><br><br><br>
 
