@@ -26,6 +26,15 @@ html, body{
     padding-bottom: 80px;
 }
 
+span.fa-thumb-styling.fa.fa-thumbs-down{
+    font-size : 28px;
+    color:red;
+}
+
+span.fa-thumb-styling.fa.fa-thumbs-up{
+    font-size : 28px;
+    color:green;
+}
 
 .wrapper {
     display:inline-block;

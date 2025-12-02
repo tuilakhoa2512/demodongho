@@ -44,6 +44,18 @@
     </div>
 
     <div class="table-responsive">
+    @if (session('message'))
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Kích hoạt sản phẩm thành công!',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    </script>
+                @endif
       <table class="table table-striped b-t b-light">
 
         <thead>
@@ -63,6 +75,7 @@
             <th>Kích thước</th>
             <th>Chất liệu dây</th>
             <th>Giá bán</th>
+            <th>Hiển Thị</th>
             <th style="width:80px;">Thao tác</th>
           </tr>
         </thead>
@@ -105,6 +118,20 @@
             <td>{{ $product->strap_material }}</td>
 
             <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+
+            <td><span class="text-ellipsis">
+                            <?php
+                            if($product->status==0){
+                                ?>
+                               <a href="{{  URL::to('/unactive-product/'.$product->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
+                            <?php    
+                            }else{
+                                ?>
+                                <a href="{{ URL::to('/active-product/'.$product->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
+                                <?php   
+                            }
+                            ?>
+                        </span></td>
 
            <td>
                <a href="{{ URL::to('/admin/products/'.$product->id.'/edit') }}">

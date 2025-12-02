@@ -126,6 +126,16 @@
                             <input type="file" name="image_4" accept="image/*" class="form-control">
                         </div>
 
+                        <div class="form-group">
+                            <label for="productTypeDesc">Trạng Thái</label>
+                            <select name="product_status" class="form-control input-sm m-bot15">
+                                <option value="0">Ẩn</option>
+                                <option value="1">Hiển Thị</option>
+                               
+                            </select>
+
+                        </div>
+
 
                         <button type="submit" class="btn btn-info">Thêm sản phẩm</button>
 

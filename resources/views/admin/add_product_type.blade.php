@@ -34,9 +34,17 @@
                         <div class="form-group">
                             <label for="productTypeDesc">Mô tả Loại sản phẩm</label>
                             <textarea style="resize: vertical; min-height: 150px;" name="product_type_desc" class="form-control" id="productTypeDesc" placeholder="Mô tả Loại sản phẩm"></textarea>
-
                         </div>
 
+                        <div class="form-group">
+                            <label for="productTypeDesc">Trạng Thái</label>
+                            <select name="product_type_status" class="form-control input-sm m-bot15">
+                                <option value="0">Ẩn</option>
+                                <option value="1">Hiển Thị</option>
+                               
+                            </select>
+
+                        </div>
                         <button type="submit" name="add_product_type" class="btn btn-info">Thêm loại</button>
                     </form>
                 </div>

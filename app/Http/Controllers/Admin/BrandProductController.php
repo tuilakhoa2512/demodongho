@@ -48,11 +48,13 @@ class BrandProductController extends Controller
             'brand_product_name'   => 'required|string|max:150',
             'brand_product_image'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'brand_product_desc'   => 'nullable|string',
+            'product_type_status' => 'required'
         ]);
 
         $data = [];
         $data['name']        = $request->brand_product_name;
         $data['description'] = $request->brand_product_desc;
+        $data['status'] = $request->brand_product_status;
 
         if ($request->hasFile('brand_product_image')) {
             $file = $request->file('brand_product_image');
@@ -68,6 +70,18 @@ class BrandProductController extends Controller
 
         session()->flash('message', 'Thêm thương hiệu sản phẩm thành công');
         return Redirect::to('add-brand-product');
+    }
+
+    public function unactive_brand_product($id){
+        DB::table('brands')->where('id',$id)->update(['status'=> 1]);
+        session()->flash('message','Không kích hoạt thương hiệu sản phẩm thành công');
+        return Redirect::to('all-brand-product');
+    }
+
+    public function active_brand_product($id){
+        DB::table('brands')->where('id',$id)->update(['status'=> 0]);
+        session()->flash('message','Kích hoạt thương hiệu sản phẩm thành công');
+        return Redirect::to('all-brand-product');
     }
 
     public function edit_brand_product($id)
@@ -155,10 +169,10 @@ class BrandProductController extends Controller
     public function show_brand_home($id)
 {
     // Lấy tất cả categories để render menu
-    $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
+    $cate_pro = DB::table('categories')->where('status','0')->orderBy('id', 'asc')->get();
 
     // Lấy tất cả brands để render menu
-    $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
+    $brand_pro = DB::table('brands')->where('status','0')->orderBy('id', 'asc')->get();
 
     // Lấy tên thương hiệu được click
     $brand_name = DB::table('brands')->where('id', $id)->value('name');

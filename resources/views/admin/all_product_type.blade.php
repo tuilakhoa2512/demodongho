@@ -40,6 +40,18 @@
             </div>
         </div>
         <div class="table-responsive">
+            @if (session('message'))
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Kích hoạt loại sản phẩm thành công!',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    </script>
+                @endif
             <table class="table table-striped b-t b-light">
                 <thead>
                     <tr>
@@ -51,6 +63,7 @@
                         <th>ID</th>
                         <th>Tên loại</th>
                         <th>Mô tả</th>
+                        <th>Hiển Thị</th>
                         <th>Thao tác</th>
                         <th style="width:30px;"></th>
                     </tr>
@@ -62,6 +75,20 @@
                         <td>{{ $cate_pro->id }}</td>
                         <td>{{ $cate_pro->name }}</td>
                         <td>{{ $cate_pro->description }}</td>
+                        <!-- <td>{{ $cate_pro->status }}</td> -->
+                        <td><span class="text-ellipsis">
+                            <?php
+                            if($cate_pro->status==0){
+                                ?>
+                               <a href="{{ URL::to('/unactive-product-type/'.$cate_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
+                            <?php    
+                            }else{
+                                ?>
+                                <a href="{{ URL::to('/active-product-type/'.$cate_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
+                                <?php   
+                            }
+                            ?>
+                        </span></td>
                         <td>
                             <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit">
                                 <i class="fa fa-pencil-square-o text-success text-active"></i>

@@ -41,6 +41,18 @@
     </div>
 
     <div class="table-responsive">
+    @if (session('message'))
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: 'Kích hoạt thương hiệu sản phẩm thành công!',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    </script>
+                @endif
       <table class="table table-striped b-t b-light">
         <thead>
           <tr>
@@ -53,6 +65,7 @@
             <th>Tên thương hiệu</th>
             <th>Mô tả</th>
             <th>Hình</th>
+            <th>Hiển Thị</th>
             <th>Thao tác</th>
             <th style="width:30px;"></th>
           </tr>
@@ -69,7 +82,6 @@
             <td>{{ $brand_pro->id }}</td>
             <td>{{ $brand_pro->name }}</td>
             <td>{{ $brand_pro->description }}</td>
-
             <td>
               @if ($brand_pro->image)
                 <img src="{{ asset('storage/' . $brand_pro->image) }}"
@@ -79,6 +91,19 @@
                 <span>Chưa có ảnh</span>
               @endif
             </td>
+            <td><span class="text-ellipsis">
+                            <?php
+                            if($brand_pro->status==0){
+                                ?>
+                               <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
+                            <?php    
+                            }else{
+                                ?>
+                                <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
+                                <?php   
+                            }
+                            ?>
+                        </span></td>
 
             <td>
                             <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">

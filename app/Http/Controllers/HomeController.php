@@ -11,11 +11,12 @@ class HomeController extends Controller
 {
     public function index()
 {
-    $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
-    $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
+    $cate_pro = DB::table('categories')->where('status','0')->orderBy('id', 'asc')->get();
+    $brand_pro = DB::table('brands')->where('status','0')->orderBy('id', 'asc')->get();
 
     // Lấy tất cả sản phẩm, phân trang 9 sản phẩm/trang
     $all_product = Product::with('productImage')
+        ->where('status','0')
         ->orderBy('id', 'desc')
         ->paginate(6);  // <-- 9 sản phẩm/trang
 
