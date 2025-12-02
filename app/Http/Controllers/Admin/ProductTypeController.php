@@ -37,14 +37,28 @@ class ProductTypeController extends Controller
         $request->validate([
             'product_type_name' => 'required|max:255',
             'product_type_desc'   => 'nullable|string',
+            'product_type_status' => 'required'
         ]);
         $data = array();
         $data['name'] = $request->product_type_name;
         $data['description'] = $request->product_type_desc;
+        $data['status'] = $request->product_type_status;
 
        DB::table('categories')->insert($data);
        session()->flash('message', 'Thêm loại sản phẩm thành công');
        return Redirect::to('add-product-type');
+    }
+
+    public function unactive_product_type($id){
+        DB::table('categories')->where('id',$id)->update(['status'=> 1]);
+        session()->flash('message','Không kích hoạt danh mục sản phẩm thành công');
+        return Redirect::to('all-product-type');
+    }
+
+    public function active_product_type($id){
+        DB::table('categories')->where('id',$id)->update(['status'=> 0]);
+        session()->flash('message','Kích hoạt danh mục sản phẩm thành công');
+        return Redirect::to('all-product-type');
     }
 
     public function edit_product_type($id){
@@ -57,6 +71,7 @@ class ProductTypeController extends Controller
         $request->validate([
             'product_type_name' => 'required|max:255',
             'product_type_desc'   => 'nullable|string',
+            'product_type_status' => 'required',
         ]);
     
         // Cập nhật sản phẩm
@@ -72,8 +87,8 @@ class ProductTypeController extends Controller
     }
     public function show_category_home($id)
         {
-            $cate_pro = DB::table('categories')->orderBy('id', 'asc')->get();
-            $brand_pro = DB::table('brands')->orderBy('id', 'asc')->get();
+            $cate_pro = DB::table('categories')->where('status','0')->orderBy('id', 'asc')->get();
+            $brand_pro = DB::table('brands')->where('status','0')->orderBy('id', 'asc')->get();
 
             $category_name = DB::table('categories')->where('id', $id)->value('name');
 

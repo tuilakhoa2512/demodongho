@@ -10,6 +10,9 @@ use App\Models\Brand;
 use App\Models\ProductImage;
 use Illuminate\Support\Facades\Storage as FileStorage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class ProductController extends Controller
 {
@@ -49,6 +52,7 @@ class ProductController extends Controller
         'dial_size'      => 'nullable|numeric|min:0',
         'strap_material' => 'nullable|string|max:100',
         'price'          => 'required|numeric|min:0',
+        'status'         => 'required',
 
         'image_1'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
         'image_2'        => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
@@ -72,6 +76,7 @@ class ProductController extends Controller
         'strap_material' => $validated['strap_material'] ?? null,
         'price'          => $validated['price'],
         'quantity'       => $quantity,   // lấy từ kho
+        'status'         => $validated['status'],
     ]);
 
   
@@ -144,7 +149,6 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'brands', 'categories'));
     }
 
-
     public function update(Request $request, $id)
     {
         
@@ -175,6 +179,7 @@ class ProductController extends Controller
             'dial_size'      => $request->dial_size,
             'strap_material' => $request->strap_material,
             'price'          => $request->price,
+            'status' => $request->product_status,
         ]);
 
         $productImage = ProductImage::firstOrCreate(
@@ -205,6 +210,22 @@ class ProductController extends Controller
 
   
         return redirect('/admin/products')->with('success', 'Cập nhật sản phẩm thành công!');
+    }
+
+    public function unactive_product($id){
+        DB::table('products')->where('id',$id)->update(['status'=> 1]);
+        session()->flash('message','Không kích hoạt sản phẩm thành công');
+        return redirect('/admin/products');
+
+
+    }
+
+    public function active_product($id){
+        DB::table('products')->where('id',$id)->update(['status'=> 0]);
+        session()->flash('message','Kích hoạt danh mục sản phẩm thành công');
+        return redirect('/admin/products');
+
+
     }
 
 }

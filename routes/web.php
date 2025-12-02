@@ -95,6 +95,10 @@ Route::get('/all-product-type', [ProductTypeController::class, 'all_product_type
 
 Route::post('/save-product-type', [ProductTypeController::class, 'save_product_type'])->name('admin.saveproducttype');
 
+Route::get('/unactive-product-type/{id}', [ProductTypeController::class, 'unactive_product_type'])->name('admin.unactivecate');
+
+Route::get('/active-product-type/{id}', [ProductTypeController::class, 'active_product_type'])->name('admin.activecate');
+
 Route::get('/edit-product-type/{id}', [ProductTypeController::class, 'edit_product_type'])->name('admin.editproducttype');
 
 Route::get('/delete-product-type/{id}', [ProductTypeController::class, 'delete_product_type'])->name('destroy');
@@ -113,6 +117,10 @@ Route::get('/edit-brand-product/{id}', [BrandProductController::class, 'edit_bra
 Route::get('/delete-brand-product/{id}', [BrandProductController::class, 'delete_brand_product'])->name('admin.deletebrandproduct');
 
 Route::post('/update-brand-product/{id}', [BrandProductController::class, 'update_brand_product'])->name('admin.updatebrandproduct');
+
+Route::get('/unactive-brand-product/{id}', [BrandProductController::class, 'unactive_brand_product'])->name('admin.unactivebrand');
+
+Route::get('/active-brand-product/{id}', [BrandProductController::class, 'active_brand_product'])->name('admin.activebrand');
 
 
 // ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
@@ -145,6 +153,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/products/{id}/edit', [ProductController::class, 'edit']);
 
     Route::post('/products/{id}/update', [ProductController::class, 'update']);
+
+    Route::post('/active-product/{id}', [ProductController::class, 'active_product'])->name('active-product');
+    Route::post('/unactive-product/{id}', [ProductController::class, 'unactive_product'])->name('unactive-product');
 
 
 });
