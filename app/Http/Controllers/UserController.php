@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
+use App\Models\Province;
+use App\Models\Ward;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Requests;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
@@ -25,7 +29,7 @@ class UserController extends Controller
         Session::put('images', $user->image);
     }
 }
-    public function profile()
+public function profile()
 {
     $id = Session::get('id');
     if (!$id) {
@@ -33,7 +37,29 @@ class UserController extends Controller
     }
 
     $user = DB::table('users')->where('id', $id)->first();
-    return view('pages.profile', compact('user'));
+
+    // Lấy danh sách tỉnh
+    $provinces = DB::table('provinces')->orderBy('name')->get();
+
+    // Lấy huyện theo tỉnh người dùng đang chọn
+    $districts = [];
+    if ($user->province_id) {
+        $districts = DB::table('districts')
+            ->where('province_id', $user->province_id)
+            ->orderBy('name')
+            ->get();
+    }
+
+    // Lấy xã theo huyện người dùng đang chọn
+    $wards = [];
+    if ($user->district_id) {
+        $wards = DB::table('wards')
+            ->where('district_id', $user->district_id)
+            ->orderBy('name')
+            ->get();
+    }
+
+    return view('pages.profile', compact('user', 'provinces', 'districts', 'wards'));
 }
 
 public function profileUpdate(Request $request)
@@ -44,13 +70,21 @@ public function profileUpdate(Request $request)
     }
     $user = DB::table('users')->where('id', $id)->first();
 
-    $data = [];
-    $data['fullname'] = $request->fullname;
-    $data['phone'] = $request->phone;
-    $data['address'] = $request->address;
-    $data['district'] = $request->district;
-    $data['ward'] = $request->ward;
-    $data['province'] = $request->province;
+        $request->validate([
+            'fullname' => 'required|string|max:150',
+            'phone'    => 'nullable|string|max:20',
+            'address'  => 'nullable|string|max:255',           
+            'image'    => 'nullable|image|max:2048',
+        ]);
+
+        $data = [
+            'fullname'    => $request->fullname,
+            'phone'       => $request->phone,
+            'address'     => $request->address,
+            'province_id' => $request->province_id,
+            'district_id' => $request->district_id,
+            'ward_id'     => $request->ward_id,
+        ];
 
     // upload ảnh đại diện
     if ($request->hasFile('image')) {
@@ -77,10 +111,25 @@ public function profileUpdate(Request $request)
             $data['image'] = $user ? $user->image : null;
         }    
 
-    DB::table('users')->where('id', $id)->update($data);
+    //  
     Session::put('fullname', $data['fullname']);
     Session::put('images', $data['image']);
     return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
 }
 
+public function getDistricts($province_id)
+    {
+        return DB::table('districts')
+            ->where('province_id', $province_id)
+            ->orderBy('name')
+            ->get();
+    }
+
+    public function getWards($district_id)
+    {
+        return DB::table('wards')
+            ->where('district_id', $district_id)
+            ->orderBy('name')
+            ->get();
+    }
 }

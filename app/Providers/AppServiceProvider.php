@@ -18,13 +18,13 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    // public function boot(): void
-    // {
-    //     $categories = DB::table('categories')->get();
-    //     View::share('category', $categories);
+    public function boot(): void
+    {
+        $categories = DB::table('categories')->get();
+        View::share('category', $categories);
 
-    //     $brands = DB::table('brands')->get();
-    //     View::share('brand', $brands);
+        $brands = DB::table('brands')->get();
+        View::share('brand', $brands);
         
-    // }
+    }
 }

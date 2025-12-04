@@ -72,26 +72,55 @@
                 </div>
 
 
+                {{-- PROVINCE --}}
                 <div class="form-group">
                     <label for="province">Tỉnh / Thành phố</label>
-                    <select name="province" id="province" class="form-control" style="max-width: 800px;">
+                    <select name="province_id" id="province" class="form-control" style="max-width: 800px;">
                         <option value="">-- Chọn Tỉnh / Thành phố --</option>
+
+                        @foreach ($provinces as $p)
+                            <option value="{{ $p->id }}"
+                                {{ $p->id == $user->province_id ? 'selected' : '' }}>
+                                {{ $p->name }}
+                            </option>
+                        @endforeach
+
                     </select>
                 </div>
 
+                {{-- DISTRICT --}}
                 <div class="form-group">
                     <label for="district">Quận / Huyện</label>
-                    <select name="district" id="district" class="form-control" style="max-width: 800px;">
+                    <select name="district_id" id="district" class="form-control" style="max-width: 800px;">
                         <option value="">-- Chọn Quận / Huyện --</option>
+
+                        @foreach ($districts as $d)
+                            <option value="{{ $d->id }}"
+                                {{ $d->id == $user->district_id ? 'selected' : '' }}>
+                                {{ $d->name }}
+                            </option>
+                        @endforeach
+
                     </select>
                 </div>
 
+                {{-- WARD --}}
                 <div class="form-group">
                     <label for="ward">Phường / Xã</label>
-                    <select name="ward" id="ward" class="form-control" style="max-width: 800px;">
+                    <select name="ward_id" id="ward" class="form-control" style="max-width: 800px;">
                         <option value="">-- Chọn Phường / Xã --</option>
+
+                        @foreach ($wards as $w)
+                            <option value="{{ $w->id }}"
+                                {{ $w->id == $user->ward_id ? 'selected' : '' }}>
+                                {{ $w->name }}
+                            </option>
+                        @endforeach
+
                     </select>
                 </div>
+
+
 
                 <div class="form-group">
                     <label>Ảnh đại diện</label>
@@ -106,124 +135,44 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const provinceSelect = document.getElementById('province');
-    const districtSelect = document.getElementById('district');
-    const wardSelect     = document.getElementById('ward');
 
-    const currentProvinceName = @json($user->province);
-    const currentDistrictName = @json($user->district);
-    const currentWardName     = @json($user->ward);
+    const province = document.getElementById('province');
+    const district = document.getElementById('district');
+    const ward     = document.getElementById('ward');
 
-    fetch('{{ route('location.provinces') }}')
-        .then(response => response.json())
-        .then(provinces => {
-            console.log('Provinces from backend:', provinces);
+    // Khi chọn tỉnh -> load huyện
+    province.addEventListener('change', function() {
+        const pid = this.value;
+        district.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
+        ward.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
 
-            if (!Array.isArray(provinces)) {
-                console.error('Sai format provinces:', provinces);
-                return;
-            }
+        if (!pid) return;
 
-            provinces.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.name;
-                opt.textContent = p.name;
-          
-                opt.dataset.code = p.code;
-                provinceSelect.appendChild(opt);
+        fetch(`/location/districts/${pid}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(d => {
+                    district.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                });
             });
-
-            if (currentProvinceName) {
-                provinceSelect.value = currentProvinceName;
-                const selectedProvince = provinceSelect.selectedOptions[0];
-                if (selectedProvince) {
-                    loadDistricts(selectedProvince.dataset.code);
-                }
-            }
-        })
-        .catch(err => console.error('Lỗi load provinces:', err));
-
-    provinceSelect.addEventListener('change', function () {
-        const selected = this.selectedOptions[0];
-        const provinceCode = selected ? selected.dataset.code : null;
-
-        districtSelect.innerHTML = '<option value="">-- Chọn Quận / Huyện --</option>';
-        wardSelect.innerHTML     = '<option value="">-- Chọn Phường / Xã --</option>';
-
-        if (!provinceCode) return;
-
-        loadDistricts(provinceCode);
     });
 
-    function loadDistricts(provinceCode) {
-        const url = '{{ url('location/provinces') }}/' + provinceCode + '/districts';
+    // Khi chọn huyện -> load xã
+    district.addEventListener('change', function() {
+        const did = this.value;
+        ward.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
 
-        fetch(url)
-            .then(response => response.json())
-            .then(districts => {
-                console.log('Districts:', districts);
+        if (!did) return;
 
-                if (!Array.isArray(districts)) {
-                    console.error('Sai format districts:', districts);
-                    return;
-                }
-
-                districts.forEach(d => {
-                    const opt = document.createElement('option');
-                    opt.value = d.name;       
-                    opt.textContent = d.name;
-                    opt.dataset.code = d.code; 
-                    districtSelect.appendChild(opt);
+        fetch(`/location/wards/${did}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(w => {
+                    ward.innerHTML += `<option value="${w.id}">${w.name}</option>`;
                 });
-
-                if (currentDistrictName) {
-                    districtSelect.value = currentDistrictName;
-                    const selectedDistrict = districtSelect.selectedOptions[0];
-                    if (selectedDistrict) {
-                        loadWards(selectedDistrict.dataset.code);
-                    }
-                }
-            })
-            .catch(err => console.error('Lỗi load districts:', err));
-    }
-
-    districtSelect.addEventListener('change', function () {
-        const selected = this.selectedOptions[0];
-        const districtCode = selected ? selected.dataset.code : null;
-
-        wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
-
-        if (!districtCode) return;
-
-        loadWards(districtCode);
+            });
     });
 
-    function loadWards(districtCode) {
-        const url = '{{ url('location/districts') }}/' + districtCode + '/wards';
-
-        fetch(url)
-            .then(response => response.json())
-            .then(wards => {
-                console.log('Wards:', wards);
-
-                if (!Array.isArray(wards)) {
-                    console.error('Sai format wards:', wards);
-                    return;
-                }
-
-                wards.forEach(w => {
-                    const opt = document.createElement('option');
-                    opt.value = w.name; 
-                    opt.textContent = w.name;
-                    wardSelect.appendChild(opt);
-                });
-
-                if (currentWardName) {
-                    wardSelect.value = currentWardName;
-                }
-            })
-            .catch(err => console.error('Lỗi load wards:', err));
-    }
 });
 </script>
 

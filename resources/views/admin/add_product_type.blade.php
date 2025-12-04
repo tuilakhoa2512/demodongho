@@ -39,8 +39,8 @@
                         <div class="form-group">
                             <label for="productTypeDesc">Trạng Thái</label>
                             <select name="product_type_status" class="form-control input-sm m-bot15">
-                                <option value="0">Ẩn</option>
-                                <option value="1">Hiển Thị</option>
+                                <option value="1">Ẩn</option>
+                                <option value="0">Hiển Thị</option>
                                
                             </select>
 

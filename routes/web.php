@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\StorageDetailController;
+use Illuminate\Support\Facades\DB;
+
 
 
 use App\Models\Category;
@@ -51,11 +54,19 @@ Route::post('/tim-kiem', [HomeController::class, 'search']);
 Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
 
 
-//Tinh Thanh
+/// Tỉnh - Huyện - Xã
 Route::prefix('location')->group(function () {
-    Route::get('/provinces', [LocationController::class, 'provinces'])->name('location.provinces');
-    Route::get('/provinces/{code}/districts', [LocationController::class, 'districts'])->name('location.districts');
-    Route::get('/districts/{code}/wards', [LocationController::class, 'wards'])->name('location.wards');
+
+  // API load huyện theo tỉnh
+  Route::get('/districts/{province_id}', [UserController::class, 'getDistricts']);
+
+  // API load xã theo huyện
+  Route::get('/wards/{district_id}', [UserController::class, 'getWards']);
+
+  // Nếu bạn vẫn muốn giữ API theo code
+  Route::get('/provinces', [LocationController::class, 'provinces'])->name('location.provinces');
+  Route::get('/provinces/{code}/districts', [LocationController::class, 'districts'])->name('location.districts');
+  Route::get('/districts/{code}/wards', [LocationController::class, 'wards'])->name('location.wards');
 });
 
 

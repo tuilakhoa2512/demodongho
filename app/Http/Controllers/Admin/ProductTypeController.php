@@ -71,7 +71,7 @@ class ProductTypeController extends Controller
         $request->validate([
             'product_type_name' => 'required|max:255',
             'product_type_desc'   => 'nullable|string',
-            'product_type_status' => 'required',
+            
         ]);
     
         // Cập nhật sản phẩm

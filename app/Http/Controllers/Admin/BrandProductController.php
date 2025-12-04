@@ -48,7 +48,7 @@ class BrandProductController extends Controller
             'brand_product_name'   => 'required|string|max:150',
             'brand_product_image'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'brand_product_desc'   => 'nullable|string',
-            'product_type_status' => 'required'
+            'brand_product_status' => 'required'
         ]);
 
         $data = [];

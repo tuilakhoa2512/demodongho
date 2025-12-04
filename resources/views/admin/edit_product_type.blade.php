@@ -53,7 +53,7 @@
                                       style="resize: none;">{{ $edit_value->description }}</textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-info">
+                        <button type="submit" name="update_product_type" class="btn btn-info">
                             Cập nhật loại sản phẩm
                         </button>
 
