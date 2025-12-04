@@ -37,10 +37,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="productTypeDesc">Trạng Thái</label>
-                            <select name="product_type_status" class="form-control input-sm m-bot15">
-                                <option value="0">Ẩn</option>
-                                <option value="1">Hiển Thị</option>
+                            <label for="productTypeDesc">Hiển Thị</label>
+                            <select name="brand_product_status" class="form-control input-sm m-bot15">
+                                <option value="1">Ẩn</option>
+                                <option value="0">Hiển Thị</option>
                                
                             </select>
 
@@ -51,7 +51,7 @@
                             <input type="file" name="brand_product_image" class="form-control">
                         </div>
 
-                        <button type="submit" class="btn btn-info">Thêm Thương Hiệu</button>
+                        <button type="submit" name="add_brand_product" class="btn btn-info">Thêm Thương Hiệu</button>
 
                     </form>
 
