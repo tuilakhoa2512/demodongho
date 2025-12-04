@@ -1,0 +1,155 @@
+@extends('pages.admin_layout')
+@section('admin_content')
+
+<div class="table-agile-info">
+  <div class="panel panel-default">
+
+    <div class="panel-heading" style="color:#000; font-weight:600;">
+    @isset($currentStatus)
+        @if($currentStatus == 'pending')      Hàng Chưa Bán Trong Kho
+        @elseif($currentStatus == 'selling')  Hàng Đang Bán Trong Kho
+        @elseif($currentStatus == 'sold_out') Hàng Bán Hết Trong Kho
+        @elseif($currentStatus == 'stopped')  Hàng Ngừng Bán Trong Kho
+        @endif
+    @else
+        Quản Lý Kho Hàng (Của Các Lô)
+    @endisset
+    </div>
+
+    {{-- Toast thông báo thành công --}}
+    @if(session('success'))
+      <div class="alert alert-success" style="margin:15px;">
+        {{ session('success') }}
+      </div>
+    @endif
+
+    {{-- Hàng lọc theo lô hàng --}}
+    <div class="row w3-res-tb" style="padding: 0 15px; margin-top: 15px;">
+      <div class="col-sm-5 m-b-xs">
+        <form method="GET" action="{{ route('admin.storage-details.index') }}" class="form-inline">
+
+          {{-- Dropdown chọn lô --}}
+          <select name="storage_id" class="input-sm form-control w-sm inline v-middle">
+            <option value="">Lọc theo lô (Tất cả)</option>
+            @foreach($storages as $st)
+              <option value="{{ $st->id }}"
+                {{ isset($selectedStorageId) && $selectedStorageId == $st->id ? 'selected' : '' }}>
+                {{ $st->batch_code }}
+              </option>
+            @endforeach
+          </select>
+
+          {{-- Nút áp dụng --}}
+          <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">
+            Áp dụng
+          </button>
+
+        </form>
+      </div>
+
+      <div class="col-sm-4"></div> {{-- Chừa trống cho layout đúng như menu ảnh mẫu --}}
+    </div>
+
+    {{-- Bảng danh sách kho --}}
+    <div class="table-responsive" style="margin-top:10px;">
+      <table class="table table-striped b-t b-light">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Mã lô</th>
+            <th>Tên sản phẩm</th>
+            <th>Số lượng nhập</th>
+            <th>Trạng thái kho</th>
+            <th>Ghi chú</th>
+            <th>Hiển thị</th>
+            <th style="width:130px;">Thao tác</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @forelse($details as $detail)
+            <tr>
+              <td>{{ $detail->id }}</td>
+
+              {{-- Hiển thị mã lô --}}
+              <td>{{ optional($detail->storage)->batch_code ?? '—' }}</td>
+
+              {{-- Tên sản phẩm trong lô --}}
+              <td>{{ $detail->product_name }}</td>
+
+              {{-- SL nhập --}}
+              <td>{{ number_format($detail->import_quantity) }}</td>
+
+              {{-- Nhãn trạng thái kho --}}
+              <td>
+                @if($detail->stock_status === 'pending')
+                  <span class="label label-warning">Chờ bán</span>
+                @elseif($detail->stock_status === 'selling')
+                  <span class="label label-success">Đang bán</span>
+                @elseif($detail->stock_status === 'sold_out')
+                  <span class="label label-default">Hết hàng</span>
+                @elseif($detail->stock_status === 'stopped')
+                  <span class="label label-danger">Ngừng bán</span>
+                @else
+                  <span class="label label-default">—</span>
+                @endif
+              </td>
+
+              {{-- Ghi chú --}}
+              <td>{{ $detail->note }}</td>
+
+              {{-- Ẩn/hiện --}}
+              <td>
+                @if($detail->status)
+                  <span class="label label-success">Hiện</span>
+                @else
+                  <span class="label label-default">Ẩn</span>
+                @endif
+              </td>
+
+              {{-- Các nút thao tác --}}
+              <td>
+                {{-- Nút sửa --}}
+                <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
+                   class="btn btn-xs btn-warning">Sửa</a>
+
+                {{-- Nút Ẩn/Hiện --}}
+                <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
+                      method="POST" style="display:inline-block;">
+                  @csrf
+                  @method('PATCH')
+                  <button type="submit" class="btn btn-xs btn-secondary">
+                    {{ $detail->status ? 'Ẩn' : 'Hiện' }}
+                  </button>
+                </form>
+
+                {{-- Nút xem kho theo lô cụ thể --}}
+                @if($detail->storage)
+                  <a href="{{ route('admin.storage-details.by-storage', $detail->storage->id) }}"
+                     class="btn btn-xs btn-info">Xem lô</a>
+                @endif
+              </td>
+            </tr>
+
+          @empty
+            <tr>
+              <td colspan="8" class="text-center">Kho đang trống.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+
+    {{-- Footer phân trang --}}
+    <footer class="panel-footer">
+      <div class="row">
+        <div class="col-sm-12 text-right text-center-xs">
+          {{ $details->links('pagination::bootstrap-4') }}
+        </div>
+      </div>
+    </footer>
+
+  </div>
+</div>
+
+@endsection

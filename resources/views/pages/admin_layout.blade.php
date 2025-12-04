@@ -140,6 +140,30 @@ body {
                     </ul>
                 </li>
 
+                <li class="sub-menu">
+                    <a href="javascript:;">
+                        <i class="fa fa-database"></i>
+                        <span>Lô Hàng Nhập</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="{{ URL::to('/admin/storages') }}">Danh Sách Lô Hàng</a></li>                                                  
+                        <li><a href="{{ URL::to('/admin/storages/create') }}">Thêm Lô Hàng Mới</a> </li>                                                
+                    </ul>
+                </li>
+
+                <li class="sub-menu">
+                    <a href="javascript:;">
+                        <i class="fa fa-archive"></i>
+                        <span>Kho Hàng</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="{{ route('admin.storage-details.index') }}">Toàn Bộ Hàng Trong Kho</a></li>
+                        <li><a href="{{ route('admin.storage-details.pending') }}">Chưa Bán</a></li>
+                        <li><a href="{{ route('admin.storage-details.selling') }}">Đang Bán</a></li>
+                        <li><a href="{{ route('admin.storage-details.sold-out') }}">Bán Hết</a></li>
+                        <li><a href="{{ route('admin.storage-details.stopped') }}">Ngừng Bán</a></li>
+                    </ul>
+                </li>
 
                 <li class="sub-menu">
                     <a href="javascript:;">
@@ -152,17 +176,6 @@ body {
                     </ul>
                 </li>
 
-
-              <li class="sub-menu">
-                    <a href="javascript:;">
-                        <i class="fa fa-database"></i>
-                        <span>Kho Nhập</span>
-                    </a>
-                    <ul class="sub">
-                        <li><a href="{{ URL::to('/admin/storages') }}">Danh Sách Lô Hàng</a></li>                                                  
-                        <li><a href="{{ URL::to('/admin/storages/create') }}">Thêm Lô Hàng Mới</a> </li>                                                
-                    </ul>
-                </li>
 
 
                 <li class="sub-menu">

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('batch_code', 50)->unique(); // VARCHAR(50) UNIQUE
 
             $table->string('supplier_name', 255)->nullable(); // VARCHAR(255)
-            $table->string('supplier_mail', 100)->nullable(); // VARCHAR(100)
+            $table->string('supplier_email', 100)->nullable(); // VARCHAR(100)
 
             $table->timestamp('import_date')->useCurrent(); // TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 

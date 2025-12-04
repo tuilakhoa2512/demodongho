@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\Admin\StorageDetailController;
 
 
 use App\Models\Category;
@@ -123,23 +124,49 @@ Route::get('/unactive-brand-product/{id}', [BrandProductController::class, 'unac
 Route::get('/active-brand-product/{id}', [BrandProductController::class, 'active_brand_product'])->name('admin.activebrand');
 
 
-// ================= KHO NHẬP (TRONG PREFIX ADMIN) =================
+// ================= LÔ HÀNG + CHI TIẾT KHO (TRONG PREFIX ADMIN) =================
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // KHO NHẬP
+    // ======== KHO NHẬP (Lô Hàng) ========
     Route::get('/storages', [StorageController::class, 'index'])->name('storages.index');
 
     Route::get('/storages/create', [StorageController::class, 'create'])->name('storages.create');
 
     Route::post('/storages', [StorageController::class, 'store'])->name('storages.store');
 
-    Route::delete('/storages/{id}', [StorageController::class, 'destroy']);
+    Route::get('/storages/{id}/edit', [StorageController::class, 'edit'])->name('storages.edit');
 
-    Route::get('/storages/{id}/edit', [StorageController::class, 'edit']);
+    Route::put('/storages/{id}', [StorageController::class, 'update'])->name('storages.update');
 
-    Route::put('/storages/{id}',      [StorageController::class, 'update']);
+      // status ẩn/hiện
+    Route::patch('/storages/{id}/toggle-status', [StorageController::class, 'toggleStatus'])->name('storages.toggle-status');
 
+    // ======== QUẢN LÝ KHO HÀNG (STORAGE DETAILS) ========
+
+      //xem toàn bộ sản phẩm của tất cả lô
+    Route::get('/storage-details', [StorageDetailController::class, 'index'])->name('storage-details.index');
+
+      // Danh sách kho theo 1 lô cụ thể
+      // GET /admin/storages/{storageId}/details
+    Route::get('/storages/{storageId}/details', [StorageDetailController::class, 'indexByStorage'])->name('storage-details.by-storage');
+
+    Route::get('/storages/{storageId}/details/create', [StorageDetailController::class, 'create'])->name('storage-details.create');
+
+    Route::post('/storages/{storageId}/details', [StorageDetailController::class, 'store'])->name('storage-details.store');
+
+    Route::get('/storage-details/{id}/edit', [StorageDetailController::class, 'edit'])->name('storage-details.edit');
+
+    Route::put('/storage-details/{id}', [StorageDetailController::class, 'update'])->name('storage-details.update');
+
+    Route::patch('/storage-details/{id}/toggle-status', [StorageDetailController::class, 'toggleStatus'])->name('storage-details.toggle-status');
+
+     // Lọc kho tổng theo trạng thái stock_status
+    Route::get('/storage-details/status/pending',  [StorageDetailController::class, 'listPending'])->name('storage-details.pending');
+    Route::get('/storage-details/status/selling',  [StorageDetailController::class, 'listSelling'])->name('storage-details.selling');
+    Route::get('/storage-details/status/sold-out', [StorageDetailController::class, 'listSoldOut'])->name('storage-details.sold-out');
+    Route::get('/storage-details/status/stopped',  [StorageDetailController::class, 'listStopped'])->name('storage-details.stopped');
     
     // QUẢN LÝ SẢN PHẨM
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

@@ -1,8 +1,6 @@
 @extends('pages.admin_layout')
 @section('admin_content')
 
-
-
 <div class="row">
     <div class="col-lg-12">
         <section class="panel">
@@ -13,26 +11,42 @@
             <div class="panel-body">
                 <div class="position-center">
 
-                    <form role="form" method="POST" action="{{ URL::to('/admin/storages') }}">
-                        @csrf
-                   
-                        <div class="form-group">
-                            <label for="product_name">Tên sản phẩm</label>
-                            <input type="text"
-                                name="product_name"
-                                class="form-control"
-                                id="product_name"
-                                placeholder="Nhập tên sản phẩm"
-                                required>
+                    {{-- Hiển thị lỗi validate --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul style="margin-bottom: 0;">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
+                    @endif
+
+                    <form role="form" method="POST" action="{{ route('admin.storages.store') }}">
+                         @csrf
 
                         <div class="form-group">
-                            <label for="supplier_name">Nhà cung cấp</label>
+                            <label for="supplier_name">Tên nhà cung cấp</label>
                             <input type="text"
                                 name="supplier_name"
                                 class="form-control"
                                 id="supplier_name"
-                                placeholder="Tên nhà cung cấp (nếu có)">
+                                value="{{ old('supplier_name') }}"
+                                placeholder="Nhập tên nhà cung cấp (tối đa 50 ký tự)"
+                                maxlength="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="supplier_email">Email nhà cung cấp</label>
+                            <input type="email"
+                                name="supplier_email"
+                                class="form-control"
+                                id="supplier_email"
+                                value="{{ old('supplier_email') }}"
+                                placeholder="Email phải có đuôi @gmail.com"
+                                pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                                title="Vui lòng nhập email có đuôi @gmail.com"
+                                maxlength="30">
                         </div>
 
                         <div class="form-group">
@@ -41,35 +55,23 @@
                                 name="import_date"
                                 class="form-control"
                                 id="import_date"
-                                required>
+                                value="{{ old('import_date') }}">
                         </div>
 
                         <div class="form-group">
-                            <label for="import_quantity">Số lượng nhập</label>
-                            <input type="number"
-                                min="1"
-                                name="import_quantity"
-                                class="form-control"
-                                id="import_quantity"
-                                placeholder="Nhập số lượng"
-                                required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="unit_import_price">Giá nhập (1 sản phẩm)</label>
-                            <input type="number"
-                                step="0.01"
-                                min="0"
-                                name="unit_import_price"
-                                class="form-control"
-                                id="unit_import_price"
-                                placeholder="VD: 1500000"
-                                required>
+                            <label for="note">Ghi chú</label>
+                            <textarea name="note"
+                                    id="note"
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Tối đa 200 ký tự"
+                                    maxlength="200">{{ old('note') }}</textarea>
                         </div>
 
                         <button type="submit" class="btn btn-info">Thêm Lô Hàng</button>
-
+                        <a href="{{ route('admin.storages.index') }}" class="btn btn-default">Quay lại</a>
                     </form>
+
 
                 </div>
             </div>

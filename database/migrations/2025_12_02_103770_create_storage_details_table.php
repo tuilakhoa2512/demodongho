@@ -18,7 +18,6 @@ return new class extends Migration
             $table->tinyInteger('status')->default(1)->comment('1=active, 0=inactive');
             $table->timestamps();
 
-            // Khóa ngoại
             $table->foreign('storage_id')->references('id')->on('storages')->onDelete('cascade');
         });
     }

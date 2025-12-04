@@ -5,108 +5,115 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Storage;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class StorageController extends Controller
 {
-    // danh sách lô hàng
-    public function index()
+    public function index(Request $request)
     {
-        $storages = Storage::with('product')
-            ->orderBy('id', 'asc')
-            ->paginate(10);
+        // Lấy trạng thái lọc từ URL ?status=1 hoặc 0
+        $filterStatus = $request->input('status');
 
-        return view('admin.storages.index', compact('storages'));
+        $query = Storage::query()->orderByDesc('id');
+
+        if ($filterStatus !== null && $filterStatus !== '') {
+            $query->where('status', $filterStatus);
+        }
+
+        $storages = $query->paginate(10)->appends($request->query());
+
+        return view('admin.storages.index', [
+            'storages' => $storages,
+            'filterStatus' => $filterStatus
+        ]);
     }
 
-    // form thêm lô
+
     public function create()
     {
         return view('admin.storages.create');
     }
 
-    // lưu lô mới
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        $validated = $request->validate([
-            'product_name'       => 'required|string|max:255',
-            'supplier_name'      => 'nullable|string|max:255',
-            'import_date'        => 'required|date',
-            'import_quantity'    => 'required|integer|min:1',
-            'unit_import_price'  => 'required|numeric|min:0',
+        $request->validate([
+            'supplier_name'  => 'nullable|string|max:50',
+
+            'supplier_email' => ['nullable','email','max:30', function ($attribute, $value, $fail) {
+                if (!str_ends_with($value, '@gmail.com')) {
+                    $fail('Email phải có đuôi @gmail.com');
+                }
+            }],
+
+            'import_date' => 'nullable|date',
+
+            'note'       => 'nullable|string|max:200',
         ]);
 
-        $validated['total_import_price'] =
-            $validated['import_quantity'] * $validated['unit_import_price'];
+        $year = Carbon::now()->year;
+        $sequence = (Storage::max('id') ?? 0) + 1;
+        $batchCode = "LH{$year}-{$sequence}";
 
-        Storage::create($validated);
+        Storage::create([
+            'batch_code'     => $batchCode,
+            'supplier_name'  => $request->supplier_name,
+            'supplier_email' => $request->supplier_email,
+            'import_date'    => $request->import_date ?? Carbon::now(),
+            'note'           => $request->note,
+            'status'         => 1,
+        ]);
 
-        // sau khi lưu xong thì quay về danh sách
-        return redirect()
-            ->route('admin.storages.index')
-            ->with('success', 'Thêm lô hàng mới thành công!');
-    }
-
-        //xóa lô
-       public function destroy($id)
-    {
-        $storage = Storage::with('product')->findOrFail($id);
-
-        if ($storage->product) {
-            return redirect()->back()
-                ->with('error', 'Lô hàng này đang được đăng bán, không thể xóa.');
-        }
-
-        $storage->delete();
-
-        return redirect()->back()
-            ->with('success', 'Xóa lô hàng thành công.');
+        return redirect()->route('admin.storages.index')
+            ->with('success', 'Tạo lô hàng thành công. Mã lô: '.$batchCode);
     }
 
     public function edit($id)
     {
-        
-        $storage = Storage::with('product')->findOrFail($id);
+        $storage = Storage::findOrFail($id);
 
         return view('admin.storages.edit', compact('storage'));
     }
 
-
     public function update(Request $request, $id)
     {
-        
-        $storage = Storage::with('product')->findOrFail($id);
+        $storage = Storage::findOrFail($id);
 
-        $rules = [
-            'product_name'      => 'required|string|max:255',
-            'supplier_name'     => 'nullable|string|max:255',
-            'import_date'       => 'required|date',
-            'unit_import_price' => 'required|numeric|min:0',
-        ];
+        $request->validate([
+            'supplier_name'  => 'nullable|string|max:50',
+            'supplier_email' => [
+                'nullable',
+                'string',
+                'max:30',
+                'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/',
+            ],
+            'import_date'    => 'nullable|date',
+            'note'           => 'nullable|string|max:200',
+        ], [
+            'supplier_email.regex' => 'Email phải có đuôi @gmail.com',
+        ]);
 
-        // lô chưa đăng -> cho phép sửa SL nhập
-        if (!$storage->product) {
-            $rules['import_quantity'] = 'required|integer|min:1';
-        }
-       
-        $validated = $request->validate($rules);
-
-        if ($storage->product) {
-            // đã đăng -> lấy sl nhập cũ
-            $validated['import_quantity'] = $storage->import_quantity;
-        } else {
-            // chưa đăng → lấy từ form
-            $validated['import_quantity'] = (int) $validated['import_quantity'];
-        }
-
-        // tính lại tổng nhập
-        $validated['total_import_price'] =
-            $validated['import_quantity'] * $validated['unit_import_price'];
-
-        $storage->update($validated);
+        // batch_code KHÔNG sửa ở đây, chỉ sửa các thông tin khác
+        $storage->update([
+            'supplier_name'  => $request->supplier_name,
+            'supplier_email' => $request->supplier_email,
+            'import_date'    => $request->import_date ?? $storage->import_date,
+            'note'           => $request->note,
+            // status giữ nguyên, quản lý bằng toggle-status riêng
+        ]);
 
         return redirect()
-            ->to('/admin/storages')
+            ->route('admin.storages.index')
             ->with('success', 'Cập nhật lô hàng thành công.');
     }
 
+    // Ẩn / hiện lô hàng bằng status
+    public function toggleStatus($id)
+    {
+        $storage = Storage::findOrFail($id);
+        $storage->status = $storage->status ? 0 : 1;
+        $storage->save();
+
+        return redirect()->back()
+            ->with('success', 'Cập nhật trạng thái lô hàng thành công.');
+    }
 }

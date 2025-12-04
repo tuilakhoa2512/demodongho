@@ -7,19 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class Storage extends Model
 {
 
-    
+    protected $table = 'storages';
+
     protected $fillable = [
-        'product_name',      
-        'supplier_name',     
-        'import_date',       
-        'import_quantity',    
-        'unit_import_price',  
-        'total_import_price', 
+        'batch_code',
+        'supplier_name',
+        'supplier_email',
+        'import_date', 
+        'note',
+        'status',                // 1 = active, 0 = inactive/archived
     ];
 
-    // quan hệ: 1 lô hàng -> 1 sản phẩm
-    public function product()
+    // 1 Storage có nhiều StorageDetail
+    public function storageDetails()
     {
-        return $this->hasOne(Product::class, 'storage_id', 'id');
+        return $this->hasMany(StorageDetail::class, 'storage_id', 'id');
     }
 }
