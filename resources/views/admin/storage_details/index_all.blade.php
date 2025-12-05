@@ -48,11 +48,18 @@
         </form>
       </div>
 
-      <div class="col-sm-4"></div> {{-- Chừa trống cho layout đúng như menu ảnh mẫu --}}
+      <div class="col-sm-4"></div> 
     </div>
 
     {{-- Bảng danh sách kho --}}
     <div class="table-responsive" style="margin-top:10px;">
+      <style>
+          table td, table th {
+              text-align: center !important;
+              vertical-align: middle !important;
+          }
+      </style>
+
       <table class="table table-striped b-t b-light">
         <thead>
           <tr>

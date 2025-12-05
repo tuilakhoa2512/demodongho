@@ -26,6 +26,14 @@
       </div>
     @endif
 
+    <style>
+        table td, table th {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+    </style>
+
+
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
 
@@ -52,7 +60,7 @@
         <div class="input-group">
           <input type="text" class="input-sm form-control" placeholder="Tìm theo mã lô / nhà cung cấp...">
           <span class="input-group-btn">
-            <button class="btn btn-sm btn-default" type="button">Go!</button>
+            <button class="btn btn-sm btn-default" type="button">Tìm</button>
           </span>
         </div>
       </div>
