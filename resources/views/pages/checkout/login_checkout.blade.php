@@ -1,14 +1,14 @@
 @extends('pages.layout')
 @section('content')
 
-<h2 class="title text-center">Đăng Nhập Tài Khoản</h2>
+<!-- <h2 class="title text-center">Đăng Nhập Tài Khoản</h2> -->
 <div class="container" style="margin-top:50px;">
     <div class="row justify-content-center">
     <div class="col-sm-9 d-flex justify-content-center" style="padding-right: 15px;">
             <div class="login-form p-4" 
                  style="border: 1px solid #ddd; border-radius: 10px; background-color: #fff; width: 100%;">
                  
-                <h2 class="text-center mb-4">Đăng nhập</h2>
+                <h2 class="title text-center mb-4 ">Đăng nhập</h2>
               
 
                 @if(session('error'))
@@ -22,6 +22,7 @@
                     <label for="">Email:</label>
                     <input type="text" name="email" placeholder="xxx@gmail.com" 
                            class="form-control mb-3" style="width: 130%;"/>
+                           
                     <label for="">Mật Khẩu:</label>
                     <input type="password" name="password" placeholder="********" 
                            class="form-control mb-3" style="width: 130%;"/>

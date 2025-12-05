@@ -25,11 +25,36 @@ class ProductTypeController extends Controller
         // $this->AuthLogin();
         return view('admin.add_product_type');
     }
-    public function all_product_type(){
+    // public function all_product_type(){
+    //     // $this->AuthLogin();
+    //     $all_product_type = DB::table('categories')->get();
+    //     $manager_product_type = view('admin.all_product_type')->with('all_product_type',$all_product_type);
+    //     return view('pages.admin_layout')->with('admin.all_product_type',$manager_product_type);
+        
+    // }
+
+    public function all_product_type(Request $request){
         // $this->AuthLogin();
-        $all_product_type = DB::table('categories')->get();
-        $manager_product_type = view('admin.all_product_type')->with('all_product_type',$all_product_type);
-        return view('pages.admin_layout')->with('admin.all_product_type',$manager_product_type);
+        $filterStatus = $request->input('status');
+        $query = DB::table('categories');
+
+        // Nếu có chọn trạng thái thì lọc
+    if ($filterStatus !== null && $filterStatus !== '') {
+        $query->where('status', $filterStatus);
+    }
+
+    // Lấy danh sách theo điều kiện
+    $all_product_type = $query->orderBy('id', 'desc')->get();
+
+    // Truyền biến qua view
+    $manager_product_type = view('admin.all_product_type')
+        ->with('all_product_type', $all_product_type)
+        ->with('filterStatus', $filterStatus);
+
+    return view('pages.admin_layout')->with('admin.all_product_type', $manager_product_type);
+        // $all_product_type = DB::table('categories')->get();
+        // $manager_product_type = view('admin.all_product_type')->with('all_product_type',$all_product_type);
+        // return view('pages.admin_layout')->with('admin.all_product_type',$manager_product_type);
         
     }
     public function save_product_type(Request $request){
@@ -50,13 +75,13 @@ class ProductTypeController extends Controller
     }
 
     public function unactive_product_type($id){
-        DB::table('categories')->where('id',$id)->update(['status'=> 1]);
+        DB::table('categories')->where('id',$id)->update(['status'=> 0]);
         session()->flash('message','Không kích hoạt danh mục sản phẩm thành công');
         return Redirect::to('all-product-type');
     }
 
     public function active_product_type($id){
-        DB::table('categories')->where('id',$id)->update(['status'=> 0]);
+        DB::table('categories')->where('id',$id)->update(['status'=> 1]);
         session()->flash('message','Kích hoạt danh mục sản phẩm thành công');
         return Redirect::to('all-product-type');
     }

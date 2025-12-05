@@ -9,6 +9,19 @@
       </header>
 
       <div class="panel-body">
+      @if (session('message'))
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: '{{ session("message") }}',
+                confirmButtonText: 'OK'
+            });
+        });
+    </script>
+@endif
         <div class="position-center">
 
           @if ($errors->any())

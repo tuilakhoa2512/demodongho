@@ -4,6 +4,15 @@
 
 <div class="table-agile-info">
     <div class="panel panel-default">
+    <div class="panel-heading">
+     
+       @if($filterStatus == 1)
+          <small>(Trạng Thái: Hiện)</small>
+        @elseif($filterStatus === "0")
+          <small>(Trạng Thái: Ẩn)</small>
+        @endif
+    </div>
+   
         <div class="panel-heading">
             Liệt Kê Loại Sản Phẩm
         </div>
@@ -22,12 +31,12 @@
         <div class="row w3-res-tb">
             <div class="col-sm-5 m-b-xs">
                 <select class="input-sm form-control w-sm inline v-middle">
-                    <option value="0">Bulk action</option>
-                    <option value="1">Delete selected</option>
-                    <option value="2">Bulk edit</option>
-                    <option value="3">Export</option>
+                    
+                    <option value="">Lọc trạng thái (Tất cả)</option>
+            <option value="1" {{ isset($filterStatus) && $filterStatus == 1 ? 'selected' : '' }}>Hiện</option>
+            <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>Ẩn</option>
                 </select>
-                <button class="btn btn-sm btn-default">Apply</button>                
+                <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">Áp dụng</button>              
             </div>
             <div class="col-sm-4"></div>
             <div class="col-sm-3">
@@ -78,7 +87,7 @@
                         <!-- <td>{{ $cate_pro->status }}</td> -->
                         <td><span class="text-ellipsis">
                             <?php
-                            if($cate_pro->status==0){
+                            if($cate_pro->status==1){
                                 ?>
                                <a href="{{ URL::to('/unactive-product-type/'.$cate_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
                             <?php    

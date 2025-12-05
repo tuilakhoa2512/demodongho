@@ -1,17 +1,15 @@
 @extends('pages.layout')
 @section('content')
 
-<section id="register-form">
-<h2 class="title text-center">Đăng Ký Tài Khoản</h2>
 
 <div class="container" style="margin-top:50px;">
     <div class="row justify-content-center">
 
         <div class="col-sm-9 d-flex justify-content-center" style="padding-right: 15px;">
             <div class="login-form p-4"
-                 style="border: 1px solid #ddd; border-radius: 10px; background-color:#fff; width:100%; max-width:600px;">
+                 style="border: 1px solid #ddd; border-radius: 10px; background-color:#fff; width:100%;">
 
-                <h2 class="text-center mb-4">Đăng ký</h2>
+                <h2 class="title text-center mb-4">Đăng ký</h2>
 
                 @if ($errors->any())
                     <div class="alert alert-danger text-center">
@@ -39,10 +37,28 @@
                     <label>Số điện thoại:</label>
                     <input type="text" name="phone" placeholder="0123456789"
                            class="form-control mb-3" style="width:130%;" required>
+                           
 
                     <button type="submit" class="btn btn-danger btn-block" style="width:130%;">Đăng ký</button>
                 </form>
 
+<style type="text/css">
+    ul.list-login {
+        margin: 10px;
+        padding: 0;
+        text-align: center;
+         
+    }
+    .list-login {
+        margin: 10px 0;
+        text-align: center; 
+    }
+    ul.list-login li {
+        display: inline-block;
+        margin: 5px;
+    }
+    
+</style>
                 <div class="mt-4 text-center">
                     <p>Đã có tài khoản?
                         <a href="{{ URL::to('/login-checkout') }}" style="color:blue; font-weight:bold;">Đăng nhập</a>
@@ -54,7 +70,5 @@
 
     </div>
 </div>
-
-</section>
 
 @endsection

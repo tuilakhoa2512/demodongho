@@ -73,13 +73,13 @@ class BrandProductController extends Controller
     }
 
     public function unactive_brand_product($id){
-        DB::table('brands')->where('id',$id)->update(['status'=> 1]);
+        DB::table('brands')->where('id',$id)->update(['status'=> 0]);
         session()->flash('message','Không kích hoạt thương hiệu sản phẩm thành công');
         return Redirect::to('all-brand-product');
     }
 
     public function active_brand_product($id){
-        DB::table('brands')->where('id',$id)->update(['status'=> 0]);
+        DB::table('brands')->where('id',$id)->update(['status'=> 1]);
         session()->flash('message','Kích hoạt thương hiệu sản phẩm thành công');
         return Redirect::to('all-brand-product');
     }
@@ -169,10 +169,10 @@ class BrandProductController extends Controller
     public function show_brand_home($id)
 {
     // Lấy tất cả categories để render menu
-    $cate_pro = DB::table('categories')->where('status','0')->orderBy('id', 'asc')->get();
+    $cate_pro = DB::table('categories')->where('status','1')->orderBy('id', 'asc')->get();
 
     // Lấy tất cả brands để render menu
-    $brand_pro = DB::table('brands')->where('status','0')->orderBy('id', 'asc')->get();
+    $brand_pro = DB::table('brands')->where('status','1')->orderBy('id', 'asc')->get();
 
     // Lấy tên thương hiệu được click
     $brand_name = DB::table('brands')->where('id', $id)->value('name');

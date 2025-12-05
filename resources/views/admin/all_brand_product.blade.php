@@ -91,19 +91,23 @@
                 <span>Chưa có ảnh</span>
               @endif
             </td>
-            <td><span class="text-ellipsis">
-                            <?php
-                            if($brand_pro->status==0){
-                                ?>
-                               <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
-                            <?php    
-                            }else{
-                                ?>
+              <td>
+                <span class="text-ellipsis">
+                              <?php
+                              if($brand_pro->status==1){
+                                  ?>
+                                <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
+
+                              <?php    
+                              }else{
+                                  ?>
                                 <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
-                                <?php   
-                            }
-                            ?>
-                        </span></td>
+
+                                  <?php   
+                              }
+                              ?>
+                          </span>
+              </td>
 
             <td>
                             <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">

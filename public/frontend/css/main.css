@@ -734,6 +734,7 @@ ul.sub-menu {
     border: 1px solid #f7f7f0;
     margin-bottom: 35px;
     padding-bottom: 20px;
+    padding-top: 20px;
    
 }
 .panel.panel-default {
@@ -1547,11 +1548,22 @@ h2.title {
 
 .login-form h2,
 .signup-form h2 {
-    color: #696763;
+    /* color: #d70018;
     font-family: "Roboto", sans-serif;
     font-size: 20px;
+    text-transform: uppercase;
+    position: relative;
     font-weight: 300;
-    margin-bottom: 30px;
+    margin-bottom: 30px; */
+    color: #d70018;
+    font-family: "Roboto", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 auto 5px;
+    text-align: center;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 3;
 }
 
 .login-form form input,

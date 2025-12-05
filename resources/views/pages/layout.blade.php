@@ -244,26 +244,22 @@
 							</div>
 							@endforeach
 						</div><!--/category-products-->
+						
 
 						<div class="brands_products"><!--brands_products-->
-							<h2>Brands</h2>
-							<div class="brands-name">
-								<ul class="nav nav-pills nav-stacked">
-									@foreach ($brand as $key => $brand)
-									 <li><a href="{{URL::to('/thuong-hieu-san-pham/' .$brand->id)}}">
-									  <span class="pull-right"></span>{{ $brand->name }}</a></li>
-									<!-- <li><a href="#"> <span class="pull-right">(56)</span>Cartier</a></li>
-									<li><a href="#"> <span class="pull-right">(27)</span>Patek Philippe</a></li>
-									<li><a href="#"> <span class="pull-right">(32)</span>Breitling</a></li>
-									<li><a href="#"> <span class="pull-right">(5)</span>Puma</a></li>
-									<li><a href="#"> <span class="pull-right">(9)</span>Casio</a></li>
-									<li><a href="#"> <span class="pull-right">(4)</span>Adidas</a></li>
-									<li><a href="#"> <span class="pull-right">(5)</span>BaBy-G</a></li>
-									<li><a href="#"> <span class="pull-right">(6)</span>G-Shock</a></li>
-									<li><a href="#"> <span class="pull-right">(10)</span>	</a></li>  -->
-									@endforeach
-								</ul>
+						<h2>Brand</h2>
+						<div class="panel-group category-products" id="accordian"><!--brand-productsr-->
+							@foreach ($brand as $key => $brand)
+
+
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<h4 class="panel-title"><a href="{{URL::to('/thuong-hieu-san-pham/' .$brand->id)}}">{{ $brand->name }}</a></h4>
+								</div>
+
 							</div>
+							@endforeach
+						</div><!--/brand-products-->
 						</div><!--/brands_products-->
 
 						<div class="price-range"><!--price-range-->

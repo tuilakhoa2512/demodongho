@@ -8,13 +8,22 @@
     <div class="panel-heading" style="color:#000; font-weight:600;">
       Quản lý sản phẩm trong lô: {{ $storage->batch_code }}
     </div>
-
-  
     @if (session('success'))
+        <script>
+            Swal.fire({
+                title: "Thành công!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                confirmButtonText: "OK",
+            });
+        </script>
+        @endif
+  
+    <!-- @if (session('success'))
       <div class="alert alert-success" style="margin: 15px;">
         {{ session('success') }}
       </div>
-    @endif
+    @endif -->
 
     <div style="margin: 15px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9f9f9;">
       <h4 style="margin-top:0; font-weight:600; text-align:center">THÔNG TIN LÔ HÀNG</h4> <br>
