@@ -186,15 +186,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
-    Route::delete('/products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::get('/products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
 
-    Route::get('/products/{id}/edit', [ProductController::class, 'edit']);
+    Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 
-    Route::post('/products/{id}/update', [ProductController::class, 'update']);
-
-    Route::post('/active-product/{id}', [ProductController::class, 'active_product'])->name('active-product');
-    Route::post('/unactive-product/{id}', [ProductController::class, 'unactive_product'])->name('unactive-product');
-
+    Route::patch('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
 
 });
 

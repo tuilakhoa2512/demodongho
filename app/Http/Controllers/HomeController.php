@@ -16,23 +16,17 @@ class HomeController extends Controller
 
     // Lấy tất cả sản phẩm, phân trang 9 sản phẩm/trang
     $all_product = Product::with('productImage')
-        ->where('status','0')
+        ->where('status', 1)                 
+        ->where('stock_status', 'selling')    
         ->orderBy('id', 'desc')
-        ->paginate(6);  // <-- 9 sản phẩm/trang
+        ->paginate(6);
 
-    foreach ($all_product as $p) {
-        $img = $p->productImage;
-
-        $p->main_image_url = $img && $img->image_1 ? Storage::url($img->image_1) : asset('frontend/images/noimage.jpg');
-        $p->hover_image_url = $img && $img->image_2 ? Storage::url($img->image_2) : $p->main_image_url;
-    }
 
     return view('pages.home')
         ->with('category', $cate_pro)
         ->with('brand', $brand_pro)
         ->with('all_product', $all_product);
 }
-
 
 
     public function search(Request $request)
