@@ -4,16 +4,17 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
 
+    {{-- Tiêu đề --}}
     <div class="panel-heading" style="color:#000; font-weight:600;">
-    @isset($currentStatus)
-        @if($currentStatus == 'pending')      Hàng Chưa Bán Trong Kho
-        @elseif($currentStatus == 'selling')  Hàng Đang Bán Trong Kho
-        @elseif($currentStatus == 'sold_out') Hàng Bán Hết Trong Kho
-        @elseif($currentStatus == 'stopped')  Hàng Ngừng Bán Trong Kho
-        @endif
-    @else
-        Quản Lý Kho Hàng (Của Các Lô)
-    @endisset
+      @isset($currentStatus)
+          @if($currentStatus == 'pending')      Hàng Chưa Bán Trong Kho
+          @elseif($currentStatus == 'selling')  Hàng Đang Bán Trong Kho
+          @elseif($currentStatus == 'sold_out') Hàng Bán Hết Trong Kho
+          @elseif($currentStatus == 'stopped')  Hàng Ngừng Bán Trong Kho
+          @endif
+      @else
+          Quản Lý Kho Hàng (Của Các Lô)
+      @endisset
     </div>
 
     {{-- Toast thông báo thành công --}}
@@ -107,26 +108,38 @@
                 @endif
               </td>
 
-              {{-- Các nút thao tác --}}
+              {{-- Các nút thao tác (dùng icon giống Lô Hàng) --}}
               <td>
                 {{-- Nút sửa --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
-                   class="btn btn-xs btn-warning">Sửa</a>
+                   title="Sửa"
+                   style="margin-right:6px;">
+                  <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
+                </a>
 
                 {{-- Nút Ẩn/Hiện --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
-                      method="POST" style="display:inline-block;">
+                      method="POST"
+                      style="display:inline-block; margin-right:6px;">
                   @csrf
                   @method('PATCH')
-                  <button type="submit" class="btn btn-xs btn-secondary">
-                    {{ $detail->status ? 'Ẩn' : 'Hiện' }}
+                  <button type="submit"
+                          title="{{ $detail->status ? 'Ẩn' : 'Hiện' }}"
+                          style="background:none; border:none; padding:0;">
+                    @if($detail->status)
+                      <i class="fa fa-eye-slash text-warning" style="font-size:18px;"></i>
+                    @else
+                      <i class="fa fa-eye text-warning" style="font-size:18px;"></i>
+                    @endif
                   </button>
                 </form>
 
                 {{-- Nút xem kho theo lô cụ thể --}}
                 @if($detail->storage)
                   <a href="{{ route('admin.storage-details.by-storage', $detail->storage->id) }}"
-                     class="btn btn-xs btn-info">Xem lô</a>
+                     title="Xem lô">
+                    <i class="fa fa-database" style="font-size:18px;"></i>
+                  </a>
                 @endif
               </td>
             </tr>
@@ -140,7 +153,6 @@
       </table>
     </div>
 
-    {{-- Footer phân trang --}}
     <footer class="panel-footer">
       <div class="row">
         <div class="col-sm-12 text-right text-center-xs">

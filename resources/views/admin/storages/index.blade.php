@@ -111,7 +111,7 @@
                 {{-- Sửa lô hàng --}}
                 <a href="{{ route('admin.storages.edit', $storage->id) }}"
                    class="active styling-edit" title="Sửa lô hàng">
-                  <i class="fa fa-pencil-square-o text-success text-active"></i>
+                  <i class="fa fa-pencil-square-o text-success text-active" style="font-size:18px;"></i>
                 </a>
 
                 {{-- Ẩn / hiện lô hàng (không xóa cứng nữa) --}}
@@ -124,9 +124,9 @@
                           style="border:none; background:none; padding:0;"
                           title="{{ $storage->status ? 'Ẩn lô hàng' : 'Hiện lô hàng' }}">
                     @if($storage->status)
-                      <i class="fa fa-eye-slash text-warning"></i>
+                      <i class="fa fa-eye-slash text-warning" style="font-size:18px;"></i>
                     @else
-                      <i class="fa fa-eye text-info"></i>
+                      <i class="fa fa-eye text-info" style="font-size:18px;"></i>
                     @endif
                   </button>
                 </form>
@@ -134,7 +134,7 @@
                 {{-- Xem chi tiết kho theo lô --}}
                 <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
                    title="Xem sản phẩm trong lô này">
-                  <i class="fa fa-archive text-primary"></i>
+                  <i class="fa fa-archive text-primary" style="font-size:18px;"></i>
                 </a>
               </td>
             </tr>
