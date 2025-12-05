@@ -41,6 +41,7 @@
                             <select name="product_type_status" class="form-control input-sm m-bot15">
                                 <option value="0">Ẩn</option>
                                 <option value="1">Hiển Thị</option>
+
                                
                             </select>
 

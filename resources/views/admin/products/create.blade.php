@@ -2,171 +2,196 @@
 @section('admin_content')
 
 <div class="row">
-    <div class="col-lg-12">
-        <section class="panel">
-            <header class="panel-heading" style="font-size: 18px; font-weight: 600;">
-                Thêm Sản Phẩm Mới
-            </header>
+  <div class="col-lg-12">
+    <section class="panel">
+      <header class="panel-heading" style="color:#000; font-weight:600;">
+        Đăng sản phẩm mới từ kho
+      </header>
 
-            <div class="panel-body">
-                <div class="position-center">
+      <div class="panel-body">
+        <div class="position-center">
 
-                    <form role="form"
-                        method="POST"
-                        action="{{ URL::to('/admin/products') }}"
-                        enctype="multipart/form-data">
-                        @csrf
-
-                       
-                        <div class="form-group">
-                            <label for="storage_id">Chọn lô hàng từ Kho</label>
-                            <select name="storage_id" id="storage_id" class="form-control" required style="color:black;">
-                                <option value="">-- Chọn lô hàng --</option>
-                                @foreach($storages as $item)
-                                    <option value="{{ $item->id }}">
-                                        Lô #{{ $item->id }} – {{ $item->product_name }}
-                                        (SL: {{ $item->import_quantity }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                       
-                        <div class="form-group">
-                            <label for="quantity">Số lượng (từ kho)</label>
-                            <input type="number" id="quantity" class="form-control" readonly style="color:black;">
-                        </div>
-
-                       
-                        <div class="form-group">
-                            <label for="category_id">Loại sản phẩm</label>
-                            <select name="category_id" id="category_id" class="form-control" required style="color:black;">
-                                <option value="">-- Chọn loại sản phẩm --</option>
-                                @foreach($productTypes as $type)
-                                    <option value="{{ $type->id }}">{{ $type->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                       
-                        <div class="form-group">
-                            <label for="brand_id">Thương hiệu</label>
-                            <select name="brand_id" id="brand_id" class="form-control" required style="color:black;">
-                                <option value="">-- Chọn thương hiệu --</option>
-                                @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="name">Tên sản phẩm</label>
-                            <input type="text" name="name" class="form-control" placeholder="VD: Rolex DateJust 41mm"
-                                   required style="color:black;">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="description">Mô tả sản phẩm</label>
-                            <textarea name="description" rows="5" class="form-control" style="resize:none; color:black;"
-                                      placeholder="Mô tả chi tiết sản phẩm"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="gender">Giới tính</label>
-                            <select name="gender" class="form-control" required style="color:black;">
-                                <option value="male">Nam</option>
-                                <option value="female">Nữ</option>
-                                <option value="unisex">Unisex</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="dial_size">Kích thước mặt (mm)</label>
-                            <input type="number"
-                                step="0.01"
-                                min="0"
-                                name="dial_size"
-                                id="dial_size"
-                                class="form-control"
-                                style="color:black;"
-                                placeholder="VD: 40.5">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="strap_material">Chất liệu dây</label>
-                            <input type="text" name="strap_material" class="form-control" style="color:black;"
-                                   placeholder="VD: Da, Cao su, Thép không gỉ">
-                        </div>
-
-                  
-                        <div class="form-group">
-                            <label for="price">Giá bán (VNĐ)</label>
-                            <input type="number" name="price" min="0" class="form-control"
-                                   placeholder="VD: 2500000" required style="color:black;">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ảnh 1 (ảnh chính)</label>
-                            <input type="file" name="image_1" accept="image/*" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ảnh 2</label>
-                            <input type="file" name="image_2" accept="image/*" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ảnh 3</label>
-                            <input type="file" name="image_3" accept="image/*" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Ảnh 4</label>
-                            <input type="file" name="image_4" accept="image/*" class="form-control">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="productTypeDesc">Trạng Thái</label>
-                            <select name="product_status" class="form-control input-sm m-bot15">
-                                <option value="0">Ẩn</option>
-                                <option value="1">Hiển Thị</option>
-                               
-                            </select>
-
-                        </div>
-
-
-                        <button type="submit" class="btn btn-info">Thêm sản phẩm</button>
-
-                    </form>
-
-                </div>
+          {{-- Hiển thị lỗi validate --}}
+          @if ($errors->any())
+            <div class="alert alert-danger">
+              <ul style="margin-bottom:0;">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
             </div>
-        </section>
-    </div>
+          @endif
+
+          <form method="POST"
+                action="{{ route('admin.products.store') }}"
+                enctype="multipart/form-data">
+            @csrf
+
+            {{-- Chọn sản phẩm trong kho (StorageDetail) --}}
+            <div class="form-group">
+              <label for="storage_detail_id">
+                Chọn sản phẩm trong kho <span class="text-danger">*</span>
+              </label>
+              <select name="storage_detail_id" id="storage_detail_id" class="form-control" required>
+                <option value="">-- Chọn từ kho --</option>
+                @foreach($storageDetails as $detail)
+                  <option value="{{ $detail->id }}"
+                    {{ old('storage_detail_id') == $detail->id ? 'selected' : '' }}>
+                    [Lô {{ optional($detail->storage)->batch_code ?? 'N/A' }}]
+                    {{ $detail->product_name ?? 'Chưa đặt tên' }}
+                    - SL: {{ $detail->import_quantity ?? 0 }}
+                    - TT: {{ $detail->stock_status ?? 'pending' }}
+                  </option>
+                @endforeach
+              </select>
+              <small class="text-muted">
+                Chỉ hiển thị các dòng kho <strong>đang hiển thị</strong>, 
+                trạng thái <strong>pending.
+              </small>
+            </div>
+
+            {{-- Thương hiệu --}}
+            <div class="form-group">
+              <label for="brand_id">Thương hiệu <span class="text-danger">*</span></label>
+              <select name="brand_id" id="brand_id" class="form-control" required>
+                <option value="">-- Chọn thương hiệu --</option>
+                @foreach($brands as $brand)
+                  <option value="{{ $brand->id }}"
+                    {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                    {{ $brand->name }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+
+            {{-- Loại đồng hồ --}}
+            <div class="form-group">
+              <label for="category_id">Loại đồng hồ <span class="text-danger">*</span></label>
+              <select name="category_id" id="category_id" class="form-control" required>
+                <option value="">-- Chọn loại --</option>
+                @foreach($categories as $cate)
+                  <option value="{{ $cate->id }}"
+                    {{ old('category_id') == $cate->id ? 'selected' : '' }}>
+                    {{ $cate->name }}
+                  </option>
+                @endforeach
+              </select>
+            </div>
+
+            {{-- Tên sản phẩm --}}
+            <div class="form-group">
+              <label for="name">Tên sản phẩm hiển thị</label>
+              <input type="text"
+                     name="name"
+                     id="name"
+                     class="form-control"
+                     value="{{ old('name') }}"
+                     placeholder="Nếu để trống sẽ dùng tên trong kho">
+            </div>
+
+            {{-- Mô tả --}}
+            <div class="form-group">
+              <label for="description">Mô tả</label>
+              <textarea name="description"
+                        id="description"
+                        rows="4"
+                        class="form-control"
+                        placeholder="Mô tả chi tiết sản phẩm...">{{ old('description') }}</textarea>
+            </div>
+
+            {{-- Chất liệu dây --}}
+            <div class="form-group">
+              <label for="strap_material">Chất liệu dây</label>
+              <input type="text"
+                     name="strap_material"
+                     id="strap_material"
+                     class="form-control"
+                     value="{{ old('strap_material') }}"
+                     placeholder="VD: Thép không gỉ, Da, Cao su...">
+            </div>
+
+            {{-- Kích thước mặt (mm) --}}
+            <div class="form-group">
+              <label for="dial_size">Kích thước mặt (mm)</label>
+              <input type="number"
+                     step="0.01"
+                     min="0"
+                     max="99.99"
+                     name="dial_size"
+                     id="dial_size"
+                     class="form-control"
+                     value="{{ old('dial_size') }}"
+                     placeholder="VD: 40, 40.5">
+            </div>
+
+            {{-- Giới tính --}}
+            <div class="form-group">
+              <label for="gender">Giới tính</label>
+              <select name="gender" id="gender" class="form-control">
+                <option value="male"   {{ old('gender') === 'male' ? 'selected' : '' }}>Nam</option>
+                <option value="female" {{ old('gender') === 'female' ? 'selected' : '' }}>Nữ</option>
+                <option value="unisex" {{ old('gender') === 'unisex' ? 'selected' : '' }}>Unisex</option>
+              </select>
+            </div>
+
+            {{-- Giá bán --}}
+            <div class="form-group">
+              <label for="price">Giá bán (VNĐ) <span class="text-danger">*</span></label>
+              <input type="number"
+                     name="price"
+                     id="price"
+                     class="form-control"
+                     min="0"
+                     step="1000"
+                     value="{{ old('price') }}"
+                     required>
+            </div>
+
+            {{-- Số lượng đăng bán --}}
+            <div class="form-group">
+              <label for="quantity">Số lượng đăng bán <span class="text-danger">*</span></label>
+              <input type="number"
+                     name="quantity"
+                     id="quantity"
+                     class="form-control"
+                     min="1"
+                     value="{{ old('quantity') }}"
+                     required>
+              <small class="text-muted">
+                Không được lớn hơn số lượng trong kho của dòng đã chọn.
+              </small>
+            </div>
+
+            {{-- Ảnh sản phẩm --}}
+            <div class="form-group">
+              <label>Ảnh sản phẩm (tối đa 4 ảnh)</label>
+              <div style="margin-bottom:5px;">
+                <strong>Ảnh 1 (chính) <span class="text-danger">*</span></strong>
+                <input type="file" name="image_1" class="form-control">
+              </div>
+              <div style="margin-bottom:5px;">
+                <strong>Ảnh 2 (hover)</strong>
+                <input type="file" name="image_2" class="form-control">
+              </div>
+              <div style="margin-bottom:5px;">
+                <strong>Ảnh 3 (phụ)</strong>
+                <input type="file" name="image_3" class="form-control">
+              </div>
+              <div>
+                <strong>Ảnh 4 (phụ)</strong>
+                <input type="file" name="image_4" class="form-control">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-info">Đăng sản phẩm</button>
+            <a href="{{ route('admin.products.index') }}" class="btn btn-default">Quay lại</a>
+
+          </form>
+
+        </div>
+      </div>
+    </section>
+  </div>
 </div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-
-        const storageSelect = document.getElementById('storage_id');
-        const quantityInput = document.getElementById('quantity');
-
-        // map { storage_id : import_quantity }
-        const storageQuantities = @json($storages->pluck('import_quantity', 'id'));
-
-        storageSelect.addEventListener('change', function () {
-            const selectedId = this.value;
-
-            if (storageQuantities[selectedId]) {
-                quantityInput.value = storageQuantities[selectedId];
-            } else {
-                quantityInput.value = '';
-            }
-        });
-    });
-</script>
 
 @endsection
