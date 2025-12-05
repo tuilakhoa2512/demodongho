@@ -16,12 +16,9 @@ class HomeController extends Controller
 
     // Lấy tất cả sản phẩm, phân trang 9 sản phẩm/trang
     $all_product = Product::with('productImage')
-<<<<<<< HEAD
-        ->where('status','1')
-=======
+
         ->where('status', 1)                 
         ->where('stock_status', 'selling')    
->>>>>>> main
         ->orderBy('id', 'desc')
         ->paginate(6);
 
