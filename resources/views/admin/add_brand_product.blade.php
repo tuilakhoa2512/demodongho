@@ -28,7 +28,7 @@
 
                         <div class="form-group">
                             <label>Tên Thương Hiệu</label>
-                            <input type="text" name="brand_product_name" class="form-control">
+                            <input type="text" name="brand_product_name" class="form-control"maxlength="50">
                         </div>
 
                         <div class="form-group">

@@ -42,7 +42,8 @@
                                    name="brand_product_name"
                                    value="{{ $edit_value->name }}"
                                    class="form-control"
-                                   placeholder="Tên thương hiệu">
+                                   placeholder="Tên thương hiệu"
+                                   maxlength="50">
                         </div>
 
                         <div class="form-group">

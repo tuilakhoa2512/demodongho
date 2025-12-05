@@ -42,7 +42,8 @@
                                    name="product_type_name"
                                    value="{{ $edit_value->name }}"
                                    class="form-control"
-                                   placeholder="Tên loại">
+                                   placeholder="Tên loại"
+                                   maxlength="50">
                         </div>
 
                         <div class="form-group">

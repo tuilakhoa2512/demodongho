@@ -28,7 +28,7 @@
                         
                         <div class="form-group">
                             <label for="productTypeName">Tên loại sản phẩm</label>
-                            <input type="text" name="product_type_name" class="form-control" id="productTypeName" placeholder="Tên loại sản phẩm">
+                            <input type="text" name="product_type_name" class="form-control" id="productTypeName" placeholder="Tên loại sản phẩm" maxlength="50">
                         </div>
                         
                         <div class="form-group">

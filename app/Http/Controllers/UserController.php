@@ -68,54 +68,54 @@ public function profileUpdate(Request $request)
     if (!$id) {
         return redirect('/login-checkout');
     }
+
+    // Lấy user dạng object
     $user = DB::table('users')->where('id', $id)->first();
 
-        $request->validate([
-            'fullname' => 'required|string|max:150',
-            'phone'    => 'nullable|string|max:20',
-            'address'  => 'nullable|string|max:255',           
-            'image'    => 'nullable|image|max:2048',
-        ]);
+    $request->validate([
+        'fullname' => 'required|string|max:150',
+        'phone'    => 'nullable|string|max:20',
+        'address'  => 'nullable|string|max:255',
+        'image'    => 'nullable|image|max:2048',
+    ]);
 
-        $data = [
-            'fullname'    => $request->fullname,
-            'phone'       => $request->phone,
-            'address'     => $request->address,
-            'province_id' => $request->province_id,
-            'district_id' => $request->district_id,
-            'ward_id'     => $request->ward_id,
-        ];
+    // Dữ liệu text
+    $data = [
+        'fullname'    => $request->fullname,
+        'phone'       => $request->phone,
+        'address'     => $request->address,
+        'province_id' => $request->province_id,
+        'district_id' => $request->district_id,
+        'ward_id'     => $request->ward_id,
+    ];
 
-    // upload ảnh đại diện
+    // Xử lý ảnh đại diện
     if ($request->hasFile('image')) {
+
         $file = $request->file('image');
-        // lưu vào storage/app/public/users
-        $path = $file->store('users', 'public'); // vd "brands/logo1.jpg"
-            $data['image'] = $path;
-        } else {
-            $data['image'] = null;
-        } 
-        
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $path = $file->store('users', 'public'); // ảnh mới
+        $path = $file->store('users', 'public'); // upload ảnh mới
+        $data['image'] = $path;
 
-            $data['image'] = $path;
+        // XÓA ảnh cũ nếu có
+        if ($user && $user->image) {
+            Storage::disk('public')->delete($user->image);
+        }
 
-            // xóa ảnh cũ
-            if ($user && $user->image) {
-                Storage::disk('public')->delete($user->image);
-            }
-        } else {
-            // không upload ảnh mới, giữ nguyên ảnh cũ
-            $data['image'] = $user ? $user->image : null;
-        }    
+    } else {
+        // KHÔNG upload ảnh mới → giữ ảnh cũ
+        $data['image'] = $user ? $user->image : null;
+    }
 
-    //  
+    // Cập nhật database
+    DB::table('users')->where('id', $id)->update($data);
+
+    // Cập nhật session
     Session::put('fullname', $data['fullname']);
     Session::put('images', $data['image']);
+
     return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
 }
+
 
 public function getDistricts($province_id)
     {
