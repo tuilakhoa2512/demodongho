@@ -4,20 +4,58 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
 
-    {{-- Tiêu đề --}}
+   
     <div class="panel-heading" style="color:#000; font-weight:600;">
-      Sản phẩm trong lô: {{ $storage->batch_code }}
+      Quản lý sản phẩm trong lô: {{ $storage->batch_code }}
     </div>
 
-    {{-- Thông báo --}}
-    @if(session('success'))
-      <div class="alert alert-success" style="margin:15px;">
+  
+    @if (session('success'))
+      <div class="alert alert-success" style="margin: 15px;">
         {{ session('success') }}
       </div>
     @endif
 
-    {{-- Nút chức năng --}}
-    <div style="margin: 15px;">
+    <div style="margin: 15px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9f9f9;">
+      <h4 style="margin-top:0; font-weight:600; text-align:center">THÔNG TIN LÔ HÀNG</h4> <br>
+
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-sm-4">
+          <strong>Mã lô:</strong> {{ $storage->batch_code }}
+        </div>
+        <div class="col-sm-4">
+          <strong>Nhà cung cấp:</strong> {{ $storage->supplier_name ?? '—' }}
+        </div>
+        <div class="col-sm-4">
+          <strong>Email NCC:</strong> {{ $storage->supplier_email ?? '—' }}
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom: 5px;">
+        <div class="col-sm-4">
+          <strong>Ngày nhập:</strong>
+          {{ $storage->import_date ? \Carbon\Carbon::parse($storage->import_date)->format('d/m/Y') : '—' }}
+        </div>
+        <div class="col-sm-4">
+          <strong>Trạng thái lô:</strong>
+          @if($storage->status)
+            <span class="label label-success">Đang hoạt động</span>
+          @else
+            <span class="label label-default">Đã ẩn / ngừng</span>
+          @endif
+        </div>
+        <div class="col-sm-4">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <strong>Ghi chú:</strong> {{ $storage->note ?? '—' }}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin: 0 15px 15px 15px;">
       <a href="{{ route('admin.storage-details.create', $storage->id) }}" class="btn btn-primary btn-sm">
         + Thêm sản phẩm vào lô này
       </a>
@@ -26,7 +64,13 @@
       </a>
     </div>
 
-    {{-- Bảng danh sách sản phẩm trong lô --}}
+    <style>
+        table td, table th {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+    </style>
+
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
         <thead>
@@ -40,19 +84,16 @@
             <th style="width:130px;">Thao tác</th>
           </tr>
         </thead>
-
         <tbody>
           @forelse ($details as $detail)
             <tr>
               <td>{{ $detail->id }}</td>
 
-              {{-- Tên sản phẩm --}}
+           
               <td>{{ $detail->product_name }}</td>
 
-              {{-- Số lượng nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
 
-              {{-- Trạng thái kho --}}
               <td>
                 @if($detail->stock_status === 'pending')
                   <span class="label label-warning">Chờ bán</span>
@@ -82,14 +123,14 @@
               {{-- Thao tác với icon --}}
               <td>
 
-                {{-- Nút sửa --}}
+                {{-- Sửa --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
                    title="Sửa"
                    style="margin-right:6px;">
                   <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Nút ẩn/hiện --}}
+                {{-- Ẩn/Hiện --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -106,15 +147,14 @@
                   </button>
                 </form>
 
-              
+                {{-- Xem lại lô (reload trang hiện tại) --}}
                 <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
-                   title="Xem lô">
-                  <i class="fa fa-database" style="font-size:18px;"></i>
+                   title="Xem lại lô">
+                  <i class="fa fa-archive text-primary" style="font-size:18px;"></i>
                 </a>
 
               </td>
             </tr>
-
           @empty
             <tr>
               <td colspan="7" class="text-center">Chưa có sản phẩm nào trong lô này.</td>
@@ -124,7 +164,7 @@
       </table>
     </div>
 
-    {{-- Phần phân trang --}}
+    {{-- PHÂN TRANG --}}
     <footer class="panel-footer">
       <div class="row">
         <div class="col-sm-12 text-right text-center-xs">
