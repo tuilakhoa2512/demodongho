@@ -14,6 +14,7 @@
 	<link href="{{ asset('frontend/css/animate.css') }}" rel="stylesheet">
 	<link href="{{ asset('frontend/css/main.css') }}" rel="stylesheet">
 	<link href="{{ asset('frontend/css/responsive.css') }}" rel="stylesheet">
+	
 
 	<link rel="shortcut icon" href="{{ asset('frontend/images/ico/favicon.ico')}}">
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
@@ -373,6 +374,8 @@
 	<script src="{{ asset('frontend/js/price-range.js')}}"></script>
 	<script src="{{ asset('frontend/js/jquery.prettyPhoto.js')}}"></script>
 	<script src="{{ asset('frontend/js/main.js')}}"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 	
 </body>
 

@@ -62,7 +62,7 @@ class StorageController extends Controller
             'note'           => $request->note,
             'status'         => 1,
         ]);
-
+        
         return redirect()->route('admin.storages.index')
             ->with('success', 'Tạo lô hàng thành công. Mã lô: '.$batchCode);
     }

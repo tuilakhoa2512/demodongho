@@ -12,13 +12,23 @@
         @endif
     </div>
    
-
-
     @if (session('success'))
+        <script>
+            Swal.fire({
+                title: "Thành công!",
+                text: "{{ session('success') }}",
+                icon: "success",
+                confirmButtonText: "OK",
+              
+            });
+        </script>
+        @endif
+
+    <!-- @if (session('success'))
       <div class="alert alert-success" style="margin: 15px;">
         {{ session('success') }}
       </div>
-    @endif
+    @endif -->
 
     @if (session('error'))
       <div class="alert alert-danger" style="margin: 15px;">

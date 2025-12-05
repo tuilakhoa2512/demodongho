@@ -9,7 +9,7 @@
             </header>
 
             <div class="panel-body">
-            @if (session('message'))
+            @if (session('success'))
                     <script>
                         $(document).ready(function() {
                             Swal.fire({
