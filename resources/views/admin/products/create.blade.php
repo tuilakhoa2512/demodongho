@@ -45,8 +45,31 @@
                 @endforeach
               </select>
               <small class="text-muted">
-                Chỉ hiển thị các dòng kho <strong>đang hiển thị</strong>, 
-                trạng thái <strong>pending.
+                Chỉ hiển thị các dòng kho <strong>đang hiển thị</strong> và
+                có trạng thái <strong>pending</strong>.
+              </small>
+            </div>
+
+            {{-- Số lượng dùng để bán (readonly, auto-fill từ kho) --}}
+            <div class="form-group">
+              <label for="quantity_display">Số lượng dùng để bán</label>
+
+              <input type="number"
+                     id="quantity_display"
+                     class="form-control"
+                     value="{{ old('quantity') }}"
+                     readonly
+                     placeholder="Hãy chọn sản phẩm trong kho trước">
+
+              {{-- Giá trị thật gửi lên server --}}
+              <input type="hidden"
+                     name="quantity"
+                     id="quantity_real"
+                     value="{{ old('quantity') }}">
+
+              <small class="text-muted">
+                Hệ thống sẽ tự động dùng đúng số lượng đã nhập ở Kho Hàng (Storage Detail)
+                cho dòng sản phẩm bạn chọn.
               </small>
             </div>
 
@@ -147,21 +170,6 @@
                      required>
             </div>
 
-            {{-- Số lượng đăng bán --}}
-            <div class="form-group">
-              <label for="quantity">Số lượng đăng bán <span class="text-danger">*</span></label>
-              <input type="number"
-                     name="quantity"
-                     id="quantity"
-                     class="form-control"
-                     min="1"
-                     value="{{ old('quantity') }}"
-                     required>
-              <small class="text-muted">
-                Không được lớn hơn số lượng trong kho của dòng đã chọn.
-              </small>
-            </div>
-
             {{-- Ảnh sản phẩm --}}
             <div class="form-group">
               <label>Ảnh sản phẩm (tối đa 4 ảnh)</label>
@@ -193,5 +201,41 @@
     </section>
   </div>
 </div>
+
+{{-- JS tự động đổ số lượng theo dòng kho được chọn --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectDetail    = document.getElementById('storage_detail_id');
+    const quantityDisplay = document.getElementById('quantity_display');
+    const quantityReal    = document.getElementById('quantity_real');
+
+    // Map: { storage_detail_id : import_quantity }
+    const storageData = @json(
+        $storageDetails->mapWithKeys(function($d){
+            return [$d->id => $d->import_quantity];
+        })
+    );
+
+    function updateQuantityByDetailId(id) {
+        if (storageData[id]) {
+            quantityDisplay.value = storageData[id];
+            quantityReal.value    = storageData[id];
+        } else {
+            quantityDisplay.value = '';
+            quantityReal.value    = '';
+        }
+    }
+
+    // Khi chọn dòng kho
+    selectDetail.addEventListener('change', function () {
+        updateQuantityByDetailId(this.value);
+    });
+
+    // Nếu form bị validate lỗi và có old('storage_detail_id') thì set lại luôn
+    if (selectDetail.value) {
+        updateQuantityByDetailId(selectDetail.value);
+    }
+});
+</script>
 
 @endsection

@@ -48,7 +48,7 @@
         </form>
       </div>
 
-      <div class="col-sm-4"></div> 
+      <div class="col-sm-4"></div>
     </div>
 
     {{-- Bảng danh sách kho --}}
@@ -70,7 +70,7 @@
             <th>Trạng thái kho</th>
             <th>Ghi chú</th>
             <th>Hiển thị</th>
-            <th style="width:130px;">Thao tác</th>
+            <th style="width:150px;">Thao tác</th>
           </tr>
         </thead>
 
@@ -115,16 +115,16 @@
                 @endif
               </td>
 
-              {{-- Các nút thao tác (dùng icon giống Lô Hàng) --}}
+              {{-- Các nút thao tác --}}
               <td>
-                {{-- Nút sửa --}}
+                {{-- Sửa dòng kho --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
                    title="Sửa"
                    style="margin-right:6px;">
                   <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Nút Ẩn/Hiện --}}
+                {{-- Ẩn / Hiện dòng kho --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -141,11 +141,27 @@
                   </button>
                 </form>
 
-                {{-- Nút xem kho theo lô cụ thể --}}
+                {{-- Xem lô chứa dòng kho này --}}
                 @if($detail->storage)
                   <a href="{{ route('admin.storage-details.by-storage', $detail->storage->id) }}"
-                     title="Xem lô">
+                     title="Xem lô"
+                     style="margin-right:6px;">
                     <i class="fa fa-database" style="font-size:18px;"></i>
+                  </a>
+                @endif
+
+                {{-- Icon dẫn tới sản phẩm đã đăng bán --}}
+                @if($detail->product)
+                  <a href="{{ route('admin.products.show', $detail->product->id) }}"
+                     title="Xem sản phẩm đã đăng bán">
+                    <i class="fa fa-cubes text-info" style="font-size:18px;"></i>
+                  </a>
+                @else
+                  {{-- Chưa có Product: hiện thông báo --}}
+                  <a href="#"
+                     onclick="alert('Sản phẩm này chưa được đăng bán'); return false;"
+                     title="Sản phẩm này chưa được đăng bán">
+                    <i class="fa fa-cubes text-muted" style="font-size:18px;"></i>
                   </a>
                 @endif
               </td>

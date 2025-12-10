@@ -4,27 +4,24 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
 
-   
+    {{-- TIÊU ĐỀ --}}
     <div class="panel-heading" style="color:#000; font-weight:600;">
       Quản lý sản phẩm trong lô: {{ $storage->batch_code }}
     </div>
-    @if (session('success'))
-        <script>
-            Swal.fire({
-                title: "Thành công!",
-                text: "{{ session('success') }}",
-                icon: "success",
-                confirmButtonText: "OK",
-            });
-        </script>
-        @endif
-  
-    <!-- @if (session('success'))
-      <div class="alert alert-success" style="margin: 15px;">
-        {{ session('success') }}
-      </div>
-    @endif -->
 
+    {{-- THÔNG BÁO THÀNH CÔNG (SweetAlert) --}}
+    @if (session('success'))
+      <script>
+          Swal.fire({
+              title: "Thành công!",
+              text: "{{ session('success') }}",
+              icon: "success",
+              confirmButtonText: "OK",
+          });
+      </script>
+    @endif
+
+    {{-- THÔNG TIN LÔ HÀNG --}}
     <div style="margin: 15px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9f9f9;">
       <h4 style="margin-top:0; font-weight:600; text-align:center">THÔNG TIN LÔ HÀNG</h4> <br>
 
@@ -53,8 +50,7 @@
             <span class="label label-default">Đã ẩn / ngừng</span>
           @endif
         </div>
-        <div class="col-sm-4">
-        </div>
+        <div class="col-sm-4"></div>
       </div>
 
       <div class="row">
@@ -64,6 +60,7 @@
       </div>
     </div>
 
+    {{-- NÚT THÊM & QUAY LẠI --}}
     <div style="margin: 0 15px 15px 15px;">
       <a href="{{ route('admin.storage-details.create', $storage->id) }}" class="btn btn-primary btn-sm">
         + Thêm sản phẩm vào lô này
@@ -73,6 +70,7 @@
       </a>
     </div>
 
+    {{-- CĂN GIỮA BẢNG --}}
     <style>
         table td, table th {
             text-align: center !important;
@@ -80,6 +78,7 @@
         }
     </style>
 
+    {{-- BẢNG SẢN PHẨM TRONG LÔ --}}
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
         <thead>
@@ -90,7 +89,7 @@
             <th>Trạng thái kho</th>
             <th>Ghi chú</th>
             <th>Hiển thị</th>
-            <th style="width:130px;">Thao tác</th>
+            <th style="width:160px;">Thao tác</th>
           </tr>
         </thead>
         <tbody>
@@ -98,11 +97,13 @@
             <tr>
               <td>{{ $detail->id }}</td>
 
-           
+              {{-- Tên sản phẩm trong lô --}}
               <td>{{ $detail->product_name }}</td>
 
+              {{-- Số lượng nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
 
+              {{-- Trạng thái kho --}}
               <td>
                 @if($detail->stock_status === 'pending')
                   <span class="label label-warning">Chờ bán</span>
@@ -129,17 +130,17 @@
                 @endif
               </td>
 
-              {{-- Thao tác với icon --}}
+              {{-- THAO TÁC --}}
               <td>
 
-                {{-- Sửa --}}
+                {{-- Sửa dòng kho --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
                    title="Sửa"
                    style="margin-right:6px;">
                   <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Ẩn/Hiện --}}
+                {{-- Ẩn / Hiện dòng kho --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -156,11 +157,26 @@
                   </button>
                 </form>
 
-                {{-- Xem lại lô (reload trang hiện tại) --}}
+                {{-- Xem lại lô (trang hiện tại) --}}
                 <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
-                   title="Xem lại lô">
+                   title="Xem lại lô"
+                   style="margin-right:6px;">
                   <i class="fa fa-archive text-primary" style="font-size:18px;"></i>
                 </a>
+
+                {{-- Icon dẫn tới sản phẩm đã đăng bán từ dòng kho này --}}
+                @if($detail->product)
+                  <a href="{{ route('admin.products.show', $detail->product->id) }}"
+                     title="Xem sản phẩm đã đăng bán">
+                    <i class="fa fa-cubes text-info" style="font-size:18px;"></i>
+                  </a>
+                @else
+                  <a href="#"
+                     onclick="alert('Sản phẩm này chưa được đăng bán'); return false;"
+                     title="Sản phẩm này chưa được đăng bán">
+                    <i class="fa fa-cubes text-muted" style="font-size:18px;"></i>
+                  </a>
+                @endif
 
               </td>
             </tr>

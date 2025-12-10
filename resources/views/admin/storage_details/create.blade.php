@@ -9,24 +9,28 @@
       </header>
 
       <div class="panel-body">
-      @if (session('message'))
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công!',
-                text: '{{ session("message") }}',
-                confirmButtonText: 'OK'
-            });
-        });
-    </script>
-@endif
+
+        
+        @if (session('message'))
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+          <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Thành công!',
+                      text: '{{ session("message") }}',
+                      confirmButtonText: 'OK'
+                  });
+              });
+          </script>
+        @endif
+
         <div class="position-center">
 
+          {{-- Hiển thị lỗi --}}
           @if ($errors->any())
             <div class="alert alert-danger">
-              <ul style="margin-bottom: 0;">
+              <ul style="margin-bottom:0;">
                 @foreach ($errors->all() as $error)
                   <li>{{ $error }}</li>
                 @endforeach
@@ -34,9 +38,21 @@
             </div>
           @endif
 
+          {{-- THÔNG TIN LÔ HIỆN TẠI --}}
+          <div class="alert alert-info">
+            <strong>Thông Tin Lô Hàng:</strong><br>
+            Mã lô: <strong>{{ $storage->batch_code }}</strong><br>
+            Ngày nhập:
+            <strong>
+              {{ $storage->import_date ? \Carbon\Carbon::parse($storage->import_date)->format('d/m/Y') : '—' }}
+            </strong>
+          </div>
+
+          
           <form method="POST" action="{{ route('admin.storage-details.store', $storage->id) }}">
             @csrf
 
+           
             <div class="form-group">
               <label for="product_name">Tên sản phẩm (trong lô) <span class="text-danger">*</span></label>
               <input type="text"
@@ -44,9 +60,11 @@
                      id="product_name"
                      class="form-control"
                      value="{{ old('product_name') }}"
+                     placeholder="VD: Đồng hồ Orient nam dây da..."
                      required>
             </div>
 
+           
             <div class="form-group">
               <label for="import_quantity">Số lượng nhập <span class="text-danger">*</span></label>
               <input type="number"
@@ -58,17 +76,7 @@
                      required>
             </div>
 
-            <div class="form-group">
-              <label for="stock_status">Trạng thái kho (tùy chọn)</label>
-              <select name="stock_status" id="stock_status" class="form-control">
-                <option value="">-- Mặc định: Chờ bán --</option>
-                <option value="pending"  {{ old('stock_status') === 'pending' ? 'selected' : '' }}>Chờ bán</option>
-                <option value="selling"  {{ old('stock_status') === 'selling' ? 'selected' : '' }}>Đang bán</option>
-                <option value="sold_out" {{ old('stock_status') === 'sold_out' ? 'selected' : '' }}>Hết hàng</option>
-                <option value="stopped"  {{ old('stock_status') === 'stopped' ? 'selected' : '' }}>Ngừng bán</option>
-              </select>
-            </div>
-
+            
             <div class="form-group">
               <label for="note">Ghi chú</label>
               <textarea name="note"
@@ -77,7 +85,7 @@
                         class="form-control"
                         placeholder="Ghi chú thêm (nếu có)">{{ old('note') }}</textarea>
             </div>
-
+            
             <button type="submit" class="btn btn-info">Lưu vào lô</button>
             <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}" class="btn btn-default">
               Quay lại

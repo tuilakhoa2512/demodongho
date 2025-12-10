@@ -38,7 +38,6 @@ class StorageDetailController extends Controller
     }
 
     /**
-     * DANH SÁCH KHO THEO 1 LÔ HÀNG
      * GET /admin/storages/{storageId}/details
      * Route: admin.storage-details.by-storage
      */
@@ -72,28 +71,32 @@ class StorageDetailController extends Controller
      */
     public function store(Request $request, $storageId)
     {
+        // 1. Lấy lô hàng
         $storage = Storage::findOrFail($storageId);
 
+        // 2. Validate dữ liệu từ form
         $request->validate([
             'product_name'    => 'required|string|max:255',
             'import_quantity' => 'required|integer|min:1',
-            'stock_status'    => 'nullable|in:pending,selling,sold_out,stopped',
             'note'            => 'nullable|string',
         ]);
 
+        // 3. Tạo dòng kho mới
         StorageDetail::create([
             'storage_id'      => $storage->id,
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
-            'stock_status'    => $request->stock_status ?? 'pending',
+            'stock_status'    => 'pending', 
             'note'            => $request->note,
-            'status'          => 1, // mặc định hiển thị
+            'status'          => 1,         // hiển thị trong admin
         ]);
 
+        // 4. Redirect về danh sách sản phẩm trong lô
         return redirect()
             ->route('admin.storage-details.by-storage', $storage->id)
             ->with('success', 'Thêm sản phẩm vào lô hàng thành công.');
     }
+
 
     /**
      * FORM SỬA 1 DÒNG KHO
@@ -113,45 +116,82 @@ class StorageDetailController extends Controller
      * PUT /admin/storage-details/{id}
      * Route: admin.storage-details.update
      */
-    public function update(Request $request, $id)
+   public function update(Request $request, $id)
     {
-        $detail  = StorageDetail::findOrFail($id);
+        // Lấy dòng kho + lô tương ứng
+        $detail  = StorageDetail::with('storage')->findOrFail($id);
         $storage = $detail->storage;
 
         $request->validate([
             'product_name'    => 'required|string|max:255',
-            'import_quantity' => 'required|integer|min:0',
-            'stock_status'    => 'required|in:pending,selling,sold_out,stopped',
+            'import_quantity' => 'required|integer|min:1',
             'note'            => 'nullable|string',
         ]);
-
+   
         $detail->update([
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
-            'stock_status'    => $request->stock_status,
             'note'            => $request->note,
+          
         ]);
 
         return redirect()
             ->route('admin.storage-details.by-storage', $storage->id)
-            ->with('success', 'Cập nhật sản phẩm trong lô thành công.');
+            ->with('success', 'Cập nhật sản phẩm trong kho thành công.');
     }
 
+
     /**
-     * ẨN / HIỆN 1 DÒNG KHO
+     * ẨN / HIỆN
      * PATCH /admin/storage-details/{id}/toggle-status
      * Route: admin.storage-details.toggle-status
      */
-    public function toggleStatus($id)
+   public function toggleStatus($id)
     {
-        $detail = StorageDetail::findOrFail($id);
+        // Lấy dòng kho + product (nếu có)
+        $detail = StorageDetail::with('product')->findOrFail($id);
+        $product = $detail->product;
 
+        // Đảo trạng thái hiển thị của kho
         $detail->status = $detail->status ? 0 : 1;
+
+        // ============================
+        // TRƯỜNG HỢP 1: ẨN KHO
+        // ============================
+        if ($detail->status == 0) {
+
+            // Kho bị ẩn -> ngừng bán
+            $detail->stock_status = 'stopped';
+
+            if ($product) {
+                // Ẩn luôn sản phẩm + ngừng bán
+                $product->status = 0;
+                $product->stock_status = 'stopped';
+                $product->save();
+            }
+
+        }
+        // ============================
+        // TRƯỜNG HỢP 2: HIỆN KHO
+        // ============================
+        else {
+
+            if ($product) {
+                // Kho chỉ đồng bộ theo product
+                // (Product không được tự bật)
+                $detail->stock_status = $product->stock_status;
+            } else {
+                // Chưa có product => đang chờ bán
+                $detail->stock_status = 'pending';
+            }
+        }
+
+        // Lưu dòng kho
         $detail->save();
 
         return redirect()
             ->back()
-            ->with('success', 'Cập nhật trạng thái sản phẩm trong kho thành công.');
+            ->with('success', 'Cập nhật trạng thái kho (và sản phẩm liên quan) thành công.');
     }
 
     

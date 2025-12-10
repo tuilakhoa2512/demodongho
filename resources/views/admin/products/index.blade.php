@@ -5,10 +5,10 @@
   <div class="panel panel-default">
 
     <div class="panel-heading" style="font-size: 18px; font-weight: 600;">
-      Danh Sách Sản Phẩm
+      DANH SÁCH SẢN PHẨM
     </div>
 
-    {{-- Thông báo thành công (SweetAlert) --}}
+    {{-- Thông báo thành công --}}
     @if (session('success'))
       <script>
           Swal.fire({
@@ -16,11 +16,23 @@
               text: "{{ session('success') }}",
               icon: "success",
               confirmButtonText: "OK",
-              timer: 2000
           });
       </script>
     @endif
 
+    {{-- Thông báo lỗi (ví dụ kho đang ẩn, không cho hiện sản phẩm) --}}
+    @if (session('error'))
+      <script>
+          Swal.fire({
+              icon: 'error',
+              title: 'Không thể thực hiện!',
+              text: '{{ session("error") }}',
+              confirmButtonText: "OK"
+          });
+      </script>
+    @endif
+
+    {{-- Hàng công cụ (tạm để nguyên, sau này bạn làm bulk action / search sau) --}}
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
@@ -54,7 +66,6 @@
       </style>
 
       <table class="table table-striped b-t b-light">
-
         <thead>
           <tr>
             <th style="width:20px;">
@@ -65,12 +76,7 @@
             <th>ID</th>
             <th>Hình</th>
             <th>Tên sản phẩm</th>
-            <th>Lô</th>
-            <th>Loại</th>
-            <th>Thương hiệu</th>
-            <th>Giới tính</th>
-            <th>Kích thước</th>
-            <th>Chất liệu dây</th>
+            <th>Số lượng tồn kho</th>
             <th>Giá bán</th>
             <th>Trạng thái bán</th>
             <th>Hiển Thị</th>
@@ -80,6 +86,11 @@
 
         <tbody>
           @forelse($products as $product)
+            @php
+              $storageDetail = optional($product->storageDetail);
+              $storage       = optional($storageDetail->storage);
+            @endphp
+
             <tr>
               {{-- checkbox --}}
               <td>
@@ -105,49 +116,8 @@
               {{-- Tên sản phẩm --}}
               <td>{{ $product->name }}</td>
 
-              {{-- Lô hàng --}}
-              @php
-                  $storageDetail = optional($product->storageDetail);
-                  $storage = optional($storageDetail->storage);
-              @endphp
-              <td>
-                @if($storage && $storage->batch_code)
-                  {{ $storage->batch_code }}
-                @else
-                  —
-                @endif
-              </td>
-
-              {{-- Loại --}}
-              <td>{{ optional($product->category)->name ?? '—' }}</td>
-
-              {{-- Thương hiệu --}}
-              <td>{{ optional($product->brand)->name ?? '—' }}</td>
-
-              {{-- Giới tính --}}
-              <td>
-                @if($product->gender === 'male')
-                  Nam
-                @elseif($product->gender === 'female')
-                  Nữ
-                @elseif($product->gender === 'unisex')
-                  Unisex
-                @else
-                  —
-                @endif
-              </td>
-
-              {{-- Kích thước --}}
-              <td>
-                @if(!is_null($product->dial_size))
-                  {{ rtrim(rtrim(number_format($product->dial_size, 2, '.', ''), '0'), '.') }} mm
-                @else
-                  -
-                @endif
-              </td>
-
-              {{-- Chất liệu dây --}}
-              <td>{{ $product->strap_material ?: '—' }}</td>
+              {{-- Số lượng tồn kho --}}
+              <td>{{ number_format($product->quantity) }}</td>
 
               {{-- Giá bán --}}
               <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
@@ -174,20 +144,13 @@
                 @endif
               </td>
 
-              {{-- Thao tác --}}
+              {{-- Thao tác: Ẩn/Hiện – Xem chi tiết – Tới kho hàng --}}
               <td>
-
-                {{-- Sửa --}}
-                <a href="{{ route('admin.products.edit', $product->id) }}"
-                   title="Sửa"
-                   style="margin-right:6px;">
-                  <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
-                </a>
 
                 {{-- Ẩn / Hiện --}}
                 <form action="{{ route('admin.products.toggle-status', $product->id) }}"
                       method="POST"
-                      style="display:inline-block;">
+                      style="display:inline-block; margin-right:6px;">
                   @csrf
                   @method('PATCH')
                   <button type="submit"
@@ -201,16 +164,34 @@
                   </button>
                 </form>
 
+                {{-- Xem chi tiết --}}
+                <a href="{{ route('admin.products.show', $product->id) }}"
+                   title="Xem chi tiết"
+                   style="margin-right:6px;">
+                  <i class="fa fa-info-circle text-info" style="font-size:18px;"></i>
+                </a>
+
+                {{-- Tới kho hàng của sản phẩm --}}
+                @if($storage && $storage->id)
+                  <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
+                     title="Xem sản phẩm trong lô {{ $storage->batch_code }}">
+                    <i class="fa fa-archive text-primary" style="font-size:18px;"></i>
+                  </a>
+                @else
+                  <span title="Không tìm thấy lô hàng">
+                    <i class="fa fa-archive text-muted" style="font-size:18px; opacity:0.5;"></i>
+                  </span>
+                @endif
+
               </td>
             </tr>
           @empty
             <tr>
-              <td colspan="14" class="text-center">Chưa có sản phẩm nào.</td>
+              <td colspan="9" class="text-center">Chưa có sản phẩm nào.</td>
             </tr>
           @endforelse
 
         </tbody>
-
       </table>
     </div>
 

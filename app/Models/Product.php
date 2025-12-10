@@ -27,9 +27,7 @@ class Product extends Model
         'status',       // 1 = active, 0 = inactive
     ];
 
-    /**
-     * Ép kiểu cho một số field
-     */
+    
     protected $casts = [
         'dial_size'    => 'float',
         'price'        => 'float',

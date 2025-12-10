@@ -34,7 +34,7 @@
                         <strong>{{ $storage->batch_code ?? 'N/A' }}</strong><br>
                         Sản phẩm trong kho:
                         <strong>{{ $storageDetail->product_name ?? 'N/A' }}</strong><br>
-                        Số lượng nhập kho:
+                        Số lượng nhập kho ban đầu:
                         <strong>{{ $storageDetail->import_quantity ?? 0 }}</strong><br>
                         Trạng thái kho:
                         <strong>{{ $storageDetail->stock_status ?? 'N/A' }}</strong>
@@ -144,16 +144,17 @@
                                    required>
                         </div>
 
-                        {{-- Số lượng --}}
+                        {{-- Số lượng tồn kho (chỉ xem, không submit) --}}
                         <div class="form-group">
-                            <label for="quantity">Số lượng tồn kho <span class="text-danger">*</span></label>
-                            <input type="number"
-                                   name="quantity"
-                                   id="quantity"
+                            <label>Số lượng tồn kho hiện tại</label>
+                            <input type="text"
                                    class="form-control"
-                                   min="0"
-                                   value="{{ old('quantity', $product->quantity) }}"
-                                   required>
+                                   value="{{ $product->quantity }}"
+                                   readonly>
+                            <small class="text-muted">
+                                Số lượng này được cập nhật tự động theo nhập / xuất kho (đơn hàng),
+                                không thể chỉnh sửa trực tiếp tại đây.
+                            </small>
                         </div>
 
                         {{-- Trạng thái bán (stock_status) --}}
@@ -174,25 +175,8 @@
                                 </option>
                             </select>
                             <small class="text-muted">
-                                Trạng thái bán dùng cho nghiệp vụ: đang bán / hết hàng / ngừng bán.
+                                Thay đổi trạng thái bán sẽ tự đồng bộ sang Kho Hàng (Storage Detail).
                             </small>
-                        </div>
-
-                        {{-- Trạng thái hiển thị (status) --}}
-                        <div class="form-group">
-                            <label>Trạng thái hiển thị</label>
-                            <div>
-                                <label class="radio-inline">
-                                    <input type="radio" name="status" value="1"
-                                        {{ old('status', $product->status) == 1 ? 'checked' : '' }}>
-                                    Hiển thị
-                                </label>
-                                <label class="radio-inline" style="margin-left:15px;">
-                                    <input type="radio" name="status" value="0"
-                                        {{ old('status', $product->status) == 0 ? 'checked' : '' }}>
-                                    Ẩn
-                                </label>
-                            </div>
                         </div>
 
                         {{-- Ảnh sản phẩm --}}
@@ -264,7 +248,10 @@
                         </div>
 
                         <button type="submit" class="btn btn-info">Lưu thay đổi</button>
-                        <a href="{{ route('admin.products.index') }}" class="btn btn-default">Quay lại</a>
+                        {{-- Nút quay lại: về trang chi tiết sản phẩm --}}
+                        <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-default">
+                            Quay lại
+                        </a>
 
                     </form>
 

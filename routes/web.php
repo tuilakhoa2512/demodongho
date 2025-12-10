@@ -14,6 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\StorageDetailController;
+use App\Http\Controllers\Admin\DiscountProductController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -190,8 +191,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::put('/products/{id}', [ProductController::class, 'update'])->name('products.update');
 
+    Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
+
     Route::patch('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
 
+
+     // QUẢN LÝ ƯU ĐÃI SẢN PHẨM
+    Route::get('/discount-products', [DiscountProductController::class, 'index'])->name('discount-products.index');
+
+    Route::get('/discount-products/create', [DiscountProductController::class, 'create'])->name('discount-products.create');
+
+    Route::post('/discount-products', [DiscountProductController::class, 'store'])->name('discount-products.store');
+
+    Route::get('/discount-products/{id}/edit', [DiscountProductController::class, 'edit'])->name('discount-products.edit');
+
+    Route::put('/discount-products/{id}', [DiscountProductController::class, 'update'])->name('discount-products.update');
+
+    Route::patch('/discount-products/{id}/toggle-status', [DiscountProductController::class, 'toggleStatus'])->name('discount-products.toggle-status');
 });
 
 

@@ -26,7 +26,7 @@
             @csrf
             @method('PUT')
 
-            {{-- Mã lô (chỉ xem, không sửa) --}}
+            {{-- Mã lô: chỉ xem --}}
             <div class="form-group">
               <label>Mã lô hàng</label>
               <input type="text"
@@ -54,20 +54,9 @@
                      name="import_quantity"
                      id="import_quantity"
                      class="form-control"
-                     min="0"
+                     min="1"
                      value="{{ old('import_quantity', $detail->import_quantity) }}"
                      required>
-            </div>
-
-            {{-- Trạng thái kho --}}
-            <div class="form-group">
-              <label for="stock_status">Trạng thái kho <span class="text-danger">*</span></label>
-              <select name="stock_status" id="stock_status" class="form-control" required>
-                <option value="pending"  {{ old('stock_status', $detail->stock_status) === 'pending'  ? 'selected' : '' }}>Chờ bán</option>
-                <option value="selling"  {{ old('stock_status', $detail->stock_status) === 'selling'  ? 'selected' : '' }}>Đang bán</option>
-                <option value="sold_out" {{ old('stock_status', $detail->stock_status) === 'sold_out' ? 'selected' : '' }}>Hết hàng</option>
-                <option value="stopped"  {{ old('stock_status', $detail->stock_status) === 'stopped'  ? 'selected' : '' }}>Ngừng bán</option>
-              </select>
             </div>
 
             {{-- Ghi chú --}}
