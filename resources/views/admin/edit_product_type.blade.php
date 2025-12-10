@@ -47,6 +47,17 @@
                         </div>
 
                         <div class="form-group">
+                            <label>Đường dẫn (slug)</label>
+                            <input type="text"
+                                name="category_slug"
+                                id="category_slug"
+                                value="{{ $edit_value->category_slug }}"
+                                class="form-control"
+                                readonly>
+                        </div>
+
+
+                        <div class="form-group">
                             <label>Mô tả</label>
                             <textarea rows="5"
                                       name="product_type_desc"
@@ -66,5 +77,29 @@
         </section>
     </div>
 </div>
+
+{{-- JS tạo slug realtime --}}
+<script>
+    function generateSlug(str) {
+        str = str.toLowerCase();
+
+        str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        str = str.replace(/đ/g, "d");
+
+        str = str.replace(/[^a-z0-9]+/g, '-');
+        str = str.replace(/^-+|-+$/g, '');
+
+        return str;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const nameInput = document.querySelector('input[name="category_name"]');
+        const slugInput = document.getElementById("category_slug");
+
+        nameInput.addEventListener("keyup", function() {
+            slugInput.value = generateSlug(this.value);
+        });
+    });
+</script>
 
 @endsection

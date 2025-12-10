@@ -22,11 +22,21 @@ class HomeController extends Controller
         ->orderBy('id', 'desc')
         ->paginate(6);
 
+    // --- Thêm recommended products ---
+    // Lấy 6 sản phẩm ngẫu nhiên làm recommended
+    $recommended_products = Product::with('productImage')
+        ->where('status', 1)
+        ->where('stock_status', 'selling')
+        ->orderBy('created_at', 'desc') // hoặc orderBy('id', 'desc')
+        ->take(3)
+        ->get();
+
 
     return view('pages.home')
         ->with('category', $cate_pro)
         ->with('brand', $brand_pro)
-        ->with('all_product', $all_product);
+        ->with('all_product', $all_product)
+        ->with('recommended_products', $recommended_products);
 }
 
 

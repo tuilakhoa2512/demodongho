@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Favorite extends Model
 {
-    //
+    protected $table = 'favorites';
+
+    protected $fillable = [
+        'user_id',
+        'product_id',
+    ];
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+
+    }
 }

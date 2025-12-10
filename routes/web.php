@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\CompareController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -71,8 +73,12 @@ Route::prefix('location')->group(function () {
 
 
 // Danh mục sản phẩm trang chủ
-Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
-Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
+// Route::get('/danh-muc-san-pham/{id}', [ProductTypeController::class, 'show_category_home']);
+// Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
+Route::get('/danh-muc-san-pham/{category_slug}', [ProductTypeController::class, 'show_category_home'])->name('category.show');
+Route::get('/thuong-hieu-san-pham/{brand_slug}', [BrandProductController::class, 'show_brand_home'])->name('brand.show');
+Route::get('/danh-muc/{slug}', [ProductTypeController::class, 'showCategory'])->name('category.show');
+
 
 // Giỏ hàng
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');           
@@ -133,6 +139,40 @@ Route::post('/update-brand-product/{id}', [BrandProductController::class, 'updat
 Route::get('/unactive-brand-product/{id}', [BrandProductController::class, 'unactive_brand_product'])->name('admin.unactivebrand');
 
 Route::get('/active-brand-product/{id}', [BrandProductController::class, 'active_brand_product'])->name('admin.activebrand');
+
+// ================= YÊU THÍCH ================= //
+  // Thêm yêu thích
+Route::get('/yeu-thich/add/{id}', [FavoriteController::class, 'addFavorite'])
+->name('favorite.add');
+
+// Danh sách yêu thích
+Route::get('/yeu-thich', [FavoriteController::class, 'index'])
+->name('favorite.index');
+
+// Xoá yêu thích
+Route::get('/yeu-thich-xoa/{id}', [FavoriteController::class, 'removeFavorite'])
+->name('favorite.remove');
+
+Route::get('/yeu-thich/toggle/{id}', [FavoriteController::class, 'toggle'])
+    ->name('favorite.toggle');
+
+// ================= So sánh =================
+    // Trang so sánh
+// Hiển thị trang so sánh 2 sản phẩm
+Route::get('/so-sanh', [CompareController::class, 'view'])->name('compare.view');
+
+// Thêm sản phẩm vào so sánh
+Route::get('/so-sanh/add/{id}', [CompareController::class, 'add'])->name('compare.add');
+
+// Xoá sản phẩm trong slot sp1 hoặc sp2
+Route::get('/so-sanh/remove/{slot}', [CompareController::class, 'remove'])->name('compare.remove');
+Route::get('/so-sanh/chon/{slot}', [CompareController::class, 'select'])->name('compare.select');
+Route::get('/so-sanh/xoa-tat-ca', [CompareController::class, 'clear'])->name('compare.clear');
+
+
+
+
+
 
 
 // ================= LÔ HÀNG + CHI TIẾT KHO (TRONG PREFIX ADMIN) =================

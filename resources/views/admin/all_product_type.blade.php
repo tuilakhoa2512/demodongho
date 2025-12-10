@@ -4,14 +4,14 @@
 
 <div class="table-agile-info">
     <div class="panel panel-default">
-    <div class="panel-heading">
+    <!-- <div class="panel-heading">
      
        @if($filterStatus == 1)
           <small>(Trạng Thái: Hiện)</small>
         @elseif($filterStatus === "0")
           <small>(Trạng Thái: Ẩn)</small>
         @endif
-    </div>
+    </div> -->
    
         <div class="panel-heading">
             Liệt Kê Loại Sản Phẩm
@@ -32,9 +32,13 @@
             <div class="col-sm-5 m-b-xs">
                 <select class="input-sm form-control w-sm inline v-middle">
                     
-                    <option value="">Lọc trạng thái (Tất cả)</option>
+                    <!-- <option value="">Lọc trạng thái (Tất cả)</option>
             <option value="1" {{ isset($filterStatus) && $filterStatus == 1 ? 'selected' : '' }}>Hiện</option>
-            <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>Ẩn</option>
+            <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>Ẩn</option> -->4
+                    <option value="0">Bulk action</option>
+                    <option value="1">Delete selected</option>
+                    <option value="2">Bulk edit</option>
+                    <option value="3">Export</option>
                 </select>
                 <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">Áp dụng</button>              
             </div>
@@ -72,6 +76,7 @@
                         <th>ID</th>
                         <th>Tên loại</th>
                         <th>Mô tả</th>
+                        <th>Slug</th>
                         <th>Hiển Thị</th>
                         <th>Thao tác</th>
                         <th style="width:30px;"></th>
@@ -84,6 +89,7 @@
                         <td>{{ $cate_pro->id }}</td>
                         <td>{{ $cate_pro->name }}</td>
                         <td>{{ $cate_pro->description }}</td>
+                        <td>{{ $cate_pro->category_slug }}</td>
                         <!-- <td>{{ $cate_pro->status }}</td> -->
                         <td><span class="text-ellipsis">
                             <?php

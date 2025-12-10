@@ -200,6 +200,12 @@ a#scrollUp i {
     text-decoration: none;
 }
 
+
+.dropdown-menu {
+    min-width: 10rem;
+}
+
+
 .shop-menu ul li {
     display: inline-block;
     padding-left: 15px;
@@ -336,50 +342,8 @@ a#scrollUp i {
     background-color: #fff;
 }
 
-.nav.navbar-nav > li:hover > ul.sub-menu {
-    display: block;
-    -webkit-animation: fadeInUp 400ms;
-    -moz-animation: fadeInUp 400ms;
-    -ms-animation: fadeInUp 400ms;
-    -o-animation: fadeInUp 400ms;
-    animation: fadeInUp 400ms;
-}
 
-ul.sub-menu {
-    position: absolute;
-    top: 30px;
-    left: 0;
-    background: #f16a6a;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 220px;
-    -webkit-box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
-    box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
-    display: none;
-    z-index: 999;
-}
 
-.dropdown ul.sub-menu li .active {
-    color: #fdb45e;
-    padding-left: 0;
-}
-
-.navbar-nav li ul.sub-menu li {
-    padding: 10px 20px 0;
-}
-
-.navbar-nav li ul.sub-menu li:last-child {
-    padding-bottom: 3px;
-}
-
-.navbar-nav li ul.sub-menu li a {
-    color: #fff;
-}
-
-.navbar-nav li ul.sub-menu li a:hover {
-    color: #fdb45e;
-}
 
 .fa-angle-down {
     padding-left: 5px;
@@ -2764,4 +2728,179 @@ ul.nav.nav-pills.nav-justified i {
     color: #fff;
 }
 
+.compare-close {
+    background: #d70018;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 3px;     /* nếu muốn tròn hơn để mình tăng lên 8px */
+    cursor: pointer;
+    font-family: FontAwesome;
+    display: inline-block;
+    transition: 0.2s;
+}
 
+.compare-close:hover {
+    background: #b80014;
+    transform: scale(1.05);
+}
+
+.compare-btn {
+    background: #d70018;
+    color: #ffffff !important;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    display: inline-block;
+    transition: 0.2s;
+}
+/* 
+.compare-btn:hover {
+    background: #0069d9;
+    transform: scale(1.05);
+} */
+
+/* nút đỏ */
+.compare-btn.danger {
+    background: #d70018 !important;
+}
+
+.compare-btn.danger:hover {
+    background: #b80014 !important;
+    transform: scale(1.05);
+}
+/* Dropdown Thương Hiệu */
+.brand-dropdown {
+    position: relative;
+}
+
+.brand-dropdown .brand-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 15px;
+    background: white;
+    width: 720px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+.brand-dropdown:hover .brand-menu {
+    display: block;
+}
+
+/* Grid logo */
+.brand-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);   /* 6 logo trên 1 hàng */
+    gap: 20px;                                /* khoảng cách giữa các logo */
+    
+}
+
+.brand-item img {
+    width: 120px;
+    height: 60px;
+    object-fit: contain;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    transition: 0.2s ease-in-out;
+}
+
+.brand-item img:hover {
+    border-color: #c30000;
+    transform: scale(1.05);
+}
+
+.brand-menu {
+    width: 1000px !important;     /* hoặc 1100px nếu muốn rộng hơn */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.navbar .dropdown-menu {
+    min-width: 1000px !important;
+    
+}
+
+
+/* === MŨI TÊN XUỐNG GIỐNG "THƯƠNG HIỆU" === */
+.arrow-down {
+    display: inline-block;
+    margin-left: 6px;
+    width: 8px;
+    height: 8px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+    transform: rotate(-45deg);      /* mũi tên hướng xuống */
+    transition: 0.25s ease;
+}
+
+/* Hover menu cha → xoay mũi tên */
+.has-submenu:hover .arrow-down {
+    transform: rotate(135deg);      /* xoay 180° hướng lên */
+}
+
+/* === MENU CHA === */
+.has-submenu {
+    position: relative;
+          
+}
+
+.has-submenu > a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* === SUB MENU === */
+.sub-menu {
+    list-style: none;
+    padding: 20px 30px;
+    margin: 0;
+
+    background: #d70018;
+    border-radius: 12px;
+    width: 340px;                    /* rộng hơn */
+    
+    position: absolute;
+    top: calc(100% - 5px);           /* DÍNH SÁT, KHÔNG KHOẢNG HỞ */
+    left: 0;
+    display: none;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    z-index: 9999;
+}
+
+/* Hover menu cha → hiện submenu */
+.has-submenu:hover .sub-menu {
+    display: block;
+}
+
+/* === ITEM === */
+.sub-menu li {
+    margin: 14px 0;
+}
+
+
+/* Hiệu ứng hover từng mục trong submenu */
+.sub-menu li a {
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    padding: 6px 0;
+
+    transform: translateX(0);
+    transition: 0.25s ease;
+}
+
+/* Khi hover → hục ra hục vô */
+.sub-menu li a:hover {
+    transform: translateX(6px) scale(1.03);
+    filter: brightness(1.15);
+}
