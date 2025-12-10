@@ -27,7 +27,7 @@
           <option value="2">Bulk edit</option>
           <option value="3">Export</option>
         </select>
-        <button class="btn btn-sm btn-default">Apply</button>
+        <button class="btn btn-sm btn-default">Áp dụng</button>
       </div>
       <div class="col-sm-4"></div>
       <div class="col-sm-3">
@@ -64,6 +64,7 @@
             <th>ID</th>
             <th>Tên thương hiệu</th>
             <th>Mô tả</th>
+            <th>Slug</th>
             <th>Hình</th>
             <th>Hiển Thị</th>
             <th>Thao tác</th>
@@ -82,6 +83,7 @@
             <td>{{ $brand_pro->id }}</td>
             <td>{{ $brand_pro->name }}</td>
             <td>{{ $brand_pro->description }}</td>
+            <td>{{ $brand_pro->brand_slug }}</td>
             <td>
               @if ($brand_pro->image)
                 <img src="{{ asset('storage/' . $brand_pro->image) }}"
@@ -95,21 +97,17 @@
                 <span class="text-ellipsis">
                               <?php
                               if($brand_pro->status==1){
-                                  ?>
+                                ?>
                                 <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
-
-                              <?php    
-                              }else{
-                                  ?>
-                                <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
-
-                                  <?php   
-                              }
-                              ?>
-                          </span>
-              </td>
-
-            <td>
+                             <?php    
+                             }else{
+                                 ?>
+                                 <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
+                                 <?php   
+                             }
+                             ?>
+                         </span></td>
+                         <td>
                             <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">
                                 <i class="fa fa-pencil-square-o text-success text-active"></i>
                             </a>

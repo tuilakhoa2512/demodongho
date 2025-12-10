@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str; 
 
 session_start();
 
@@ -46,6 +47,7 @@ class BrandProductController extends Controller
     {
         $request->validate([
             'brand_product_name'   => 'required|string|max:150',
+            'brand_product_slug'   => 'nullable|string|max:255',
             'brand_product_image'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'brand_product_desc'   => 'nullable|string',
             'brand_product_status' => 'required'
@@ -55,6 +57,15 @@ class BrandProductController extends Controller
         $data['name']        = $request->brand_product_name;
         $data['description'] = $request->brand_product_desc;
         $data['status'] = $request->brand_product_status;
+
+        //  Tạo slug từ tên brand
+    $data['brand_slug'] = Str::slug($request->brand_product_name);
+
+    // Nếu slug bị trùng thì thêm số vào sau
+    $count = DB::table('brands')->where('brand_slug', $data['brand_slug'])->count();
+    if ($count > 0) {
+        $data['brand_slug'] = $data['brand_slug'] . '-' . ($count + 1);
+    }
 
         if ($request->hasFile('brand_product_image')) {
             $file = $request->file('brand_product_image');
@@ -111,6 +122,20 @@ class BrandProductController extends Controller
         $data = [];
         $data['name']        = $request->brand_product_name;
         $data['description'] = $request->brand_product_desc;
+       
+
+        // CẬP NHẬT SLUG KHI ĐỔI TÊN
+        $newSlug = Str::slug($request->brand_product_name);
+
+        // Nếu slug bị trùng (ngoại trừ chính nó)
+        $count = DB::table('brands')
+                    ->where('brand_slug', $newSlug)
+                    ->where('id', '!=', $id)
+                    ->count();
+        if ($count > 0) {
+            $newSlug .= '-' . ($count + 1);
+        }
+        $data['brand_slug'] = $newSlug;
 
         if ($request->hasFile('brand_product_image')) {
             $file = $request->file('brand_product_image');
@@ -166,22 +191,36 @@ class BrandProductController extends Controller
         return redirect()->to('/admin/brands')
                         ->with('success', 'Xoá sản phẩm thành công!');
     }
-    public function show_brand_home($id)
+    public function show_brand_home($brand_slug)
 {
     // Lấy tất cả categories để render menu
-    $cate_pro = DB::table('categories')->where('status','1')->orderBy('id', 'asc')->get();
+    $cate_pro = DB::table('categories')
+        ->where('status','1')
+        ->orderBy('id', 'asc')
+        ->get();
 
     // Lấy tất cả brands để render menu
-    $brand_pro = DB::table('brands')->where('status','1')->orderBy('id', 'asc')->get();
+    $brand_pro = DB::table('brands')
+        ->where('status','1')
+        ->orderBy('id', 'asc')
+        ->get();
+        // Lấy brand theo slug (thay vì id)
+    $brand = DB::table('brands')->where('brand_slug', $brand_slug)->first();
 
-    // Lấy tên thương hiệu được click
-    $brand_name = DB::table('brands')->where('id', $id)->value('name');
+    if (!$brand) {
+        abort(404, 'Thương hiệu không tồn tại');
+    }
+
+    // // Lấy tên thương hiệu được click
+    // $brand_name = DB::table('brands')
+    // ->where('id', $id)
+    // ->value('name');
 
     // Lấy sản phẩm theo brand_id
     $brand_by_id = DB::table('products')
         ->join('brands', 'products.brand_id', '=', 'brands.id')
         ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
-        ->where('products.brand_id', $id)
+        ->where('products.brand_id', $brand->id)
         ->select(
             'products.*',
             'brands.name as brand_name',
@@ -195,7 +234,7 @@ class BrandProductController extends Controller
     return view('pages.brand.show_brand')
         ->with('category', $cate_pro)
         ->with('brand', $brand_pro)
-        ->with('brand_name', $brand_name)
+        ->with('brand_name', $brand->name)
         ->with('brand_by_id', $brand_by_id);
 }
 

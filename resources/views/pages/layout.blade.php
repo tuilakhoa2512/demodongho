@@ -126,21 +126,35 @@
 						<div class="mainmenu pull-left">
 							<ul class="nav navbar-nav collapse navbar-collapse">
 								<li><a href="{{ URL::to('/trang-chu') }}" class="active">Home</a></li>
-								<li class="dropdown"><a href="#">Shop<i class="fa fa-angle-down"></i></a>
-									<ul role="menu" class="sub-menu">
-										<li><a href="shop.html">Sản Phẩm</a></li>
-										<li><a href="product-details.html">Product Details</a></li>
-										<li><a href="checkout.html">Checkout</a></li>
-										<li><a href="cart.html">Đơn Hàng</a></li>
-										<li><a href="login.html">Login</a></li>
+								<li class="has-submenu">
+									<a href="#">Đồng Hồ <span class="arrow-down"></span></a>
+									<ul class="sub-menu">
+										@foreach($category as $cate)
+											<li>
+												<a href="{{ URL::to('/danh-muc-san-pham/' . $cate->category_slug) }}">
+													{{ $cate->name }}
+												</a>
+											</li>
+										@endforeach
 									</ul>
 								</li>
-								<li class="dropdown"><a href="#">Blog<i class="fa fa-angle-down"></i></a>
-									<ul role="menu" class="sub-menu">
-										<li><a href="blog.html">Blog List</a></li>
-										<li><a href="blog-single.html">Blog Single</a></li>
-									</ul>
+
+								<li class="dropdown brand-dropdown">
+									<a href="#">
+										Thương Hiệu <i class="fa fa-angle-down"></i>
+									</a>
+
+									<div class="brand-menu">
+										<div class="brand-grid">
+											@foreach($brand as $br)
+												<a href="{{ URL::to('/thuong-hieu-san-pham/'.$br->brand_slug) }}" class="brand-item">
+												<img src="{{ asset('storage/'.$br->image) }}" alt="{{ $br->name }}">
+												</a>
+											@endforeach
+										</div>
+									</div>
 								</li>
+
 								<li><a href="404.html">Sales</a></li>
 								<li><a href="contact-us.html">Contact</a></li>
 							</ul>
@@ -238,7 +252,7 @@
 							<div class="panel panel-default">
 								<div class="panel-heading">
 									
-									<h4 class="panel-title"><a href="{{URL::to('/danh-muc-san-pham/' .$cate->id)}}">{{ $cate->name }}</a></h4>
+									<h4 class="panel-title"><a href="{{URL::to('/danh-muc-san-pham/' .$cate->category_slug)}}">{{ $cate->name }}</a></h4>
 								</div>
 
 							</div>
@@ -246,7 +260,7 @@
 						</div><!--/category-products-->
 						
 
-						<div class="brands_products"><!--brands_products-->
+						
 						<h2>Brand</h2>
 						<div class="panel-group category-products" id="accordian"><!--brand-productsr-->
 							@foreach ($brand as $key => $brand)
@@ -254,13 +268,13 @@
 
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h4 class="panel-title"><a href="{{URL::to('/thuong-hieu-san-pham/' .$brand->id)}}">{{ $brand->name }}</a></h4>
+									<h4 class="panel-title"><a href="{{URL::to('/thuong-hieu-san-pham/' .$brand->brand_slug)}}">{{ $brand->name }}</a></h4>
 								</div>
 
 							</div>
 							@endforeach
 						</div><!--/brand-products-->
-						</div><!--/brands_products-->
+						
 
 						<div class="price-range"><!--price-range-->
 							<h2>Tầm Giá</h2>
