@@ -95,25 +95,32 @@
             </td>
               <td>
                 <span class="text-ellipsis">
-                              <?php
-                              if($brand_pro->status==1){
-                                ?>
-                                <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
-                             <?php    
-                             }else{
-                                 ?>
-                                 <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
-                                 <?php   
-                             }
-                             ?>
-                         </span></td>
+                @if ($brand_pro->status == 1)
+                        <span class="label label-success">Hiện</span>
+                @else
+                        <span class="label label-danger">Ẩn</span>
+                @endif
+                </span></td>
                          <td>
                             <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">
                                 <i class="fa fa-pencil-square-o text-success text-active"></i>
                             </a>
-                            <a href="#" class="active styling edit" onclick="confirmDelete('{{ URL::to('/delete-brand-product/'.$brand_pro->id) }}')">
-                                <i class="fa fa-times text-danger text"></i>
-                            </a>
+                            <!-- Ẩn / Hiện -->
+        @if ($brand_pro->status == 1)
+            <!-- Đang hiện → cho phép chuyển sang Ẩn -->
+            <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"
+               class="active styling edit"
+               style="font-size: 18px;">
+                <i class="fa fa-eye text-warning"></i>
+            </a>
+        @else
+            <!-- Đang ẩn → cho phép chuyển sang Hiện -->
+            <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"
+               class="active styling edit"
+               style="font-size: 18px;">
+                <i class="fa fa-eye-slash text-warning"></i>
+            </a>
+        @endif
                         </td>
             </td>
           </tr>
