@@ -17,6 +17,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
+use App\Http\Controllers\admin\DiscountProductDetailController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -239,7 +240,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
 
 
-     // QUẢN LÝ ƯU ĐÃI SẢN PHẨM
+    //  DISCOUNT PRODUCT 
     Route::get('/discount-products', [DiscountProductController::class, 'index'])->name('discount-products.index');
 
     Route::get('/discount-products/create', [DiscountProductController::class, 'create'])->name('discount-products.create');
@@ -251,6 +252,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/discount-products/{id}', [DiscountProductController::class, 'update'])->name('discount-products.update');
 
     Route::patch('/discount-products/{id}/toggle-status', [DiscountProductController::class, 'toggleStatus'])->name('discount-products.toggle-status');
+
+        //  DISCOUNT PRODUCT DETAIL (pivot) 
+    Route::get('/discount-products/{id}/products', [DiscountProductDetailController::class, 'index'])->name('discount-products.products.index');
+
+    Route::post('/discount-products/{id}/products/attach', [DiscountProductDetailController::class, 'attach'])->name('discount-products.products.attach');
+
+    Route::put('/discount-products/{id}/products/{productId}', [DiscountProductDetailController::class, 'updateExpiration'])->name('discount-products.products.update');
+
+    Route::patch('/discount-products/{id}/products/{productId}/toggle', [DiscountProductDetailController::class, 'toggle'])->name('discount-products.products.toggle');
+
 });
 
 
