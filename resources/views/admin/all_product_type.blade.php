@@ -92,25 +92,29 @@
                         <td>{{ $cate_pro->category_slug }}</td>
                         <!-- <td>{{ $cate_pro->status }}</td> -->
                         <td><span class="text-ellipsis">
-                            <?php
-                            if($cate_pro->status==1){
-                                ?>
-                               <a href="{{ URL::to('/unactive-product-type/'.$cate_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-up"></span></a>
-                            <?php    
-                            }else{
-                                ?>
-                                <a href="{{ URL::to('/active-product-type/'.$cate_pro->id) }}"><span class="fa-thumb-styling fa fa-thumbs-down"></span></a>
-                                <?php   
-                            }
-                            ?>
+                        @if ($cate_pro->status == 1)
+                            <span class="label label-success">Hiện</span>
+                        @else
+                            <span class="label label-danger">Ẩn</span>
+                        @endif
                         </span></td>
                         <td>
                             <a href="{{ URL::to('/edit-product-type/'.$cate_pro->id) }}" class="active styling edit">
                                 <i class="fa fa-pencil-square-o text-success text-active"></i>
                             </a>
-                            <a href="#" class="active styling edit" onclick="confirmDelete('{{ URL::to('/delete-product-type/'.$cate_pro->id) }}')">
-                                <i class="fa fa-times text-danger text"></i>
-                            </a>
+                            <!-- Thao tác Ẩn Hiện -->
+                            @if ($cate_pro->status == 1)
+                                <!-- Đang hiện → cho phép ẩn -->
+                                <a href="{{ URL::to('/unactive-product-type/'.$cate_pro->id) }}" class="active styling edit" style="font-size: 18px;">
+                                    <i class="fa fa-eye text-warning"></i>
+                                </a>
+                            @else
+                                <!-- Đang ẩn → cho phép hiện -->
+                                <a href="{{ URL::to('/active-product-type/'.$cate_pro->id) }}" class="active styling edit" style="font-size: 18px;">
+                                    <i class="fa fa-eye-slash text-warning"></i>
+                                </a>
+                            @endif
+
                         </td>
                     </tr>
                     @endforeach

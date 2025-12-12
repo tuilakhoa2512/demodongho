@@ -2745,31 +2745,27 @@ ul.nav.nav-pills.nav-justified i {
     transform: scale(1.05);
 }
 
-.compare-btn {
-    background: #d70018;
-    color: #ffffff !important;
+.compare-btn.danger {
+    background: #ffffff !important;     /* nền trắng */
+    color: #d70018 !important;          /* chữ đỏ */
+    border: 2px solid #d70018 !important;  /* viền đỏ */
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.compare-now {
+    background: #d70018 !important;   /* nền đỏ */
+    color: #ffffff !important;        /* chữ trắng */
     padding: 12px 24px;
     font-size: 15px;
     font-weight: 600;
     border-radius: 6px;
     display: inline-block;
-    transition: 0.2s;
-}
-/* 
-.compare-btn:hover {
-    background: #0069d9;
-    transform: scale(1.05);
-} */
-
-/* nút đỏ */
-.compare-btn.danger {
-    background: #d70018 !important;
+    transition: 0.2s;       /* viền đỏ */
 }
 
-.compare-btn.danger:hover {
-    background: #b80014 !important;
-    transform: scale(1.05);
-}
 /* Dropdown Thương Hiệu */
 .brand-dropdown {
     position: relative;
@@ -2903,4 +2899,33 @@ ul.nav.nav-pills.nav-justified i {
 .sub-menu li a:hover {
     transform: translateX(6px) scale(1.03);
     filter: brightness(1.15);
+}
+
+/* img {
+    width: 250px !important;
+    height: 300px !important;
+    object-fit: cover;   
+    object-position: center;
+} */
+.col-sm-6.text-center img {
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+    object-position: center;
+}
+
+.btn-xoass1{
+    color:#fff;
+    background-color: #d70018;
+    padding: 8px 16px;
+    font: 14px Roboto,sans-serif;
+    border-color: #d43f3a;
+}
+
+.btn-xoass2{
+    color:#fff;
+    background-color: #d70018;
+    padding: 8px 16px;
+    font: 14px Roboto,sans-serif;
+    border-color: #d43f3a;
 }

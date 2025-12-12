@@ -161,6 +161,9 @@ Route::get('/yeu-thich/toggle/{id}', [FavoriteController::class, 'toggle'])
     // Trang so sánh
 // Hiển thị trang so sánh 2 sản phẩm
 Route::get('/so-sanh', [CompareController::class, 'view'])->name('compare.view');
+Route::get('/contact-us', function () {
+  return view('pages.contact');
+})->name('contact.us');
 
 // Thêm sản phẩm vào so sánh
 Route::get('/so-sanh/add/{id}', [CompareController::class, 'add'])->name('compare.add');
