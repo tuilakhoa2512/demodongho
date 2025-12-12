@@ -195,11 +195,11 @@ body {
                 <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class=" fa fa-ticket"></i>
-                        <span>Ưu Đãi</span>
+                        <span>Ưu Đãi Sản Phẩm</span>
                     </a>
-                    <ul class="sub">
-                        <li><a href="mail.html">Theo Sản Phẩm</a></li>
-                        <li><a href="mail_compose.html">Theo Hóa Đơn</a></li>
+                      <ul class="sub">
+                        <li><a href="{{ route('admin.discount-products.index') }}">Danh sách ưu đãi</a></li>
+                        <li><a href="{{ route('admin.discount-products.create') }}">Thêm ưu đãi mới</a></li>
                     </ul>
                 </li>
                 <li class="sub-menu">
