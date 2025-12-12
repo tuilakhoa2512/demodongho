@@ -94,4 +94,67 @@ class Product extends Model
         // Nếu không có ảnh trong DB thì dùng luôn main_image_url
         return $this->main_image_url;
     }
+
+    public function discountProducts()
+    {
+        return $this->belongsToMany(\App\Models\DiscountProduct::class, 'discount_product_details', 'product_id', 'discount_product_id')
+            ->withPivot(['expiration_date', 'status'])
+            ->withTimestamps();
+    }
+
+    // ================== DISCOUNT (ƯU ĐÃI) ==================
+
+    /**
+     * Lấy 1 ưu đãi đang áp dụng cho sản phẩm (nếu có)
+     * Quy tắc:
+     * - discount_products.status = 1 (chương trình đang hoạt động)
+     * - pivot.status = 1 (chi tiết đang áp dụng)
+     * - expiration_date null hoặc >= hôm nay
+     * - Nếu có nhiều ưu đãi cùng lúc (trường hợp hiếm), lấy ưu đãi có rate cao nhất
+     */
+    public function activeDiscountProduct()
+    {
+        $today = now()->toDateString();
+
+        return $this->discountProducts()
+            ->where('discount_products.status', 1)
+            ->wherePivot('status', 1)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('discount_product_details.expiration_date')
+                ->orWhere('discount_product_details.expiration_date', '>=', $today);
+            })
+            ->orderByDesc('discount_products.rate');
+    }
+
+    /** Accessor: ưu đãi đang áp dụng (object) */
+    public function getActiveDiscountAttribute()
+    {
+        return $this->activeDiscountProduct()->first();
+    }
+
+    /** Accessor: text hiển thị ưu đãi */
+    public function getDiscountLabelAttribute()
+    {
+        $d = $this->active_discount;
+        if (!$d) return null;
+
+        return "{$d->name} ({$d->rate}%)";
+    }
+
+    /** Accessor: giá sau ưu đãi (float|null) */
+    public function getDiscountedPriceAttribute()
+    {
+        $d = $this->active_discount;
+        if (!$d) return null;
+
+        $rate = (float) $d->rate;
+        $price = (float) $this->price;
+
+        $newPrice = $price * (100 - $rate) / 100;
+
+        // nếu bạn muốn làm tròn tiền:
+        return round($newPrice, 0);
+    }
+
+
 }

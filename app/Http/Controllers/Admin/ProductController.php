@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -19,14 +20,48 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // Lấy sản phẩm kèm brand, category, lô hàng (qua storageDetail -> storage)
-        $products = Product::with(['brand', 'category', 'storageDetail.storage'])
-            ->orderByDesc('id')
+        $today = now()->toDateString();
+
+        // ✅ Lấy sản phẩm + join ưu đãi đang áp dụng (nếu có)
+        // Điều kiện ưu đãi được tính là "đang áp dụng":
+        // - dp.status = 1 (chương trình ưu đãi đang bật)
+        // - dpd.status = 1 (chi tiết đang áp dụng)
+        // - expiration_date null hoặc >= hôm nay
+        $products = Product::query()
+            ->with([
+                'brand',
+                'category',
+                'storageDetail.storage',
+                'productImage',
+            ])
+            ->leftJoin('discount_product_details as dpd', function ($join) use ($today) {
+                $join->on('dpd.product_id', '=', 'products.id')
+                    ->where('dpd.status', 1)
+                    ->where(function ($q) use ($today) {
+                        $q->whereNull('dpd.expiration_date')
+                          ->orWhere('dpd.expiration_date', '>=', $today);
+                    });
+            })
+            ->leftJoin('discount_products as dp', function ($join) {
+                $join->on('dp.id', '=', 'dpd.discount_product_id')
+                     ->where('dp.status', 1);
+            })
+            ->select([
+                'products.*',
+                DB::raw('dp.id as discount_id'),
+                DB::raw('dp.name as discount_name'),
+                DB::raw('dp.rate as discount_rate'),
+            ])
+            ->orderByDesc('products.id')
             ->paginate(20);
 
         return view('admin.products.index', compact('products'));
     }
 
+    /**
+     * CHI TIẾT SẢN PHẨM
+     * Route: admin.products.show
+     */
     public function show($id)
     {
         $product = Product::with([
@@ -34,22 +69,22 @@ class ProductController extends Controller
             'category',
             'productImage',
             'storageDetail.storage',
+            'discountProducts',
         ])->findOrFail($id);
 
         return view('admin.products.show', compact('product'));
     }
 
-
     /**
      * FORM TẠO SẢN PHẨM MỚI TỪ KHO
      * Route: admin.products.create
      */
-   public function create()
+    public function create()
     {
         // Chỉ lấy dòng kho:
         // - đang hiển thị (status = 1)
-        // - stock_status = 'pending' (chờ bán)
-        // - chưa có product nào gắn vào
+        // - stock_status = pending
+        // - chưa có product
         $storageDetails = StorageDetail::with('storage')
             ->where('status', 1)
             ->where('stock_status', 'pending')
@@ -67,113 +102,117 @@ class ProductController extends Controller
         ));
     }
 
-
-
     /**
      * LƯU SẢN PHẨM MỚI
      * Route: admin.products.store
      */
-      public function store(Request $request)
-        {
-            // 1. Validate (LOẠI BỎ quantity khỏi validate)
-            $request->validate([
-                'storage_detail_id' => 'required|exists:storage_details,id',
-                'category_id'       => 'required|exists:categories,id',
-                'brand_id'          => 'required|exists:brands,id',
+    public function store(Request $request)
+    {
+        $request->validate([
+            'storage_detail_id' => 'required|exists:storage_details,id',
+            'category_id'       => 'required|exists:categories,id',
+            'brand_id'          => 'required|exists:brands,id',
 
-                'name'              => 'nullable|string|max:255',
-                'description'       => 'nullable|string',
-                'strap_material'    => 'nullable|string|max:100',
-                'dial_size'         => 'nullable|numeric|min:0|max:99.99',
-                'gender'            => 'nullable|in:male,female,unisex',
+            'name'              => 'nullable|string|max:255',
+            'description'       => 'nullable|string',
+            'strap_material'    => 'nullable|string|max:100',
+            'dial_size'         => 'nullable|numeric|min:0|max:99.99',
+            'gender'            => 'nullable|in:male,female,unisex',
 
-                'price'             => 'required|numeric|min:0',
+            'price'             => 'required|numeric|min:0',
+            'status'            => 'nullable|in:0,1',
 
-                'status'            => 'nullable|in:0,1',
+            'image_1'           => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image_2'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image_3'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image_4'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+        ], [
+            'storage_detail_id.required' => 'Vui lòng chọn sản phẩm trong kho.',
+            'image_1.required'           => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
+        ]);
 
-                'image_1'           => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
-                'image_2'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-                'image_3'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-                'image_4'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-            ], [
-                'storage_detail_id.required' => 'Vui lòng chọn sản phẩm trong kho.',
-                'image_1.required'          => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
-            ]);
+        // 2) Lấy dòng kho
+        $detail = StorageDetail::with('storage', 'product')->findOrFail($request->storage_detail_id);
 
-            // 2. Lấy dòng kho
-            $detail = StorageDetail::with('storage')->findOrFail($request->storage_detail_id);
-
-            // Bảo vệ: chỉ cho đăng từ dòng kho còn pending
-            if ($detail->stock_status !== 'pending') {
-                return back()
-                    ->withErrors([
-                        'storage_detail_id' => 'Dòng kho này không còn trạng thái Chờ bán (pending).'
-                    ])
-                    ->withInput();
-            }
-
-            // 3. LẤY SỐ LƯỢNG TỪ KHO (KHÔNG CHO NHẬP TAY)
-            $quantityFromStorage = (int) $detail->import_quantity;
-
-            if ($quantityFromStorage <= 0) {
-                return back()
-                    ->withErrors([
-                        'storage_detail_id' => 'Dòng kho này không còn số lượng khả dụng.'
-                    ])
-                    ->withInput();
-            }
-
-            // 4. Nếu không nhập tên -> dùng tên trong kho
-            $name = $request->name ?: $detail->product_name;
-
-            // 5. Tạo Product – quantity lấy từ kho
-            $product = Product::create([
-                'storage_detail_id' => $detail->id,
-                'category_id'       => $request->category_id,
-                'brand_id'          => $request->brand_id,
-                'name'              => $name,
-                'description'       => $request->description,
-                'strap_material'    => $request->strap_material,
-                'dial_size'         => $request->dial_size,
-                'gender'            => $request->gender,
-                'price'             => $request->price,
-
-                // ✅ Số lượng bằng đúng số lượng trong kho
-                'quantity'          => $quantityFromStorage,
-
-                // Mới đăng sản phẩm => Đang bán
-                'stock_status'      => 'selling',
-
-                // Hiển thị hay không (mặc định 1 = hiển thị)
-                'status'            => $request->status ?? 1,
-            ]);
-
-            // 6. Cập nhật dòng kho sang 'selling'
-            $detail->stock_status = 'selling';
-            $detail->save();
-
-            // 7. Lưu ảnh
-            $folder = "products/{$product->id}";
-            $imagesData = [
-                'product_id' => $product->id,
-            ];
-
-            for ($i = 1; $i <= 4; $i++) {
-                $field = "image_{$i}";
-                if ($request->hasFile($field)) {
-                    $path = $request->file($field)->store($folder, 'public');
-                    $imagesData["image_{$i}"] = $path;
-                }
-            }
-
-            ProductImage::create($imagesData);
-
-            return redirect()
-                ->route('admin.products.index')
-                ->with('success', 'Đăng sản phẩm mới thành công.');
+        // ✅ Chặn: kho đang ẩn
+        if ((int)$detail->status !== 1) {
+            return back()
+                ->withErrors(['storage_detail_id' => 'Dòng kho này đang bị ẩn, không thể đăng bán.'])
+                ->withInput();
         }
 
+        // ✅ Chặn: đã có product rồi
+        if ($detail->product) {
+            return back()
+                ->withErrors(['storage_detail_id' => 'Dòng kho này đã được đăng bán (đã có sản phẩm).'])
+                ->withInput();
+        }
 
+        // ✅ Chỉ cho đăng từ pending
+        if ($detail->stock_status !== 'pending') {
+            return back()
+                ->withErrors(['storage_detail_id' => 'Dòng kho này không còn trạng thái Chờ bán (pending).'])
+                ->withInput();
+        }
+
+        // 3) Lấy số lượng từ kho
+        $quantityFromStorage = (int)$detail->import_quantity;
+
+        if ($quantityFromStorage <= 0) {
+            return back()
+                ->withErrors(['storage_detail_id' => 'Dòng kho này không còn số lượng khả dụng.'])
+                ->withInput();
+        }
+
+        // 4) Nếu không nhập tên -> dùng tên trong kho
+        $name = $request->name ?: $detail->product_name;
+
+        // 5) Tạo Product
+        $product = Product::create([
+            'storage_detail_id' => $detail->id,
+            'category_id'       => $request->category_id,
+            'brand_id'          => $request->brand_id,
+
+            'name'              => $name,
+            'description'       => $request->description,
+            'strap_material'    => $request->strap_material,
+            'dial_size'         => $request->dial_size,
+            'gender'            => $request->gender,
+
+            'price'             => $request->price,
+
+            // ✅ quantity = import_quantity
+            'quantity'          => $quantityFromStorage,
+
+            // ✅ mới đăng => đang bán
+            'stock_status'      => 'selling',
+
+            // ✅ mặc định hiển thị
+            'status'            => $request->status ?? 1,
+        ]);
+
+        // 6) Đồng bộ kho sang selling
+        $detail->stock_status = 'selling';
+        $detail->save();
+
+        // 7) Lưu ảnh
+        $folder = "products/{$product->id}";
+        $imagesData = ['product_id' => $product->id];
+
+        for ($i = 1; $i <= 4; $i++) {
+            $field = "image_{$i}";
+            if ($request->hasFile($field)) {
+                $path = $request->file($field)->store($folder, 'public');
+                $imagesData["image_{$i}"] = $path;
+            }
+        }
+
+        ProductImage::create($imagesData);
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Đăng sản phẩm mới thành công.');
+    }
 
     /**
      * FORM SỬA SẢN PHẨM
@@ -194,9 +233,11 @@ class ProductController extends Controller
         ));
     }
 
-    
-        // Cập nhật product
-     public function update(Request $request, $id)
+    /**
+     * UPDATE SẢN PHẨM
+     * Route: admin.products.update
+     */
+    public function update(Request $request, $id)
     {
         $product = Product::with('productImage', 'storageDetail')->findOrFail($id);
 
@@ -212,7 +253,7 @@ class ProductController extends Controller
 
             'price'           => 'required|numeric|min:0',
 
-            // Cho phép đổi trạng thái bán ở Product
+            // Cho phép đổi trạng thái bán
             'stock_status'    => 'nullable|in:selling,sold_out,stopped',
 
             'status'          => 'nullable|in:0,1',
@@ -235,11 +276,11 @@ class ProductController extends Controller
 
             'price'          => $request->price,
 
-            // Giữ hoặc cập nhật stock_status nếu có gửi lên
             'stock_status'   => $request->stock_status ?? $product->stock_status,
             'status'         => $request->status ?? $product->status,
         ]);
 
+        // 🔁 Đồng bộ stock_status sang kho
         if ($product->storageDetail) {
             $product->storageDetail->stock_status = $product->stock_status;
             $product->storageDetail->save();
@@ -257,11 +298,9 @@ class ProductController extends Controller
         for ($i = 1; $i <= 4; $i++) {
             $field = "image_{$i}";
             if ($request->hasFile($field)) {
-                // Xoá ảnh cũ nếu có
                 if (!empty($images[$field])) {
                     Storage::disk('public')->delete($images[$field]);
                 }
-                // Lưu ảnh mới
                 $path = $request->file($field)->store($folder, 'public');
                 $images[$field] = $path;
             }
@@ -274,27 +313,22 @@ class ProductController extends Controller
             ->with('success', 'Cập nhật sản phẩm thành công.');
     }
 
-
-
     /**
      * ẨN / HIỆN SẢN PHẨM
      * Route: admin.products.toggle-status (PATCH)
-     * CHỈ ĐỔI status, KHÔNG XOÁ CỨNG
      */
     public function toggleStatus($id)
     {
-        // Lấy sản phẩm + dòng kho
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
-        // 1) SẢN PHẨM ĐANG HIỂN THỊ → BẤM LÀ ẨN
+        // 1) ĐANG HIỂN THỊ -> ẨN
         if ($product->status == 1) {
 
             $product->status = 0;
-            $product->stock_status = 'stopped'; 
+            $product->stock_status = 'stopped';
             $product->save();
 
-            // Đồng bộ kho → stopped
             if ($detail) {
                 $detail->stock_status = 'stopped';
                 $detail->save();
@@ -305,9 +339,9 @@ class ProductController extends Controller
                 ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-        // 2) SẢN PHẨM ĐANG ẨN → BẤM LÀ HIỆN
+        // 2) ĐANG ẨN -> HIỆN
 
-        // Kho đang bị ẩn → KHÔNG CHO HIỂN
+        // Kho đang ẩn -> KHÔNG cho hiện
         if ($detail && $detail->status == 0) {
             return redirect()
                 ->back()
@@ -316,7 +350,7 @@ class ProductController extends Controller
 
         $product->status = 1;
 
-        // Cập nhật trạng thái bán theo tồn kho
+        // cập nhật trạng thái bán theo tồn kho
         if ($product->quantity > 0) {
             $product->stock_status = 'selling';
         } else {
@@ -325,7 +359,7 @@ class ProductController extends Controller
 
         $product->save();
 
-        // Đồng bộ lại trạng thái kho
+        // đồng bộ kho
         if ($detail) {
             $detail->stock_status = $product->stock_status;
             $detail->save();
@@ -335,5 +369,4 @@ class ProductController extends Controller
             ->back()
             ->with('success', 'Đã hiển thị sản phẩm.');
     }
-
 }

@@ -20,7 +20,7 @@
       </script>
     @endif
 
-    {{-- Thông báo lỗi (ví dụ kho đang ẩn, không cho hiện sản phẩm) --}}
+    {{-- Thông báo lỗi --}}
     @if (session('error'))
       <script>
           Swal.fire({
@@ -32,7 +32,7 @@
       </script>
     @endif
 
-    {{-- Hàng công cụ (tạm để nguyên, sau này bạn làm bulk action / search sau) --}}
+    {{-- Hàng công cụ --}}
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
@@ -57,7 +57,6 @@
 
     <div class="table-responsive">
 
-      {{-- Căn giữa toàn bộ bảng --}}
       <style>
           table td, table th {
               text-align: center !important;
@@ -78,9 +77,14 @@
             <th>Tên sản phẩm</th>
             <th>Số lượng tồn kho</th>
             <th>Giá bán</th>
+
+            {{-- ✅ MỚI --}}
+            <th>Ưu đãi</th>
+            <th>Giá sau ưu đãi</th>
+
             <th>Trạng thái bán</th>
             <th>Hiển Thị</th>
-            <th style="width:110px;">Thao tác</th>
+            <th style="width:140px;">Thao tác</th>
           </tr>
         </thead>
 
@@ -89,6 +93,15 @@
             @php
               $storageDetail = optional($product->storageDetail);
               $storage       = optional($storageDetail->storage);
+
+              // ✅ dữ liệu ưu đãi được join từ controller (có thì mới hiện)
+              $hasDiscount = !empty($product->discount_id) && !is_null($product->discount_rate);
+              $discountRate = $hasDiscount ? (int)$product->discount_rate : null;
+
+              $discountPrice = null;
+              if ($hasDiscount && $discountRate > 0) {
+                $discountPrice = (float)$product->price * (100 - $discountRate) / 100;
+              }
             @endphp
 
             <tr>
@@ -102,7 +115,7 @@
               {{-- ID --}}
               <td>{{ $product->id }}</td>
 
-              {{-- Hình (ảnh 1) --}}
+              {{-- Hình --}}
               <td>
                 @if ($product->productImage && $product->productImage->image_1)
                   <img src="{{ asset('storage/' . $product->productImage->image_1) }}"
@@ -113,14 +126,34 @@
                 @endif
               </td>
 
-              {{-- Tên sản phẩm --}}
+              {{-- Tên --}}
               <td>{{ $product->name }}</td>
 
-              {{-- Số lượng tồn kho --}}
+              {{-- SL tồn --}}
               <td>{{ number_format($product->quantity) }}</td>
 
               {{-- Giá bán --}}
               <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
+
+              {{-- ✅ Ưu đãi --}}
+              <td>
+                @if($hasDiscount)
+                  <span class="label label-info">
+                    {{ $product->discount_name }} ({{ $discountRate }}%)
+                  </span>
+                @else
+                  —
+                @endif
+              </td>
+
+              {{-- ✅ Giá sau ưu đãi --}}
+              <td>
+                @if($hasDiscount && !is_null($discountPrice))
+                  <strong>{{ number_format($discountPrice, 0, ',', '.') }} đ</strong>
+                @else
+                  —
+                @endif
+              </td>
 
               {{-- Trạng thái bán --}}
               <td>
@@ -144,7 +177,7 @@
                 @endif
               </td>
 
-              {{-- Thao tác: Ẩn/Hiện – Xem chi tiết – Tới kho hàng --}}
+              {{-- Thao tác --}}
               <td>
 
                 {{-- Ẩn / Hiện --}}
@@ -187,7 +220,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="9" class="text-center">Chưa có sản phẩm nào.</td>
+              <td colspan="11" class="text-center">Chưa có sản phẩm nào.</td>
             </tr>
           @endforelse
 
