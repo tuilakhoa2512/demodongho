@@ -4,17 +4,13 @@
 
 <div class="table-agile-info">
     <div class="panel panel-default">
-    <!-- <div class="panel-heading">
-     
-       @if($filterStatus == 1)
-          <small>(Trạng Thái: Hiện)</small>
-        @elseif($filterStatus === "0")
-          <small>(Trạng Thái: Ẩn)</small>
-        @endif
-    </div> -->
-   
         <div class="panel-heading">
             Liệt Kê Loại Sản Phẩm
+            @if($filterStatus == 1)
+                <small>(Trạng Thái: Hiện)</small>
+            @elseif($filterStatus === "0")
+                <small>(Trạng Thái: Ẩn)</small>
+            @endif  
         </div>
         @if (session('message'))
                             <script>
@@ -22,7 +18,7 @@
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Thành công!',
-                                        text: 'Xoá loại sản phẩm thành công!',
+                                        text: '{{ session('message') }}',
                                         confirmButtonText: 'OK'
                                     });
                                 });
@@ -30,17 +26,18 @@
                         @endif
         <div class="row w3-res-tb">
             <div class="col-sm-5 m-b-xs">
-                <select class="input-sm form-control w-sm inline v-middle">
-                    
-                    <!-- <option value="">Lọc trạng thái (Tất cả)</option>
+            <form method="GET" action="{{ route('admin.allproducttype') }}" class="form-inline">
+          <select name="status" class="input-sm form-control w-sm inline v-middle">
+            <option value="">Lọc trạng thái (Tất cả)</option>
             <option value="1" {{ isset($filterStatus) && $filterStatus == 1 ? 'selected' : '' }}>Hiện</option>
-            <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>Ẩn</option> -->4
-                    <option value="0">Bulk action</option>
-                    <option value="1">Delete selected</option>
-                    <option value="2">Bulk edit</option>
-                    <option value="3">Export</option>
-                </select>
-                <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">Áp dụng</button>              
+            <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>Ẩn</option>
+          </select>
+
+          <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">
+            Áp dụng
+          </button>
+
+        </form>             
             </div>
             <div class="col-sm-4"></div>
             <div class="col-sm-3">
@@ -53,18 +50,6 @@
             </div>
         </div>
         <div class="table-responsive">
-            @if (session('message'))
-                    <script>
-                        $(document).ready(function() {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Thành công!',
-                                text: 'Kích hoạt loại sản phẩm thành công!',
-                                confirmButtonText: 'OK'
-                            });
-                        });
-                    </script>
-                @endif
             <table class="table table-striped b-t b-light">
                 <thead>
                     <tr>

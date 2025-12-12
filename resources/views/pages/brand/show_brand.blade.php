@@ -224,7 +224,7 @@ style="position:fixed; bottom:0; left:300px; right:300px;
         <div style="margin-top: 4px;" class="col-sm-4 d-flex flex-column align-items-center justify-content-center">
             <br><br>
 
-            <a href="{{ route('compare.view') }}" class="compare-btn" style="margin-bottom: 10px;">
+            <a href="{{ route('compare.view') }}" class="compare-now" style="margin-bottom: 10px;">
                 So sánh ngay
             </a>
 

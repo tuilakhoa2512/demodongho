@@ -40,7 +40,7 @@
 
                     <div class="productinfo text-center">
                         <div class="product-img-box">
-                            <img class="img-main" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
+                            <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
                         </div>
                         <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
                         <p>{{ $product->name }}</p>
@@ -108,6 +108,94 @@
 
 
 <div class="recommended_items"><!--recommended_items-->
+<style>
+.product-img-box {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+.product-img-box img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    transition: 0.4s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.product-img-box .hover-img {
+    opacity: 0;
+}
+
+.product-img-box:hover .main-img {
+    opacity: 0;
+}
+
+.product-img-box:hover .hover-img {
+    opacity: 1;
+}
+
+.product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 280px; 
+    background: rgba(0,0,0,0.0);
+    transition: 0.4s ease-in-out;
+}
+
+.product-overlay .overlay-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.product-overlay .overlay-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    color: #fff;
+}
+
+.product-overlay:hover {
+    background: rgba(0,0,0,0.3);
+}
+.recommended_items {
+    position: relative;
+    overflow: visible !important;
+}
+
+.recommended-item-control {
+    position: absolute;
+    top: 30%;
+    transform: translateY(-50%);
+    background: #d70018;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 9999;
+}
+
+.left.recommended-item-control {
+    left: -25px;
+}
+
+.right.recommended-item-control {
+    right: -25px;
+}
+
+</style>
+
     <h2 class="title text-center">Recommended Items</h2>
 
     <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">

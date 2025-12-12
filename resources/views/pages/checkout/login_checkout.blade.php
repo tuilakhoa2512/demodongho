@@ -20,12 +20,23 @@
 
                     <!-- Input full width -->
                     <label for="">Email:</label>
-                    <input type="text" name="email" placeholder="xxx@gmail.com" 
-                           class="form-control mb-3" style="width: 130%;"/>
+                    <input type="text" name="email" 
+                        placeholder="xxx@gmail.com" 
+                        class="form-control mb-3" 
+                        style="width: 130%;"
+                        pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                        title="Email phải kết thúc bằng @gmail.com"
+                        maxlength="30"
+                        required>
                            
                     <label for="">Mật Khẩu:</label>
-                    <input type="password" name="password" placeholder="********" 
-                           class="form-control mb-3" style="width: 130%;"/>
+                    <input  type="password"
+                            name="password" 
+                            placeholder="********" 
+                            class="form-control mb-3"
+                            style="width: 130%;"
+                            maxlength="30"
+                            required>
 
                     <div class="d-flex justify-content-between mb-3">
                         <label><input type="checkbox" class="checkbox" style="width:15px"> Ghi nhớ đăng nhập</label>

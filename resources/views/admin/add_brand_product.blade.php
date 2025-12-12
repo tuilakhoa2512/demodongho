@@ -15,7 +15,7 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Thành công!',
-                                text: 'Thêm brand sản phẩm thành công!',
+                                text: '{{ session('message') }}',
                                 confirmButtonText: 'OK'
                             });
                         });

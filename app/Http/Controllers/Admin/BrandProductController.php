@@ -32,15 +32,29 @@ class BrandProductController extends Controller
         return view('admin.add_brand_product');
     }
 
-    public function all_brand_product()
+    public function all_brand_product(Request $request)
     {
         // $this->AuthLogin();
-        $all_brand_product = DB::table('brands')->get();
+        // Lấy trạng thái lọc từ URL, có thể là: null, "1", "0"
+        $filterStatus = $request->get('status');
+         // Query brands
+        $query = DB::table('brands');
+        // Nếu chọn lọc
+        if ($filterStatus === "1") {
+            $query->where('status', 1);
+        } elseif ($filterStatus === "0") {
+            $query->where('status', 0);
+        }
+        // Lấy kết quả
+        $all_brand_product = $query->get();
+        
         $manager_brand_product = view('admin.all_brand_product')
             ->with('all_brand_product', $all_brand_product);
 
-        return view('pages.admin_layout')
-            ->with('admin.all_brand_product', $manager_brand_product);
+            return view('admin.all_brand_product', [
+                'all_brand_product' => $all_brand_product,
+                'filterStatus' => $filterStatus
+            ]);
     }
 
     public function save_brand_product(Request $request)
@@ -79,19 +93,20 @@ class BrandProductController extends Controller
 
         DB::table('brands')->insert($data);
 
-        session()->flash('message', 'Thêm thương hiệu sản phẩm thành công');
-        return Redirect::to('add-brand-product');
+        return redirect()->route('admin.allbrandproduct')
+        ->with('message', 'Thêm thương hiệu sản phẩm thành công');
+
     }
 
     public function unactive_brand_product($id){
         DB::table('brands')->where('id',$id)->update(['status'=> 0]);
-        session()->flash('message','Không kích hoạt thương hiệu sản phẩm thành công');
+        session()->flash('message','Ẩn thương hiệu thành công');
         return Redirect::to('all-brand-product');
     }
 
     public function active_brand_product($id){
         DB::table('brands')->where('id',$id)->update(['status'=> 1]);
-        session()->flash('message','Kích hoạt thương hiệu sản phẩm thành công');
+        session()->flash('message','Hiện thương hiệu thành công');
         return Redirect::to('all-brand-product');
     }
 
@@ -154,8 +169,9 @@ class BrandProductController extends Controller
 
         DB::table('brands')->where('id', $id)->update($data);
 
-        session()->flash('message');
-        return redirect()->back();
+        
+        return redirect()->route('admin.allbrandproduct')
+        ->with('message', 'Cập nhật thương hiệu thành công.');
     }
 
    public function delete_brand_product($id)
@@ -178,7 +194,8 @@ class BrandProductController extends Controller
             return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
         }
         
-        return Redirect::to('all-brand-product');
+        return redirect()->route('admin.allbrandproduct')
+        ->with('error', 'Thương hiệu không tồn tại!');
     }
     public function destroy($id)
     {

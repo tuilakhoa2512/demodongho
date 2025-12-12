@@ -20,27 +20,40 @@
                 @endif
 
                 <form action="{{ URL::to('/add-user') }}" method="POST">
-                    {{ csrf_field() }}
+                        {{ csrf_field() }}
 
-                    <label>Họ và tên:</label>
-                    <input type="text" name="fullname" placeholder="Nguyễn Văn A"
-                           class="form-control mb-3" style="width:130%;" required>
+                        <label>Họ và tên:</label>
+                        <input type="text" name="fullname" placeholder="Nguyễn Văn A"
+                            class="form-control mb-3" style="width:130%;"maxlength="30" required>
 
-                    <label>Email:</label>
-                    <input type="email" name="email" placeholder="xxx@gmail.com"
-                           class="form-control mb-3" style="width:130%;" required>
+                        <label>Email:</label>
+                        <input type="email" name="email"
+                            placeholder="xxx@gmail.com"
+                            class="form-control mb-3" style="width:130%;"
+                            maxlength="30"
+                            pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                            title="Email phải kết thúc bằng @gmail.com và không vượt quá 30 ký tự"
+                            required>
 
-                    <label>Mật khẩu:</label>
-                    <input type="password" name="password" placeholder="********"
-                           class="form-control mb-3" style="width:130%;" required>
+                        <label>Mật khẩu:</label>
+                        <input type="password" name="password"
+                            placeholder="********"
+                            class="form-control mb-3" style="width:130%;"
+                            maxlength="30"
+                            title="Mật khẩu không quá 30 ký tự"
+                            required>
 
-                    <label>Số điện thoại:</label>
-                    <input type="text" name="phone" placeholder="0123456789"
-                           class="form-control mb-3" style="width:130%;" required>
-                           
+                        <label>Số điện thoại:</label>
+                        <input type="text" name="phone"
+                            placeholder="0123456789"
+                            class="form-control mb-3" style="width:130%;"
+                            pattern="^[0-9]{10,15}$"
+                            title="Số điện thoại phải từ 10 đến 15 số và không chứa chữ"
+                            required>
 
-                    <button type="submit" class="btn btn-danger btn-block" style="width:130%;">Đăng ký</button>
-                </form>
+                        <button type="submit" class="btn btn-danger btn-block" style="width:130%;">Đăng ký</button>
+                    </form>
+
 
 <style type="text/css">
     ul.list-login {

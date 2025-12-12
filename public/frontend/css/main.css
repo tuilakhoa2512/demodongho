@@ -1033,7 +1033,7 @@ h2.title {
 }
 
 .choose ul li a {
-    color: #b3afa8;
+    color: #555555;
     font-family: "Roboto", sans-serif;
     font-size: 13px;
     padding-left: 0;
@@ -2592,7 +2592,7 @@ ul.nav.nav-pills.nav-justified li {
     color: #b3afa8;
 }
 ul.nav.nav-pills.nav-justified i {
-    color: #b3afa8;
+    color: #555555;
 }
 .button_wishlist span:hover {
     color: #d70018;
@@ -2929,3 +2929,4 @@ ul.nav.nav-pills.nav-justified i {
     font: 14px Roboto,sans-serif;
     border-color: #d43f3a;
 }
+

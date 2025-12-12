@@ -19,7 +19,7 @@ class HomeController extends Controller
 
         ->where('status', 1)                 
         ->where('stock_status', 'selling')    
-        ->orderBy('id', 'desc')
+        ->inRandomOrder()
         ->paginate(6);
 
     // --- Thêm recommended products ---
@@ -28,7 +28,7 @@ class HomeController extends Controller
         ->where('status', 1)
         ->where('stock_status', 'selling')
         ->orderBy('created_at', 'desc') // hoặc orderBy('id', 'desc')
-        ->take(3)
+        ->take(6)
         ->get();
 
 

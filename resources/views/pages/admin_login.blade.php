@@ -78,13 +78,17 @@
                 <div class="form-group">
                     <label for="email">Email:</label>
                     <input type="email" name="email" class="form-control" id="email" 
-                           value="<?php if (isset($_POST['email'])) echo $email ?>" required>
+                           value="<?php if (isset($_POST['email'])) echo $email ?>"
+                           maxlength="30"
+                           required>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Mật khẩu:</label>
                     <input type="password" name="password" class="form-control" id="password" 
-                           value="<?php if (isset($_POST['password'])) echo $password ?>" required>
+                           value="<?php if (isset($_POST['password'])) echo $password ?>"
+                           maxlength="30"
+                           required>
                 </div>
 
                 <button type="submit" class="btn btn-block">Đăng Nhập</button>

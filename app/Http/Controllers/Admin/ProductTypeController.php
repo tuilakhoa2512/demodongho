@@ -35,26 +35,28 @@ class ProductTypeController extends Controller
 
     public function all_product_type(Request $request){
         // $this->AuthLogin();
-        $filterStatus = $request->input('status');
+        $filterStatus = $request->get('status');
         $query = DB::table('categories');
 
-        // Nếu có chọn trạng thái thì lọc
-    if ($filterStatus !== null && $filterStatus !== '') {
-        $query->where('status', $filterStatus);
-    }
-
-    // Lấy danh sách theo điều kiện
-    $all_product_type = $query->orderBy('id', 'desc')->get();
+        // Nếu chọn lọc
+        if ($filterStatus === "1") {
+            $query->where('status', 1);
+        } elseif ($filterStatus === "0") {
+            $query->where('status', 0);
+        }
+        // Lấy kết quả
+        $all_product_type = $query->get();
 
     // Truyền biến qua view
     $manager_product_type = view('admin.all_product_type')
         ->with('all_product_type', $all_product_type)
         ->with('filterStatus', $filterStatus);
 
-    return view('pages.admin_layout')->with('admin.all_product_type', $manager_product_type);
-        // $all_product_type = DB::table('categories')->get();
-        // $manager_product_type = view('admin.all_product_type')->with('all_product_type',$all_product_type);
-        // return view('pages.admin_layout')->with('admin.all_product_type',$manager_product_type);
+    // return view('pages.admin_layout')->with('admin.all_product_type', $manager_product_type);
+    return view('admin.all_product_type', [
+        'all_product_type' => $all_product_type,
+        'filterStatus' => $filterStatus
+    ]);
         
     }
     public function save_product_type(Request $request){
@@ -75,7 +77,7 @@ class ProductTypeController extends Controller
 
        DB::table('categories')->insert($data);
        session()->flash('message', 'Thêm loại sản phẩm thành công');
-       return Redirect::to('add-product-type');
+       return Redirect::to('all-product-type');
     }
 
     private function createSlug($str)
@@ -109,13 +111,13 @@ class ProductTypeController extends Controller
 
     public function unactive_product_type($id){
         DB::table('categories')->where('id',$id)->update(['status'=> 0]);
-        session()->flash('message','Không kích hoạt danh mục sản phẩm thành công');
+        session()->flash('message','Ẩn danh mục sản phẩm thành công');
         return Redirect::to('all-product-type');
     }
 
     public function active_product_type($id){
         DB::table('categories')->where('id',$id)->update(['status'=> 1]);
-        session()->flash('message','Kích hoạt danh mục sản phẩm thành công');
+        session()->flash('message','Hiện danh mục sản phẩm thành công');
         return Redirect::to('all-product-type');
     }
 
@@ -141,9 +143,8 @@ class ProductTypeController extends Controller
     
         DB::table('categories')->where('id', $id)->update($data);
         
-        session()->flash('message');
-        
-        return redirect()->back();
+        return redirect()->route('admin.addproducttype')
+        ->with('message', 'Cập nhật sản phẩm thành công.');
     }
     public function show_category_home($category_slug)
         {
