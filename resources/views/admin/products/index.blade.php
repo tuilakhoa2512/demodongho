@@ -78,7 +78,6 @@
             <th>Số lượng tồn kho</th>
             <th>Giá bán</th>
 
-            {{-- ✅ MỚI --}}
             <th>Ưu đãi</th>
             <th>Giá sau ưu đãi</th>
 
@@ -94,7 +93,6 @@
               $storageDetail = optional($product->storageDetail);
               $storage       = optional($storageDetail->storage);
 
-              // ✅ dữ liệu ưu đãi được join từ controller (có thì mới hiện)
               $hasDiscount = !empty($product->discount_id) && !is_null($product->discount_rate);
               $discountRate = $hasDiscount ? (int)$product->discount_rate : null;
 
@@ -105,17 +103,14 @@
             @endphp
 
             <tr>
-              {{-- checkbox --}}
               <td>
                 <label class="i-checks m-b-none">
                   <input type="checkbox" name="product_ids[]" value="{{ $product->id }}"><i></i>
                 </label>
               </td>
 
-              {{-- ID --}}
               <td>{{ $product->id }}</td>
 
-              {{-- Hình --}}
               <td>
                 @if ($product->productImage && $product->productImage->image_1)
                   <img src="{{ asset('storage/' . $product->productImage->image_1) }}"
@@ -126,16 +121,12 @@
                 @endif
               </td>
 
-              {{-- Tên --}}
               <td>{{ $product->name }}</td>
 
-              {{-- SL tồn --}}
               <td>{{ number_format($product->quantity) }}</td>
 
-              {{-- Giá bán --}}
               <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
 
-              {{-- ✅ Ưu đãi --}}
               <td>
                 @if($hasDiscount)
                   <span class="label label-info">
@@ -146,7 +137,6 @@
                 @endif
               </td>
 
-              {{-- ✅ Giá sau ưu đãi --}}
               <td>
                 @if($hasDiscount && !is_null($discountPrice))
                   <strong>{{ number_format($discountPrice, 0, ',', '.') }} đ</strong>
@@ -155,7 +145,6 @@
                 @endif
               </td>
 
-              {{-- Trạng thái bán --}}
               <td>
                 @if($product->stock_status === 'selling')
                   <span class="label label-success">Đang bán</span>
@@ -168,7 +157,6 @@
                 @endif
               </td>
 
-              {{-- Hiển thị --}}
               <td>
                 @if($product->status)
                   <span class="label label-success">Hiện</span>
@@ -177,10 +165,8 @@
                 @endif
               </td>
 
-              {{-- Thao tác --}}
               <td>
 
-                {{-- Ẩn / Hiện --}}
                 <form action="{{ route('admin.products.toggle-status', $product->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -197,14 +183,12 @@
                   </button>
                 </form>
 
-                {{-- Xem chi tiết --}}
                 <a href="{{ route('admin.products.show', $product->id) }}"
                    title="Xem chi tiết"
                    style="margin-right:6px;">
                   <i class="fa fa-info-circle text-info" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Tới kho hàng của sản phẩm --}}
                 @if($storage && $storage->id)
                   <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
                      title="Xem sản phẩm trong lô {{ $storage->batch_code }}">

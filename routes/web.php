@@ -17,7 +17,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
-use App\Http\Controllers\admin\DiscountProductDetailController;
+use App\Http\Controllers\Admin\DiscountProductDetailController;
+use App\Http\Controllers\Admin\DiscountBillController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -261,6 +262,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/discount-products/{id}/products/{productId}', [DiscountProductDetailController::class, 'updateExpiration'])->name('discount-products.products.update');
 
     Route::patch('/discount-products/{id}/products/{productId}/toggle', [DiscountProductDetailController::class, 'toggle'])->name('discount-products.products.toggle');
+
+
+        // DISCOUNT BILL
+    Route::get('/discount-bills', [\App\Http\Controllers\Admin\DiscountBillController::class, 'index'])->name('discount-bills.index');
+
+    Route::get('/discount-bills/create', [\App\Http\Controllers\Admin\DiscountBillController::class, 'create'])->name('discount-bills.create');
+
+    Route::post('/discount-bills', [\App\Http\Controllers\Admin\DiscountBillController::class, 'store'])->name('discount-bills.store');
+
+    Route::get('/discount-bills/{id}/edit', [\App\Http\Controllers\Admin\DiscountBillController::class, 'edit'])->name('discount-bills.edit');
+
+    Route::put('/discount-bills/{id}', [\App\Http\Controllers\Admin\DiscountBillController::class, 'update'])->name('discount-bills.update');
+
+    Route::patch('/discount-bills/{id}/toggle-status', [\App\Http\Controllers\Admin\DiscountBillController::class, 'toggleStatus'])->name('discount-bills.toggle-status');
 
 });
 
