@@ -19,12 +19,18 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(): void
-    {
-        $categories = DB::table('categories')->get();
-        View::share('category', $categories);
+{
+    // Danh mục — nếu bạn có cột status thì cũng nên thêm where
+    $categories = DB::table('categories')
+                     ->where('status', 1)  // nếu có cột này
+                    ->get();
+    View::share('category', $categories);
 
-        $brands = DB::table('brands')->get();
-        View::share('brand', $brands);
-        
-    }
+    // Thương hiệu — CHỈ LẤY BRAND HIỆN
+    $brands = DB::table('brands')
+                ->where('status', 1)
+                ->get();
+    View::share('brand', $brands);
+}
+
 }

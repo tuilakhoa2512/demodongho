@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Storage;
 class Product extends Model
 {
     protected $table = 'products';
+    protected $appends = ['main_image_url', 'hover_image_url'];
+
+    
 
     /**
      * Các cột được phép gán mass-assignment
@@ -38,12 +41,12 @@ class Product extends Model
 
     public function brand()
     {
-        return $this->belongsTo(Brand::class, 'brand_id', 'id');
+        return $this->belongsTo(Brand::class, 'brand_id', 'id')->where('status', 1);;
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id', 'id');
+        return $this->belongsTo(Category::class, 'category_id', 'id')->where('status', 1);;
     }
 
     public function storageDetail()

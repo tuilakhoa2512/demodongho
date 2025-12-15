@@ -12,9 +12,10 @@ session_start();
 class CheckoutController extends Controller
 {
     public function login_checkout(){
-        $cate_pro = DB::table('categories')->orderby('id','asc')->get();
-        $brand_pro = DB::table('brands')->orderby('id','asc')->get();
-        return view('pages.checkout.login_checkout')->with('category', $cate_pro)
+        $cate_pro = DB::table('categories') ->where('status', 1)->orderby('id','asc')->get();
+        $brand_pro = DB::table('brands') ->where('status', 1)->orderby('id','asc')->get();
+        return view('pages.checkout.login_checkout')
+        ->with('category', $cate_pro)
         ->with('brand', $brand_pro);
     }
     public function add_user(Request $request){
@@ -33,8 +34,8 @@ class CheckoutController extends Controller
     }
 
     public function checkout(){
-        $cate_pro = DB::table('categories')->orderby('id','asc')->get();
-        $brand_pro = DB::table('brands')->orderby('id','asc')->get();        
+        $cate_pro = DB::table('categories')->where('status', 1)->orderby('id','asc')->get();
+        $brand_pro = DB::table('brands')->where('status', 1)->orderby('id','asc')->get();        
         return view('pages.checkout.show_checkout')->with('category', $cate_pro)
         ->with('brand', $brand_pro);
     }
@@ -71,17 +72,36 @@ class CheckoutController extends Controller
     Session::put('id', $user->id);
     Session::put('fullname', $user->fullname);
     Session::put('role_id', $user->role_id);
+    // ===== GỘP YÊU THÍCH GUEST → DB =====
+    $guest_favorites = Session::get('favorite_guest', []);
+
+    if (!empty($guest_favorites)) {
+        foreach ($guest_favorites as $product_id) {
+            DB::table('favorites')->updateOrInsert(
+                [
+                    'user_id'    => $user->id,
+                    'product_id' => $product_id
+                ],
+                [
+                    'created_at' => now()
+                ]
+            );
+        }
+
+        // Xóa yêu thích tạm
+        Session::forget('favorite_guest');
+    }
 
     return Redirect::to('/trang-chu');
 }
 public function payment(){
-    $cate_pro = DB::table('categories')->orderby('id','asc')->get();
-    $brand_pro = DB::table('brands')->orderby('id','asc')->get();
+    $cate_pro = DB::table('categories')->where('status', 1)->orderby('id','asc')->get();
+    $brand_pro = DB::table('brands')->where('status', 1)->orderby('id','asc')->get();
     return view('pages.checkout.payment')->with('category', $cate_pro)
     ->with('brand', $brand_pro);    
 }
 public function register()
 {
-    return view('pages.checkout.register'); // view mới
+    return view('pages.checkout.register'); 
 }
 }

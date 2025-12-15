@@ -26,6 +26,6 @@ class Category extends Model
     // Quan hệ 1 category có nhiều products
     public function products()
     {
-        return $this->hasMany(Product::class, 'category_id', 'id');
+        return $this->hasMany(Product::class, 'category_id', 'id')->where('status',1);
     }
 }

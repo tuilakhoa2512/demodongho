@@ -27,9 +27,15 @@
 <div class="features_items"><!--features_items-->
 @php
     $user_id = Session::get('id');
-    $favorite_ids = \App\Models\Favorite::where('user_id', $user_id)
-                        ->pluck('product_id')
-                        ->toArray();
+    if ($user_id) {
+        // Đã login → lấy DB
+        $favorite_ids = \App\Models\Favorite::where('user_id', $user_id)
+                            ->pluck('product_id')
+                            ->toArray();
+    } else {
+        // Chưa login → lấy session
+        $favorite_ids = Session::get('favorite_guest', []);
+    }
 @endphp
 
 
@@ -64,22 +70,18 @@
                 </div>
 
                 <div class="choose">
-                    <ul class="nav nav-pills nav-justified">
-                        
-                         @php 
+                    <ul class="nav nav-pills nav-justified">                      
+                        @php 
                             $is_favorite = in_array($product->id, $favorite_ids);
                         @endphp
 
                         <li>
-                            <a href="{{ route('favorite.toggle', $product->id) }}"
-                            style="color: {{ $is_favorite ? 'red' : '#555' }};">
-                            
-                                <i class="fa fa-heart"
-                                style="color: {{ $is_favorite ? 'red' : '#999' }};">
-                                </i>
-
-                                {{ $is_favorite ? 'Đã Yêu Thích' : 'Yêu Thích' }}
-                            </a>
+                        <a href="{{ route('favorite.toggle', $product->id) }}"
+                        style="color: {{ $is_favorite ? 'red' : '#555' }};">
+                            <i class="fa fa-heart"
+                            style="color: {{ $is_favorite ? 'red' : '#999' }};"></i>
+                            {{ $is_favorite ? 'Đã Yêu Thích' : 'Yêu Thích' }}
+                        </a>
                         </li>
 
                         <li>
@@ -205,11 +207,6 @@
             <div class="item {{ $chunkIndex == 0 ? 'active' : '' }}">
                 @foreach($chunk as $product)
                     @php
-                        // $main = $product->image_1 ? asset('storage/' . $product->image_1) : asset('images/no-image.png');
-                        // $hover = $product->image_2 ? asset('storage/' . $product->image_2) : $main;
-                        // $user_id = Session::get('id');
-                        // $favorite_ids = \App\Models\Favorite::where('user_id', $user_id)->pluck('product_id')->toArray();
-                        // $is_favorite = in_array($product->id, $favorite_ids);
                         $main = $product->main_image_url;
                         $hover = $product->hover_image_url;
                         $user_id = Session::get('id');
