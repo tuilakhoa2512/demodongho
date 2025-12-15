@@ -222,16 +222,11 @@ class BrandProductController extends Controller
         ->orderBy('id', 'asc')
         ->get();
         // Lấy brand theo slug (thay vì id)
-    $brand = DB::table('brands')->where('brand_slug', $brand_slug)->first();
+    $brand = DB::table('brands')->where('brand_slug', $brand_slug)->where('status', 1)->first();
 
     if (!$brand) {
         abort(404, 'Thương hiệu không tồn tại');
     }
-
-    // // Lấy tên thương hiệu được click
-    // $brand_name = DB::table('brands')
-    // ->where('id', $id)
-    // ->value('name');
 
     // Lấy sản phẩm theo brand_id
     $brand_by_id = DB::table('products')
@@ -250,7 +245,7 @@ class BrandProductController extends Controller
 
     return view('pages.brand.show_brand')
         ->with('category', $cate_pro)
-        ->with('brand', $brand_pro)
+        
         ->with('brand_name', $brand->name)
         ->with('brand_by_id', $brand_by_id);
 }

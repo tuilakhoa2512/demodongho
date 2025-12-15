@@ -20,7 +20,8 @@
   left: 0;
   margin-top: -5px;
   top: 50%;
-  width: 100%;
+  width: 70%;
+  margin-left: 40px;
 }
 .slider.slider-horizontal .slider-selection {
   height: 100%;
@@ -120,4 +121,8 @@
 }
 .slider-handle.triangle {
   background: transparent none;
+}
+
+.price-range .slider {
+  width: 75%;
 }

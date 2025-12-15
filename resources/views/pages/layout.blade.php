@@ -21,6 +21,7 @@
 	<link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
+	<link rel="stylesheet" href="{{ asset('frontend/css/bootstrap-slider.css') }}">
 </head><!--/head-->
 
 <body>
@@ -284,13 +285,37 @@
 						</div><!--/brand-products-->
 						
 
-						<div class="price-range"><!--price-range-->
-							<h2>Tầm Giá</h2>
-							<div class="well text-center">
-								<input type="text" class="span2" value="" data-slider-min="0" data-slider-max="600" data-slider-step="5" data-slider-value="[250,450]" id="sl2"><br />
-								<b class="pull-left">$ 0</b> <b class="pull-right">$ 600</b>
-							</div>
-						</div><!--/price-range-->
+<form action="{{ url('/filter-price') }}" method="GET" id="price-filter-form">
+    <div class="price-range">
+        <h2>Tầm Giá ($)</h2>
+        <div class="text-center">
+    <span id="price-range-text" style="color:#d70018;">
+        @if(request()->has('min_price') || request()->has('max_price'))
+            {{ number_format(request('min_price',0), 0, ',', '.') }} ₫
+            –
+            {{ number_format(request('max_price',100000000), 0, ',', '.') }} ₫
+        @else
+            Tất cả mức giá
+        @endif
+    </span>					 
+				<input type="text"
+					class="span2"
+					data-slider-min="0"
+					data-slider-max="100000000"
+					data-slider-step="500000"
+					data-slider-value="[{{ request('min_price', 0) }},{{ request('max_price', 100000000) }}]"
+					id="sl2">
+
+
+            <input type="hidden" name="min_price" id="min_price">
+            <input type="hidden" name="max_price" id="max_price">
+
+            <br>
+            <b class="pull-left">$ 0</b>
+            <b class="pull-right">$ 1000</b>
+        </div>
+    </div>
+</form>
 
 						<div class="shipping text-center"><!--shipping-->
 							<img src="images/home/shipping.jpg" alt="" />
@@ -318,7 +343,7 @@
 				</div>
 			</div>
 		</div>
-		</div>
+
 
 		<div class="footer-widget">
 			<div class="container">
@@ -387,14 +412,60 @@
 
 
 	<script src="{{ asset('frontend/js/jquery.js')}}"></script>
-	<script src="{{ asset('frontend/js/bootstrap.min.js')}}"></script>
-	<script src="{{ asset('frontend/js/jquery.scrollUp.min.js')}}"></script>
-	<script src="{{ asset('frontend/js/price-range.js')}}"></script>
-	<script src="{{ asset('frontend/js/jquery.prettyPhoto.js')}}"></script>
-	<script src="{{ asset('frontend/js/main.js')}}"></script>
-	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('frontend/js/bootstrap-slider.min.js')}}"></script>
 
-	
+<script>
+$(document).ready(function () {
+
+    const RATE = 25000; // 1$ = 25.000 VNĐ
+
+    var slider = new Slider("#sl2", {
+        min: 0,
+        max: 4000,          // $4000 = 100 triệu VNĐ
+        step: 50,
+        range: true,
+        value: [
+            {{ floor(request('min_price', 0) / 25000) }},
+            {{ floor(request('max_price', 100000000) / 25000) }}
+        ],
+
+        tooltip: 'show',    // ✅ HIỆN GIÁ KHI RÊ
+        tooltip_split: true, // ✅ hiện 2 tooltip cho min & max
+
+        formatter: function (value) {
+            if (Array.isArray(value)) {
+                return '$ ' + value[0] + ' - $ ' + value[1];
+            }
+            return '$ ' + value;
+        }
+    });
+
+    slider.on("slideStop", function (value) {
+        let minVND = value[0] * RATE;
+        let maxVND = value[1] * RATE;
+
+        $('#min_price').val(minVND);
+        $('#max_price').val(maxVND);
+
+		 $('#price-range-text').text(
+        minVND.toLocaleString('vi-VN') + ' ₫ – ' +
+        maxVND.toLocaleString('vi-VN') + ' ₫'
+    );
+
+        $('#price-filter-form').submit();
+    });
+
+});
+</script>
+
+
+<script src="{{ asset('frontend/js/jquery.scrollUp.min.js')}}"></script>
+
+<script src="{{ asset('frontend/js/jquery.prettyPhoto.js')}}"></script>
+<script src="{{ asset('frontend/js/main.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('frontend/js/bootstrap-slider.js') }}"></script>
+
 </body>
 
 </html>

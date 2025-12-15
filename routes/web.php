@@ -173,10 +173,7 @@ Route::get('/so-sanh/add/{id}', [CompareController::class, 'add'])->name('compar
 Route::get('/so-sanh/remove/{slot}', [CompareController::class, 'remove'])->name('compare.remove');
 Route::get('/so-sanh/chon/{slot}', [CompareController::class, 'select'])->name('compare.select');
 Route::get('/so-sanh/xoa-tat-ca', [CompareController::class, 'clear'])->name('compare.clear');
-
-
-
-
+Route::get('/filter-price', [HomeController::class, 'filterPrice']);
 
 
 

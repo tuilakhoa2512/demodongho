@@ -60,30 +60,44 @@ class FavoriteController extends Controller
 
         return redirect()->back()->with('success', 'Đã xoá khỏi yêu thích!');
     }
-    public function toggle($id)
-{
-    $user_id = Session::get('id');   // SỬA LẠI CHỖ NÀY
-
-    if (!$user_id) {
-        return redirect()->back()->with('error', 'Bạn phải đăng nhập!');
+    public function toggle($product_id)
+    {
+        $user_id = Session::get('id');
+    
+        // ===== CHƯA ĐĂNG NHẬP → LƯU SESSION =====
+        if (!$user_id) {
+    
+            $favorites = Session::get('favorite_guest', []);
+    
+            if (in_array($product_id, $favorites)) {
+                // bỏ thích
+                $favorites = array_diff($favorites, [$product_id]);
+                Session::put('favorite_guest', $favorites);
+                return redirect()->back()->with('yeu-thich', 'removed');
+            } else {
+                // thêm thích
+                $favorites[] = $product_id;
+                Session::put('favorite_guest', array_unique($favorites));
+                return redirect()->back()->with('yeu-thich', 'added');
+            }
+        }
+    
+        // ===== ĐÃ ĐĂNG NHẬP → LƯU DB =====
+        $favorite = Favorite::where('user_id', $user_id)
+            ->where('product_id', $product_id)
+            ->first();
+    
+        if ($favorite) {
+            $favorite->delete();
+            return redirect()->back()->with('yeu-thich', 'removed');
+        } else {
+            Favorite::create([
+                'user_id'    => $user_id,
+                'product_id' => $product_id
+            ]);
+            return redirect()->back()->with('yeu-thich', 'added');
+        }
     }
-
-    $favorite = Favorite::where('user_id', $user_id)
-                ->where('product_id', $id)
-                ->first();
-
-    if ($favorite) {
-        // Nếu đã thích → Bỏ thích
-        $favorite->delete();
-        return redirect()->back()->with('yeu-thich', 'removed');
-    } else {
-        // Nếu chưa thích → Thêm vào
-        Favorite::create([
-            'user_id'    => $user_id,
-            'product_id' => $id
-        ]);
-        return redirect()->back()->with('yeu-thich', 'added');
-    }
-}
+    
 
 }
