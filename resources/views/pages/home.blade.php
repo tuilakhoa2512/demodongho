@@ -54,7 +54,8 @@
 <div class="productinfo text-center">
     <div class="product-img-box">
         <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
-    </div> <br>
+    </div> 
+    <br>
 
                 {{-- GIÁ CHÍNH --}}
                 <h2 style="margin-bottom:4px; font-size:18px; font-weight:700;">
@@ -73,22 +74,17 @@
                 @endif
 
                 <p>{{ $product->name }}</p>
-            </div>
 
-
+                </div>
                     <div class="product-overlay">
                         <img class="overlay-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}">
                         <div class="overlay-content">
-                            <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
-                            <p><a href="{{ url('/product/'.$product->id) }}" style="color: #fff;">{{ $product->name }}</a></p>
-                            <form action="{{ route('cart.add', $product->id) }}" method="POST" style="display:inline-block;">
-                                {{ csrf_field() }}
-                                <input type="hidden" name="quantity" value="1">
 
-                                <button type="submit" class="btn btn-default add-to-cart">
-                                    <i class="fa fa-shopping-cart"></i> Thêm Vào Giỏ
-                                </button>
-                            </form>
+                            <a href="{{ url('/product/'.$product->id) }}"
+                            class="btn btn-default add-to-cart">
+                                <i class="fa fa-eye"></i> Xem Chi Tiết
+                            </a>
+
                         </div>
                     </div>
                 </div>

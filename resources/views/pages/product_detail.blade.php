@@ -66,9 +66,29 @@
 
             <h1 class="pd-info-title">{{ $product->name }}</h1>
 
-            <div class="pd-price">
-                {{ number_format($product->price, 0, ',', '.') }} VND
+            @php
+                $salePrice = $product->discounted_price;   // null nếu không có ưu đãi
+                $basePrice = (float) $product->price;
+                $hasDiscount = !is_null($salePrice) && $salePrice < $basePrice;
+            @endphp
+
+            <div class="pd-price" style="display:flex; align-items:baseline; gap:12px;">
+                <span>
+                    @if($hasDiscount)
+                        {{ number_format($salePrice, 0, ',', '.') }} VND
+                    @else
+                        {{ number_format($basePrice, 0, ',', '.') }} VND
+                    @endif
+                </span>
+
+                @if($hasDiscount)
+                    <span style="color:#999; font-size:16px; text-decoration:line-through;">
+                        {{ number_format($basePrice, 0, ',', '.') }} VND
+                    </span>
+                @endif
             </div>
+
+
 
             <div class="pd-info-list">
                 <p><span class="label">Thương hiệu:</span> {{ optional($product->brand)->name }}</p>
@@ -210,8 +230,8 @@ document.addEventListener('DOMContentLoaded', () => {
     color: #fff;
     padding: 10px 20px;
     border: 2px solid #ff0000ff;
-    border-radius: 5px;
     font-size: 17px; 
+    border-radius: 3px;
     margin-bottom: 20px;
 }
 
@@ -220,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     color: #ff0000ff;
     padding: 10px 20px;
     border: 2px solid #ff0000ff;
-    border-radius: 5px;
+    border-radius: 3px;
     font-size: 17px;
     margin-bottom: 20px;
 }
