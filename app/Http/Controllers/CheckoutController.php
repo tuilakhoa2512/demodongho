@@ -63,6 +63,12 @@ class CheckoutController extends Controller
         return redirect('/login-checkout')->with('error', 'Tài khản này không được phép đăng nhập.');
     }
 
+    // USER BỊ KHOÁ / ẨN
+    if ($user->status == 0) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản của bạn đã bị khoá. Vui lòng liên hệ quản trị viên.');
+    }
+
     // Kiểm tra mật khẩu
     if (!Hash::check($request->password, $user->password)) {
         return redirect('/login-checkout')->with('error', 'Email hoặc mật khẩu không chính xác.');

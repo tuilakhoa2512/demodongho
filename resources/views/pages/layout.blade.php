@@ -287,7 +287,7 @@
 
 <form action="{{ url('/filter-price') }}" method="GET" id="price-filter-form">
     <div class="price-range">
-        <h2>Tầm Giá ($)</h2>
+        <h2>Tầm Giá</h2>
         <div class="text-center">
     <span id="price-range-text" style="color:#d70018;">
         @if(request()->has('min_price') || request()->has('max_price'))
@@ -311,8 +311,8 @@
             <input type="hidden" name="max_price" id="max_price">
 
             <br>
-            <b class="pull-left">$ 0</b>
-            <b class="pull-right">$ 1000</b>
+            <b class="pull-left">0tr</b>
+            <b class="pull-right">100tr</b>
         </div>
     </div>
 </form>

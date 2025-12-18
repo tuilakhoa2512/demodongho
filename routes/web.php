@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
 use App\Http\Controllers\Admin\DiscountProductDetailController;
 use App\Http\Controllers\Admin\DiscountBillController;
+use App\Http\Controllers\Admin\AdminUserController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -176,7 +177,14 @@ Route::get('/so-sanh/chon/{slot}', [CompareController::class, 'select'])->name('
 Route::get('/so-sanh/xoa-tat-ca', [CompareController::class, 'clear'])->name('compare.clear');
 Route::get('/filter-price', [HomeController::class, 'filterPrice']);
 
+//Quản lý user khách hàng
 
+
+  Route::get('/all-admin-user', [AdminUserController::class, 'all_admin_user'])->name('admin.users.index');
+  Route::get('/add-admin-user', [AdminUserController::class, 'add_admin_user'])->name('admin.users.create');
+  Route::post('/store-admin-user', [AdminUserController::class, 'store_admin_user'])->name('admin.users.store');
+  Route::get('/unactive-admin-user/{id}', [AdminUserController::class, 'unactive_admin_user'])->name('admin.users.unactive');
+  Route::get('/active-admin-user/{id}', [AdminUserController::class, 'active_admin_user'])->name('admin.users.active');
 
 // ================= LÔ HÀNG + CHI TIẾT KHO (TRONG PREFIX ADMIN) =================
 
