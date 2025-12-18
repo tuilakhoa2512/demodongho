@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (selectDetail.value) {
         updateQuantityByDetailId(selectDetail.value);
     }
-});
+  } );
 </script>
 
 @endsection

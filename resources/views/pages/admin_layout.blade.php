@@ -203,6 +203,16 @@ body {
                     </ul>
                 </li>
                 <li class="sub-menu">
+                    <a href="javascript:;">	
+                        <i class=" fa fa-ticket"></i>
+                        <span>Ưu Đãi Bill</span>
+                    </a>
+                      <ul class="sub">
+                        <li><a href="{{ route('admin.discount-bills.index') }}">Danh sách ưu đãi</a></li>
+                        <li><a href="{{ route('admin.discount-bills.create') }}">Thêm ưu đãi mới</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu">
                     <a href="javascript:;">
                         <i class=" fa fa-comments"></i>
                         <span>Đánh Giá</span>
