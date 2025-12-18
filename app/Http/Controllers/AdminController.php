@@ -105,13 +105,22 @@ public function callback_google()
        
         Auth::login($user);
 
-        // Chỉ user role_id = 2 mới vào client
-        if ($user->role_id != 2) {
-            Auth::logout();
-            return redirect('/login-checkout')->with('error', 'Tài khoản của bạn không được phép đăng nhập ở đây!');
-        }
+        // Không cho admin login client
+            if ($user->role_id != 2) {
+                return redirect('/login-checkout')
+                    ->with('error', 'Tài khoản của bạn không được phép đăng nhập ở đây!');
+            }
 
-        return redirect('/')->with('message', 'Đăng nhập Google thành công!');
+            // Không cho user bị khoá
+            if ($user->status == 0) {
+                return redirect('/login-checkout')
+                    ->with('error', 'Tài khoản của bạn đã bị đình chỉ!');
+            }
+
+            //  OK thì mới login
+            Auth::login($user);
+
+            return redirect('/')->with('message', 'Đăng nhập Google thành công!');
 
     } catch (\Exception $e) {
         return redirect('/login-checkout')->with('error', 'Đăng nhập Google thất bại!');
@@ -133,7 +142,19 @@ public function callback_user_google()
     // Lấy user liên kết
     $user = $socialAccount->user;
 
-    // Lưu session
+    // Không cho admin login client
+    if ($user->role_id != 2) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản của bạn không được phép đăng nhập!');
+    }
+
+    // Không cho user bị đình chỉ
+    if ($user->status == 0) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản của bạn đã bị đình chỉ!');
+    }
+
+    // OK thì mới lưu session
     Session::put('id', $user->id);
     Session::put('image', $user->image);
     Session::put('fullname', $user->fullname);
@@ -163,6 +184,7 @@ public function findOrCreateUser($googleUser, $provider)
             'fullname' => $googleUser->name,
             'email' => $googleUser->email,
             'role_id' => 2,
+            'status'   => 1,
             'password' => '',
         ]);
     }

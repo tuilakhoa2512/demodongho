@@ -113,6 +113,10 @@ body {
                         <i class="fa fa-user"></i>
                         <span>Quản Lý Người Dùng</span>
                     </a>
+                    <ul class="sub">
+                                <li><a href="{{ route('admin.users.index') }}">Danh Sách người dùng</a></li> 
+                                <li><a href="{{ route('admin.users.create') }}">Thêm người dùng</a></li>                                            
+                    </ul>
                     
                 </li>
                 
