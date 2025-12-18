@@ -44,6 +44,7 @@
             <div class="product-image-wrapper">
                 <div class="single-products">
 
+
                     @php
     $salePrice = $product->discounted_price;   // null nếu không có ưu đãi
     $basePrice = (float) $product->price;
@@ -74,6 +75,7 @@
                 @endif
 
                 <p>{{ $product->name }}</p>
+
 
                 </div>
                     <div class="product-overlay">
@@ -136,17 +138,9 @@
     width: 100%;
     height: 240px;
     overflow: hidden;
+    padding-top: 6px;
 }
 
-.product-img-box img {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    transition: 0.4s ease-in-out;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
 
 .product-img-box .hover-img {
     opacity: 0;
