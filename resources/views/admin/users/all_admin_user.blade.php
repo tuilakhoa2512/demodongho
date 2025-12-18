@@ -33,10 +33,10 @@
                 <select name="status" class="form-control input-sm">
                     <option value="">Lọc trạng thái (Tất cả)</option>
                     <option value="1" {{ isset($filterStatus) && $filterStatus == 1 ? 'selected' : '' }}>
-                        Hoạt động
+                        Đang Hoạt động
                     </option>
                     <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>
-                        Bị ẩn
+                        Bị đình chỉ
                     </option>
                 </select>
 
@@ -81,7 +81,7 @@
                         @else
                             <a href="{{ route('admin.users.active', $user->id) }}"
                                class="btn btn-success btn-xs">
-                                Kích hoạt
+                                Kích hoạt lại
                             </a>
                         @endif
                     </td>

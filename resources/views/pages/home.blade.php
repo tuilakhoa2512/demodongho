@@ -44,37 +44,13 @@
             <div class="product-image-wrapper">
                 <div class="single-products">
 
-                    @php
-    $salePrice = $product->discounted_price;   // null nếu không có ưu đãi
-    $basePrice = (float) $product->price;
-
-    $hasDiscount = !is_null($salePrice) && $salePrice < $basePrice;
-@endphp
-
-<div class="productinfo text-center">
-    <div class="product-img-box">
-        <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
-    </div> <br>
-
-                {{-- GIÁ CHÍNH --}}
-                <h2 style="margin-bottom:4px; font-size:18px; font-weight:700;">
-                    @if($hasDiscount)
-                        {{ number_format($salePrice, 0, ',', '.') }} VND
-                    @else
-                        {{ number_format($basePrice, 0, ',', '.') }} VND
-                    @endif
-                </h2>
-                
-                {{-- GIÁ GỐC GẠCH BỎ (chỉ hiện khi có sale) --}}
-                @if($hasDiscount)
-                    <div style="color:#999; font-size:14px; text-decoration:line-through; margin-bottom:4px;">
-                        {{ number_format($basePrice, 0, ',', '.') }} VND
+                    <div class="productinfo text-center">
+                        <div class="product-img-box">
+                            <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
+                        </div>
+                        <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
+                        <p>{{ $product->name }}</p>
                     </div>
-                @endif
-
-                <p>{{ $product->name }}</p>
-            </div>
-
 
                     <div class="product-overlay">
                         <img class="overlay-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}">
@@ -140,17 +116,9 @@
     width: 100%;
     height: 240px;
     overflow: hidden;
+    padding-top: 6px;
 }
 
-.product-img-box img {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    transition: 0.4s ease-in-out;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
 
 .product-img-box .hover-img {
     opacity: 0;

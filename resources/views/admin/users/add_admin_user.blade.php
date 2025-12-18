@@ -5,6 +5,15 @@
     <div class="panel-heading">
         Thêm người dùng
     </div>
+    @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul style="margin-bottom: 0;">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
     <div class="panel-body">
         <form action="{{ route('admin.users.store') }}" method="POST">

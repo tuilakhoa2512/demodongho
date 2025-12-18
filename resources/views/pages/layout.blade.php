@@ -311,8 +311,8 @@
             <input type="hidden" name="max_price" id="max_price">
 
             <br>
-            <b class="pull-left">0tr</b>
-            <b class="pull-right">100tr</b>
+            <b class="pull-left">0 Tr</b>
+            <b class="pull-right">100 Tr</b>
         </div>
     </div>
 </form>

@@ -177,6 +177,7 @@ Route::get('/so-sanh/chon/{slot}', [CompareController::class, 'select'])->name('
 Route::get('/so-sanh/xoa-tat-ca', [CompareController::class, 'clear'])->name('compare.clear');
 Route::get('/filter-price', [HomeController::class, 'filterPrice']);
 
+
 //Quản lý user khách hàng
 
 
