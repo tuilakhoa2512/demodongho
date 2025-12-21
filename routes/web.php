@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
 use App\Http\Controllers\Admin\DiscountProductDetailController;
@@ -167,6 +168,8 @@ Route::get('/so-sanh', [CompareController::class, 'view'])->name('compare.view')
 Route::get('/contact-us', function () {
   return view('pages.contact');
 })->name('contact.us');
+Route::post('/contact-send', [ContactController::class, 'send'])
+    ->name('contact.send');
 
 // Thêm sản phẩm vào so sánh
 Route::get('/so-sanh/add/{id}', [CompareController::class, 'add'])->name('compare.add');

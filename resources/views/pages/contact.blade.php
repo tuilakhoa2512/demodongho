@@ -78,18 +78,50 @@
     <hr>
 
     <div class="contact-form">
-        <form action="">
-            <label><strong>Tên của bạn</strong></label>
-            <input type="text" placeholder="Nhập tên của bạn">
+    <div class="contact-form">
 
-            <label><strong>Email</strong></label>
-            <input type="email" placeholder="Nhập email">
+{{-- Thông báo gửi thành công --}}
+@if(session('success'))
+    <p style="color: green; margin-bottom: 15px;">
+        {{ session('success') }}
+    </p>
+@endif
 
-            <label><strong>Nội dung cần liên hệ</strong></label>
-            <textarea placeholder="Bạn muốn gửi gì đến UnK STORE?"></textarea>
+{{-- Hiển thị lỗi validate --}}
+@if($errors->any())
+    <ul style="color:red; margin-bottom:15px;">
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+@endif
 
-            <button class="btn-send">Gửi</button>
-        </form>
+<form action="{{ route('contact.send') }}" method="POST">
+    @csrf
+
+    <label><strong>Tên của bạn</strong></label>
+    <input type="text"
+           name="name"
+           placeholder="Nhập tên của bạn"
+           required>
+
+    <label><strong>Email</strong></label>
+    <input type="email"
+           name="email"
+           placeholder="Nhập email"
+           required>
+
+    <label><strong>Nội dung cần liên hệ</strong></label>
+    <textarea name="message"
+              placeholder="Bạn muốn gửi gì đến UnK STORE?"
+              required></textarea>
+
+    <button type="submit" class="btn-send">Gửi</button>
+</form>
+
+
+</div>
+
     </div>
 
 </div>
