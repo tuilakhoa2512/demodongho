@@ -2,15 +2,14 @@
 
 @section('content')
 
-<div class="cart-page">
     <h2 class="title text-center">Giỏ Hàng Của Bạn</h2>
+
+
+<div class="cart-page">
 
     {{-- ALERT --}}
     @if(session('success'))
-        <div class="cart-alert">
-            {{ session('success') }}
-        </div>
-
+        <div class="cart-alert">{{ session('success') }}</div>
         <script>
             setTimeout(() => {
                 const el = document.querySelector('.cart-alert');
@@ -23,15 +22,14 @@
         </script>
     @endif
 
-    {{-- EMPTY CART --}}
-    @if(empty($cart) || count($cart) === 0)
+    {{-- EMPTY --}}
+    @if(empty($cart))
         <p class="cart-empty">Hiện chưa có sản phẩm nào trong giỏ hàng.</p>
     @else
 
     <form action="{{ route('cart.update') }}" method="POST">
         @csrf
 
-        {{-- TABLE --}}
         <div class="cart-table-wrapper">
             <table class="cart-table">
                 <thead>
@@ -45,169 +43,123 @@
                 </thead>
 
                 <tbody>
-                    @foreach($cart as $item)
-                        @php
-                            $maxQty = max(1, (int) ($item['max_qty'] ?? 1));
-                            $qty    = max(1, min((int) ($item['quantity'] ?? 1), $maxQty));
+                @foreach($cart as $item)
+                    @php
+                        $maxQty = max(1, (int)$item['max_qty']);
+                        $qty = max(1, min((int)$item['quantity'], $maxQty));
+                    @endphp
 
-                            $finalPrice = (float) ($item['final_price'] ?? ($item['price'] ?? 0));
-                            $basePrice  = (float) ($item['base_price'] ?? $finalPrice);
-                            $hasSale    = !empty($item['has_sale']) && $basePrice > $finalPrice;
-                            $lineTotal  = (float) ($item['line_total'] ?? ($finalPrice * $qty));
-                        @endphp
+                    <tr>
+                        {{-- PRODUCT --}}
+                        <td>
+                            <div class="cart-product-box">
+                                <img src="{{ $item['image'] }}" class="cart-product-img">
+                                <div>{{ $item['name'] }}</div>
+                            </div>
+                        </td>
 
-                        <tr>
-                            {{-- PRODUCT --}}
-                            <td class="cart-product">
-                                <div class="cart-product-box">
-                                    <div class="cart-product-img">
-                                        <img src="{{ $item['image'] ?? asset('frontend/images/noimage.jpg') }}"
-                                             alt="{{ $item['name'] ?? 'Sản phẩm' }}">
-                                    </div>
-                                    <div class="cart-product-name">
-                                        {{ $item['name'] ?? '—' }}
-                                    </div>
+                        {{-- PRICE --}}
+                        <td>
+                            <div class="cart-price-main">
+                                {{ number_format($item['final_price'],0,',','.') }} đ
+                            </div>
+                            @if($item['has_sale'])
+                                <div class="cart-price-old">
+                                    {{ number_format($item['base_price'],0,',','.') }} đ
                                 </div>
-                            </td>
+                            @endif
+                        </td>
 
-                            {{-- PRICE --}}
-                            <td class="cart-price">
-                                <div class="cart-price-main">
-                                    {{ number_format($finalPrice, 0, ',', '.') }} đ
-                                </div>
+                        {{-- QTY --}}
+                        <td>
+                            <div class="qty-control" data-max="{{ $maxQty }}">
+                                <button type="button" class="qty-btn qty-minus">−</button>
+                                <input type="text"
+                                       readonly
+                                       name="quantities[{{ $item['id'] }}]"
+                                       value="{{ $qty }}"
+                                       class="cart-qty-input">
+                                <button type="button" class="qty-btn qty-plus">+</button>
+                            </div>
+                            <div class="cart-stock-note">Tồn: {{ $maxQty }}</div>
+                        </td>
 
-                                @if($hasSale)
-                                    <div class="cart-price-old">
-                                        {{ number_format($basePrice, 0, ',', '.') }} đ
-                                    </div>
-                                @endif
-                            </td>
+                        {{-- LINE TOTAL --}}
+                        <td class="cart-subtotal">
+                            {{ number_format($item['line_total'],0,',','.') }} đ
+                        </td>
 
-                            {{-- QUANTITY ( - / + ) --}}
-                            <td class="cart-qty">
-                                <div class="qty-control"
-                                     data-max="{{ $maxQty }}"
-                                     data-product="{{ $item['id'] ?? '' }}">
-                                    <button type="button" class="qty-btn qty-minus">−</button>
-
-                                    <input
-                                        type="text"
-                                        readonly
-                                        name="quantities[{{ $item['id'] }}]"
-                                        value="{{ $qty }}"
-                                        class="cart-qty-input js-cart-qty"
-                                        data-old="{{ $qty }}"
-                                    >
-
-                                    <button type="button" class="qty-btn qty-plus">+</button>
-                                </div>
-
-                                <div class="cart-stock-note">
-                                    Tồn: {{ $maxQty }}
-                                </div>
-                            </td>
-
-                            {{-- LINE TOTAL --}}
-                            <td class="cart-subtotal">
-                                {{ number_format($lineTotal, 0, ',', '.') }} đ
-                            </td>
-
-                            {{-- REMOVE --}}
-                            <td class="cart-remove">
-                                <button
-                                    type="submit"
+                        {{-- REMOVE --}}
+                        <td>
+                            <button type="submit"
                                     class="cart-remove-btn"
                                     formaction="{{ route('cart.remove') }}"
-                                    formmethod="POST"
                                     name="product_id"
-                                    value="{{ $item['id'] }}"
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
+                                    value="{{ $item['id'] }}">
+                                Xóa
+                            </button>
+                        </td>
+                    </tr>
+                @endforeach
                 </tbody>
             </table>
         </div>
-
-        @php
-            $subtotal = $subtotal ?? 0;
-            $billDiscountAmount = $billDiscountAmount ?? 0;
-            $grandTotal = $grandTotal ?? $subtotal;
-        @endphp
 
         {{-- SUMMARY --}}
         <div class="cart-footer">
             <div class="cart-summary">
                 <div class="summary-row">
                     <span>Tạm tính:</span>
-                    <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+                    <strong>{{ number_format($subtotal,0,',','.') }} đ</strong>
                 </div>
 
-                @if(!empty($billDiscount))
-                    <div class="summary-row discount">
-                        <span>
-                            Ưu Đãi Hóa Đơn ({{ $billDiscount->name }} giảm {{ $billDiscount->rate }}%)
-                        </span>
-                        <strong>
-                            -{{ number_format($billDiscountAmount, 0, ',', '.') }} đ
-                        </strong>
-                    </div>
-                @endif
+                <div class="summary-row discount">
+                    <span>
+                        @if($billDiscount)
+                            Ưu Đãi Hóa Đơn ({{ $billDiscount->name }} - {{ $billDiscount->rate }}%)
+                        @else
+                            Ưu Đãi Hóa Đơn
+                        @endif
+                    </span>
+                    <strong>-{{ number_format($billDiscountAmount,0,',','.') }} đ</strong>
+                </div>
 
                 <div class="summary-row total">
                     <span>Tổng thanh toán:</span>
-                    <strong>{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+                    <strong>{{ number_format($grandTotal,0,',','.') }} đ</strong>
                 </div>
             </div>
 
-            {{-- ACTIONS --}}
             <div class="cart-actions">
-                <a href="{{ url('/trang-chu') }}" class="btn btn-default cart-continue">
-                    Tiếp tục mua sắm
-                </a>
-
-                <button type="submit" class="btn cart-update">
-                    Cập nhật giỏ hàng
-                </button>
+                <a href="{{ url('/trang-chu') }}" class="btn cart-continue">Tiếp tục mua sắm</a>
+                <button type="submit" class="btn cart-update">Cập nhật</button>
 
                 @if(Session::get('id'))
-                    <a href="{{ url('/payment') }}" class="btn cart-checkout">
-                        Thanh toán
-                    </a>
+                    <a href="{{ url('/payment') }}" class="btn cart-checkout">Thanh toán</a>
                 @else
-                    <a href="{{ url('/login-checkout') }}" class="btn cart-checkout">
-                        Thanh toán
-                    </a>
+                    <a href="{{ url('/login-checkout') }}" class="btn cart-checkout">Thanh toán</a>
                 @endif
             </div>
         </div>
-
     </form>
     @endif
 </div>
 
-{{-- JS: +/- quantity --}}
+{{-- JS +/- --}}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.qty-control').forEach(control => {
-        const input = control.querySelector('.cart-qty-input');
-        const minus = control.querySelector('.qty-minus');
-        const plus  = control.querySelector('.qty-plus');
-        const maxQty = parseInt(control.dataset.max) || 1;
+document.querySelectorAll('.qty-control').forEach(c => {
+    const input = c.querySelector('input');
+    const max = parseInt(c.dataset.max);
 
-        const setVal = (val) => {
-            val = Math.max(1, Math.min(val, maxQty));
-            input.value = val;
-            input.dispatchEvent(new Event('change'));
-        };
-
-        minus.addEventListener('click', () => setVal((parseInt(input.value) || 1) - 1));
-        plus.addEventListener('click',  () => setVal((parseInt(input.value) || 1) + 1));
-    });
+    c.querySelector('.qty-minus').onclick = () => {
+        input.value = Math.max(1, input.value - 1);
+    };
+    c.querySelector('.qty-plus').onclick = () => {
+        input.value = Math.min(max, parseInt(input.value) + 1);
+    };
 });
 </script>
+
 
 <style>
 /* ===== ALERT ===== */
@@ -335,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 14px;
 }
 .summary-row strong{ font-weight: 800; }
-.summary-row.discount{ color:#e60012; }
+.summary-row.discount{ color:#e60012; } /* ✅ luôn đỏ */
 .summary-row.total{
     border-top:1px dashed #ddd;
     margin-top: 4px;

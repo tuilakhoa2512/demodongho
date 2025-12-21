@@ -1,186 +1,293 @@
 @extends('pages.layout')
 
 @section('content')
-
-<h2 class="title text-center">
-        THANH TOÁN
-    </h2>
-
+<h2 class="title text-center">Thông Tin Thanh Toán</h2>
 <div class="payment-page">
 
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
-
+    {{-- ERROR / SUCCESS --}}
     @if(session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
+        <div class="pay-alert pay-alert-error">{{ session('error') }}</div>
     @endif
 
     @if($errors->any())
-        <div class="alert alert-danger">
-            <ul style="margin: 0; padding-left: 18px;">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
+        <div class="pay-alert pay-alert-error">
+            <ul style="margin:0; padding-left:18px;">
+                @foreach($errors->all() as $e)
+                    <li>{{ $e }}</li>
                 @endforeach
             </ul>
         </div>
     @endif
 
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="payment-box">
-                <h3>Thông Tin Nhận Hàng</h3>
+    <form action="{{ route('payment.place') }}" method="POST">
+        @csrf
 
-                <form action="{{ route('payment.place') }}" method="POST">
-                    @csrf
+        <div class="row">
+            {{-- LEFT: SHIPPING INFO --}}
+            <div class="col-sm-7">
+                <div class="pay-box">
+                    <h3 class="pay-box-title" style="text-align: center;">Thông Tin Giao Hàng</h3>
 
                     <div class="form-group">
-                        <label>Họ tên người nhận <span style="color:red">*</span></label>
-                        <input type="text"
-                               name="customer_name"
-                               class="form-control"
-                               value="{{ old('customer_name') }}"
-                               required
-                               style="color:black;">
+                        <label>Họ và tên người nhận *</label>
+                        <input type="text" name="receiver_name" class="form-control"
+                               value="{{ old('receiver_name', $user->fullname ?? '') }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Số điện thoại <span style="color:red">*</span></label>
-                        <input type="text"
-                               name="customer_phone"
-                               class="form-control"
-                               value="{{ old('customer_phone') }}"
-                               required
-                               style="color:black;">
+                        <label>Email *</label>
+                        <input type="email" name="receiver_email" class="form-control"
+                               value="{{ old('receiver_email', $user->email ?? '') }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Địa chỉ nhận hàng <span style="color:red">*</span></label>
-                        <textarea name="customer_address"
-                                  rows="3"
-                                  class="form-control"
-                                  required
-                                  style="resize:none; color:black;">{{ old('customer_address') }}</textarea>
+                        <label>Số điện thoại *</label>
+                        <input type="text" name="receiver_phone" class="form-control"
+                               value="{{ old('receiver_phone', $user->phone ?? '') }}" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Ghi chú thêm</label>
-                        <textarea name="customer_note"
-                                  rows="3"
-                                  class="form-control"
-                                  style="resize:none; color:black;"
-                                  placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao...">{{ old('customer_note') }}</textarea>
+                        <label>Địa chỉ (số nhà, đường) *</label>
+                        <input type="text" name="receiver_address" class="form-control"
+                               value="{{ old('receiver_address', $user->address ?? '') }}" required>
                     </div>
 
-                    <button type="submit" class="btn btn-danger btn-block">
-                        Xác nhận đặt hàng
-                    </button>
-                </form>
-            </div>
-        </div>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Tỉnh/Thành</label>
+                                <select name="province_id" id="province" class="form-control">
+                                    <option value="">-- Chọn Tỉnh --</option>
+                                    @foreach($provinces as $p)
+                                        <option value="{{ $p->id }}"
+                                            {{ (string)old('province_id', $user->province_id ?? '') === (string)$p->id ? 'selected' : '' }}>
+                                            {{ $p->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-        <div class="col-sm-6">
-            <div class="payment-box">
-                <h3>Đơn Hàng Của Bạn</h3>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Quận/Huyện</label>
+                                <select name="district_id" id="district" class="form-control">
+                                    <option value="">-- Chọn Huyện --</option>
+                                    @foreach($districts as $d)
+                                        <option value="{{ $d->id }}"
+                                            {{ (string)old('district_id', $user->district_id ?? '') === (string)$d->id ? 'selected' : '' }}>
+                                            {{ $d->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="payment-cart-summary">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Sản phẩm</th>
-                                <th class="text-right">Tạm tính</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php $total = 0; @endphp
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label>Phường/Xã</label>
+                                <select name="ward_id" id="ward" class="form-control">
+                                    <option value="">-- Chọn Xã --</option>
+                                    @foreach($wards as $w)
+                                        <option value="{{ $w->id }}"
+                                            {{ (string)old('ward_id', $user->ward_id ?? '') === (string)$w->id ? 'selected' : '' }}>
+                                            {{ $w->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
-                            @foreach($cart as $item)
-                                @php
-                                    $lineTotal = $item['price'] * $item['quantity'];
-                                    $total += $lineTotal;
-                                @endphp
-                                <tr>
-                                    <td>
-                                        {{ $item['name'] }}<br>
-                                        <small>x {{ $item['quantity'] }}</small>
-                                    </td>
-                                    <td class="text-right">
-                                        {{ number_format($lineTotal, 0, ',', '.') }} VND
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>Tổng cộng</th>
-                                <th class="text-right">
-                                    {{ number_format($total, 0, ',', '.') }} VND
-                                </th>
-                            </tr>
-                        </tfoot>
-                    </table>
+                    <hr>
+
+                    <h3 class="pay-box-title">Phương Thức Thanh Toán</h3>
+                    <div class="form-group">
+                        <select name="payment_method" class="form-control" required>
+                            <option value="COD" {{ old('payment_method') === 'COD' ? 'selected' : '' }}>COD (Thanh toán khi nhận hàng)</option>
+                            <option value="BANK" {{ old('payment_method') === 'BANK' ? 'selected' : '' }}>BANK (Chuyển khoản)</option>
+                        </select>
+                    </div>
                 </div>
+            </div>
 
-                <p class="payment-note">
-                    Đơn hàng của bạn sẽ được xử lý sau khi nhấn nút
-                    <strong>"Xác nhận đặt hàng"</strong>.
-                    Nhân viên sẽ liên hệ để xác nhận nếu cần thiết.
-                </p>
+            {{-- RIGHT: ORDER SUMMARY --}}
+            <div class="col-sm-5">
+                <div class="pay-box">
+                    <h3 class="pay-box-title" style="text-align: center;">Đơn Hàng Của Bạn</h3>
+
+                    <div class="pay-items">
+                        @foreach($cart as $it)
+                            <div class="pay-item">
+                                <div class="pay-item-name">
+                                    {{ $it['name'] }}
+                                    <span class="pay-item-qty">x {{ $it['quantity'] }}</span>
+                                </div>
+                                <div class="pay-item-price">
+                                    {{ number_format($it['line_total'], 0, ',', '.') }} đ
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <div class="pay-summary">
+                        <div class="sum-row">
+                            <span>Tạm tính</span>
+                            <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+                        </div>
+
+                        <div class="sum-row sum-discount">
+                            <span>
+                                @if(!empty($billDiscount))
+                                    Ưu đãi hóa đơn ({{ $billDiscount->name }} - {{ $billDiscount->rate }}%)
+                                @else
+                                    Ưu đãi hóa đơn
+                                @endif
+                            </span>
+                            <strong>-{{ number_format($billDiscountAmount ?? 0, 0, ',', '.') }} đ</strong>
+                        </div>
+
+                        <div class="sum-row sum-total">
+                            <span>Tổng thanh toán</span>
+                            <strong>{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn pay-btn">
+                        Xác Nhận Đặt Hàng
+                    </button>
+
+                    <a href="{{ route('cart.index') }}" class="pay-back">
+                        ← Quay lại giỏ hàng
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 </div>
 
+{{-- AJAX Province/District/Ward giống profile --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const province = document.getElementById('province');
+    const district = document.getElementById('district');
+    const ward     = document.getElementById('ward');
+
+    province.addEventListener('change', function() {
+        const pid = this.value;
+        district.innerHTML = '<option value="">-- Chọn Huyện --</option>';
+        ward.innerHTML = '<option value="">-- Chọn Xã --</option>';
+        if (!pid) return;
+
+        fetch(`/location/districts/${pid}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(d => {
+                    district.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                });
+            });
+    });
+
+    district.addEventListener('change', function() {
+        const did = this.value;
+        ward.innerHTML = '<option value="">-- Chọn Xã --</option>';
+        if (!did) return;
+
+        fetch(`/location/wards/${did}`)
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(w => {
+                    ward.innerHTML += `<option value="${w.id}">${w.name}</option>`;
+                });
+            });
+    });
+});
+</script>
+
 <style>
-    .payment-page {
-        padding: 20px 0 40px;
-    }
+.payment-page{ padding: 20px 0 40px; }
 
-    .payment-box {
-        background: #fff;
-        border-radius: 6px;
-        padding: 15px 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 0 4px rgba(0,0,0,0.05);
-    }
+.pay-alert{
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 10px 0 16px;
+    font-size: 15px;
+}
+.pay-alert-error{
+    background:#e60012;
+    color:#fff;
+}
 
-    .payment-box h3 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
+.pay-box{
+    background:#fff;
+    border:1px solid #eee;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+}
+.pay-box-title{
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 12px;
+}
+.form-group{ margin-bottom: 12px; }
+.form-control{ border-radius: 8px; }
 
-    .payment-cart-summary table {
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
+.pay-items{
+    border-top:1px dashed #eee;
+    padding-top: 10px;
+    margin-top: 6px;
+}
+.pay-item{
+    display:flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f3f3;
+}
+.pay-item-name{ font-weight: 600; }
+.pay-item-qty{ color:#777; font-weight: 700; margin-left: 6px; }
+.pay-item-price{ font-weight: 800; color:#e60012; }
 
-    .payment-note {
-        font-size: 13px;
-        color: #555;
-    }
+.pay-summary{ margin-top: 12px; }
+.sum-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 8px 0;
+}
+.sum-discount{ color:#e60012; font-weight: 700; }
+.sum-total{
+    border-top:1px dashed #ddd;
+    margin-top: 6px;
+    padding-top: 12px;
+    font-size: 16px;
+}
+.sum-total strong{ color:#e60012; font-size: 20px; }
 
-    .alert {
-        padding: 10px 15px;
-        border-radius: 4px;
-        margin-bottom: 15px;
-        font-size: 14px;
-    }
-
-    .alert-success {
-        background: #dff0d8;
-        border: 1px solid #d0e9c6;
-        color: #3c763d;
-    }
-
-    .alert-danger {
-        background: #f2dede;
-        color: #a94442;
-    }
+.pay-btn{
+    width: 100%;
+    background:#e60012;
+    border:1px solid #e60012;
+    color:#fff;
+    font-weight: 800;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+}
+.pay-btn:hover{
+    background:#b80010;
+    border-color:#b80010;
+    color:#fff;
+}
+.pay-back{
+    display:block;
+    text-align:center;
+    margin-top: 10px;
+    color:#333;
+    font-weight: 600;
+}
+.pay-back:hover{ color:#e60012; }
 </style>
 
 @endsection

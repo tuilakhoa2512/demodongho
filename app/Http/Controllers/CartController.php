@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
 
 use App\Models\Product;
 use App\Models\Cart;
@@ -14,16 +13,16 @@ use App\Models\DiscountBill;
 class CartController extends Controller
 {
     /**
-     * Trang giỏ hàng
-     * - Login: lấy DB carts
-     * - Guest: lấy session cart
-     * - Luôn load Product thật để lấy tồn kho & giá đúng
-     * - Trả về đủ biến: cart, subtotal, billDiscount, billDiscountAmount, grandTotal
+     * =========================
+     * GIỎ HÀNG
+     * =========================
+     * - Login: Session::get('id') → DB carts
+     * - Guest: Session::get('cart')
+     * - Luôn load Product thật để lấy giá & tồn kho chuẩn
      */
     public function index()
     {
-        // 1) Lấy raw cart: [product_id => qty]
-        $raw = $this->getRawCart(); // qty có thể đang vượt tồn kho
+        $raw = $this->getRawCart(); // [product_id => qty]
 
         if (empty($raw)) {
             return view('pages.cart', [
@@ -38,7 +37,6 @@ class CartController extends Controller
 
         $productIds = array_keys($raw);
 
-        // 2) Load products 1 lần (tránh N+1)
         $products = Product::with('productImage')
             ->whereIn('id', $productIds)
             ->get()
@@ -49,20 +47,25 @@ class CartController extends Controller
 
         foreach ($raw as $pid => $qty) {
             $product = $products->get($pid);
+
+            // Product không tồn tại → remove
             if (!$product) {
-                // product bị xóa => bỏ khỏi cart luôn
                 $this->removeByProductId($pid);
                 continue;
             }
 
-            // Nếu không còn bán / hết hàng => remove khỏi cart
-            if ((int)$product->status !== 1 || $product->stock_status !== 'selling' || (int)$product->quantity <= 0) {
+            // Không còn bán / hết hàng → remove
+            if (
+                (int)$product->status !== 1 ||
+                $product->stock_status !== 'selling' ||
+                (int)$product->quantity <= 0
+            ) {
                 $this->removeByProductId($pid);
                 continue;
             }
 
-            // Ảnh
-            $image = $product->productImage && $product->productImage->image_1
+            // Image
+            $image = ($product->productImage && $product->productImage->image_1)
                 ? Storage::url($product->productImage->image_1)
                 : asset('frontend/images/noimage.jpg');
 
@@ -73,10 +76,10 @@ class CartController extends Controller
             $qty = max(1, (int)$qty);
             $qty = min($qty, $maxQty);
 
-            // Giá (final) theo discounted_price nếu có
+            // Giá
             $basePrice = (float)$product->price;
             $salePrice = $product->discounted_price;
-            $hasSale = ($salePrice !== null && (float)$salePrice > 0 && (float)$salePrice < $basePrice);
+            $hasSale   = ($salePrice !== null && (float)$salePrice > 0 && (float)$salePrice < $basePrice);
 
             $finalPrice = $hasSale ? (float)$salePrice : $basePrice;
 
@@ -84,36 +87,36 @@ class CartController extends Controller
             $subtotal += $lineTotal;
 
             $cart[$pid] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'image' => $image,
+                'id'          => $product->id,
+                'name'        => $product->name,
+                'image'       => $image,
 
-                'base_price' => $basePrice,
+                'base_price'  => $basePrice,
                 'final_price' => $finalPrice,
-                'has_sale' => $hasSale,
+                'has_sale'    => $hasSale,
 
-                'quantity' => $qty,
-                'max_qty' => $maxQty,
+                'quantity'    => $qty,
+                'max_qty'     => $maxQty,
 
-                'line_total' => $lineTotal,
+                'line_total'  => $lineTotal,
             ];
 
-            // Nếu qty bị ép khác dữ liệu đang lưu => cập nhật lại cho sạch
+            // Đồng bộ qty nếu bị ép
             $this->syncQty($pid, $qty);
         }
 
-        // 3) Bill discount (nếu bạn muốn áp)
+        // =========================
+        // ƯU ĐÃI HÓA ĐƠN
+        // =========================
         $billDiscount = $this->getBestBillDiscount($subtotal);
 
         $billDiscountAmount = 0;
         if ($billDiscount) {
-            $rate = (float)$billDiscount->rate; // %
-            $billDiscountAmount = round($subtotal * $rate / 100);
+            $billDiscountAmount = round($subtotal * ((float)$billDiscount->rate / 100));
+            $billDiscountAmount = min($billDiscountAmount, $subtotal);
         }
 
         $grandTotal = max(0, $subtotal - $billDiscountAmount);
-
-        // view bạn đang dùng cả total/subtotal => cho đồng bộ
         $total = $grandTotal;
 
         return view('pages.cart', compact(
@@ -127,13 +130,14 @@ class CartController extends Controller
     }
 
     /**
-     * Add to cart (chặn tồn kho)
+     * =========================
+     * ADD TO CART
+     * =========================
      */
     public function add(Request $request, $id)
     {
-        $product = Product::with('productImage')->findOrFail($id);
+        $product = Product::findOrFail($id);
 
-        // chỉ cho mua khi đang bán + hiển thị
         if ((int)$product->status !== 1 || $product->stock_status !== 'selling') {
             return redirect()->back()->with('success', 'Sản phẩm hiện không thể mua.');
         }
@@ -145,28 +149,29 @@ class CartController extends Controller
 
         $qty = max(1, (int)$request->input('quantity', 1));
 
-        if (Auth::check()) {
+        // ===== LOGIN (Session id) =====
+        if ($this->isCustomerLoggedIn()) {
+            $userId = $this->customerId();
+
             $row = Cart::firstOrNew([
-                'user_id' => Auth::id(),
+                'user_id'    => $userId,
                 'product_id' => $product->id,
             ]);
 
             $current = $row->exists ? (int)$row->quantity : 0;
-            $newQty = min($current + $qty, $stock);
-
-            $row->quantity = $newQty;
+            $row->quantity = min($current + $qty, $stock);
             $row->save();
-        } else {
+        }
+        // ===== GUEST =====
+        else {
             $cart = Session::get('cart', []);
 
             $current = isset($cart[$id]) ? (int)($cart[$id]['quantity'] ?? 0) : 0;
-            $newQty = min($current + $qty, $stock);
 
             $cart[$id] = [
-                'id' => $product->id,
-                'name' => $product->name,
-                'quantity' => $newQty,
-                // không cần lưu price nữa
+                'id'       => $product->id,
+                'name'     => $product->name,
+                'quantity' => min($current + $qty, $stock),
             ];
 
             Session::put('cart', $cart);
@@ -176,24 +181,27 @@ class CartController extends Controller
     }
 
     /**
-     * Update cart (chặn tồn kho)
+     * =========================
+     * UPDATE CART
+     * =========================
      */
     public function update(Request $request)
     {
-        $quantities = $request->input('quantities', []); // [product_id => qty]
+        $quantities = $request->input('quantities', []);
         if (empty($quantities)) {
             return redirect()->route('cart.index');
         }
 
         $productIds = array_map('intval', array_keys($quantities));
 
-        // load tồn kho + trạng thái
         $products = Product::whereIn('id', $productIds)
             ->select('id', 'quantity', 'status', 'stock_status')
             ->get()
             ->keyBy('id');
 
-        if (Auth::check()) {
+        if ($this->isCustomerLoggedIn()) {
+            $userId = $this->customerId();
+
             foreach ($quantities as $pid => $qty) {
                 $pid = (int)$pid;
                 $qty = max(1, (int)$qty);
@@ -201,16 +209,20 @@ class CartController extends Controller
                 $p = $products->get($pid);
                 if (!$p) continue;
 
-                if ((int)$p->status !== 1 || $p->stock_status !== 'selling' || (int)$p->quantity <= 0) {
-                    Cart::where('user_id', Auth::id())->where('product_id', $pid)->delete();
+                if (
+                    (int)$p->status !== 1 ||
+                    $p->stock_status !== 'selling' ||
+                    (int)$p->quantity <= 0
+                ) {
+                    Cart::where('user_id', $userId)
+                        ->where('product_id', $pid)
+                        ->delete();
                     continue;
                 }
 
-                $qty = min($qty, (int)$p->quantity);
-
-                Cart::where('user_id', Auth::id())
+                Cart::where('user_id', $userId)
                     ->where('product_id', $pid)
-                    ->update(['quantity' => $qty]);
+                    ->update(['quantity' => min($qty, (int)$p->quantity)]);
             }
         } else {
             $cart = Session::get('cart', []);
@@ -224,13 +236,16 @@ class CartController extends Controller
                 $p = $products->get($pid);
                 if (!$p) continue;
 
-                if ((int)$p->status !== 1 || $p->stock_status !== 'selling' || (int)$p->quantity <= 0) {
+                if (
+                    (int)$p->status !== 1 ||
+                    $p->stock_status !== 'selling' ||
+                    (int)$p->quantity <= 0
+                ) {
                     unset($cart[$pid]);
                     continue;
                 }
 
-                $qty = min($qty, (int)$p->quantity);
-                $cart[$pid]['quantity'] = $qty;
+                $cart[$pid]['quantity'] = min($qty, (int)$p->quantity);
             }
 
             Session::put('cart', $cart);
@@ -240,26 +255,41 @@ class CartController extends Controller
     }
 
     /**
-     * Remove item (xóa đúng cho cả login + guest)
+     * =========================
+     * REMOVE ITEM
+     * =========================
      */
     public function remove(Request $request)
     {
         $productId = (int)$request->input('product_id');
-
         $this->removeByProductId($productId);
 
         return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
-    // ===================== HÀM PHỤ =====================
+    // =================================================
+    // =================== HÀM PHỤ ======================
+    // =================================================
+
+    private function customerId(): ?int
+    {
+        return Session::get('id') ? (int)Session::get('id') : null;
+    }
+
+    private function isCustomerLoggedIn(): bool
+    {
+        return $this->customerId() !== null;
+    }
 
     /**
-     * Lấy raw cart dạng: [product_id => qty]
+     * Lấy raw cart: [product_id => qty]
      */
     private function getRawCart(): array
     {
-        if (Auth::check()) {
-            $rows = Cart::where('user_id', Auth::id())->get(['product_id', 'quantity']);
+        if ($this->isCustomerLoggedIn()) {
+            $rows = Cart::where('user_id', $this->customerId())
+                ->get(['product_id', 'quantity']);
+
             $raw = [];
             foreach ($rows as $r) {
                 $raw[(int)$r->product_id] = (int)$r->quantity;
@@ -278,13 +308,10 @@ class CartController extends Controller
         return $raw;
     }
 
-    /**
-     * Đồng bộ qty đã bị ép về tồn kho (cho sạch dữ liệu)
-     */
     private function syncQty(int $productId, int $qty): void
     {
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())
+        if ($this->isCustomerLoggedIn()) {
+            Cart::where('user_id', $this->customerId())
                 ->where('product_id', $productId)
                 ->update(['quantity' => $qty]);
         } else {
@@ -296,13 +323,10 @@ class CartController extends Controller
         }
     }
 
-    /**
-     * Xóa item theo product_id cho cả login + guest
-     */
     private function removeByProductId(int $productId): void
     {
-        if (Auth::check()) {
-            Cart::where('user_id', Auth::id())
+        if ($this->isCustomerLoggedIn()) {
+            Cart::where('user_id', $this->customerId())
                 ->where('product_id', $productId)
                 ->delete();
         } else {
@@ -314,9 +338,6 @@ class CartController extends Controller
         }
     }
 
-    /**
-     * Lấy Discount Bill tốt nhất theo subtotal
-     */
     private function getBestBillDiscount(float $subtotal)
     {
         if ($subtotal <= 0) return null;

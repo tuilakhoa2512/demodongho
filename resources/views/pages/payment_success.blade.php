@@ -1,0 +1,172 @@
+@extends('pages.layout')
+
+@section('content')
+
+<div class="pay-success-page">
+    <h2 class="title text-center">Đặt Hàng Thành Công</h2>
+
+    @if(session('success'))
+        <div class="pay-success-alert">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="pay-success-box">
+        <div class="pay-success-row">
+            <span>Mã đơn hàng:</span>
+            <strong style="color:#e60012;">{{ $order->order_code }}</strong>
+        </div>
+
+        <div class="pay-success-row">
+            <span>Trạng thái:</span>
+            <strong>{{ $order->status }}</strong>
+        </div>
+
+        <div class="pay-success-row">
+            <span>Phương thức:</span>
+            <strong>{{ $order->payment_method }}</strong>
+        </div>
+
+        <hr>
+
+        <h3 class="pay-success-title">Thông tin giao hàng</h3>
+
+        <div class="pay-success-row">
+            <span>Người nhận:</span>
+            <strong>{{ $order->receiver_name }}</strong>
+        </div>
+        <div class="pay-success-row">
+            <span>Email:</span>
+            <strong>{{ $order->receiver_email }}</strong>
+        </div>
+        <div class="pay-success-row">
+            <span>SĐT:</span>
+            <strong>{{ $order->receiver_phone }}</strong>
+        </div>
+        <div class="pay-success-row" style="align-items:flex-start;">
+            <span>Địa chỉ:</span>
+            <strong style="text-align:right;">
+                {{ $order->receiver_address }}
+            </strong>
+        </div>
+
+        <hr>
+
+        <h3 class="pay-success-title">Chi tiết đơn hàng</h3>
+
+        <div class="pay-success-items">
+            @foreach($items as $it)
+                @php
+                    $line = (float)$it->price * (int)$it->quantity;
+                @endphp
+                <div class="pay-success-item">
+                    <div class="item-name">
+                        {{ $it->name }}
+                        <span class="item-qty">x {{ $it->quantity }}</span>
+                    </div>
+                    <div class="item-price">
+                        {{ number_format($line, 0, ',', '.') }} đ
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        <div class="pay-success-summary">
+            <div class="sum-row">
+                <span>Tạm tính</span>
+                <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+            </div>
+
+            <div class="sum-row sum-discount">
+                <span>Ưu đãi hóa đơn</span>
+                <strong>-{{ number_format($discountValue, 0, ',', '.') }} đ</strong>
+            </div>
+
+            <div class="sum-row sum-total">
+                <span>Tổng thanh toán</span>
+                <strong>{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+            </div>
+        </div>
+
+        <div class="pay-success-actions">
+            <a href="{{ url('/trang-chu') }}" class="btn btn-default">
+                Tiếp tục mua sắm
+            </a>
+
+            <a href="{{ route('cart.index') }}" class="btn btn-default">
+                Xem giỏ hàng
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.pay-success-page{ padding: 20px 0 40px; }
+.pay-success-alert{
+    background:#e60012;
+    color:#fff;
+    padding:12px 16px;
+    border-radius:10px;
+    margin: 10px 0 16px;
+    font-weight:600;
+    text-align:center;
+}
+.pay-success-box{
+    background:#fff;
+    border:1px solid #eee;
+    border-radius:12px;
+    padding: 14px 16px;
+}
+.pay-success-title{
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0 0 12px;
+}
+.pay-success-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    gap: 12px;
+    padding: 6px 0;
+}
+.pay-success-items{
+    border-top:1px dashed #eee;
+    padding-top: 10px;
+    margin-top: 6px;
+}
+.pay-success-item{
+    display:flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f3f3f3;
+}
+.item-name{ font-weight: 700; }
+.item-qty{ color:#777; font-weight: 800; margin-left: 6px; }
+.item-price{ font-weight: 900; color:#e60012; }
+
+.pay-success-summary{ margin-top: 12px; }
+.sum-row{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 8px 0;
+}
+.sum-discount{ color:#e60012; font-weight: 800; }
+.sum-total{
+    border-top:1px dashed #ddd;
+    margin-top: 6px;
+    padding-top: 12px;
+    font-size: 16px;
+}
+.sum-total strong{ color:#e60012; font-size: 20px; }
+
+.pay-success-actions{
+    margin-top: 14px;
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+</style>
+
+@endsection
