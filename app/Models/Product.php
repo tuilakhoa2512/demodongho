@@ -25,6 +25,7 @@ class Product extends Model
         'brand_id',
         'storage_detail_id',
         'price',
+        'discounted_price',
         'quantity',
         'stock_status', // selling / sold_out / stopped
         'status',       // 1 = active, 0 = inactive
@@ -53,7 +54,14 @@ class Product extends Model
     {
         return $this->belongsTo(StorageDetail::class, 'storage_detail_id', 'id');
     }
-
+    public function getImage1Attribute()
+    {
+        return optional($this->productImage)->image_1;
+    }
+    public function getImage2Attribute()
+{
+    return optional($this->productImage)->image_2;
+}
     public function productImage()
     {
         return $this->hasOne(ProductImage::class, 'product_id', 'id');
@@ -67,36 +75,28 @@ class Product extends Model
      */
     public function getMainImageUrlAttribute()
     {
-        $image = $this->productImage;
-
-        if ($image && $image->image_1) {
-            // Đường dẫn lưu trong DB là "products/{id}/xxx.jpg"
-            return Storage::url($image->image_1); // -> /storage/products/...
+        if ($this->productImage && $this->productImage->image_1) {
+            return asset('storage/' . $this->productImage->image_1);
         }
-
-        // Ảnh fallback nếu chưa có ảnh
+    
         return asset('frontend/images/rolex1.jpg');
     }
-
-    /**
-     * Ảnh khi hover (image_2 nếu có, ngược lại dùng image_1)
-     */
+    
     public function getHoverImageUrlAttribute()
     {
-        $image = $this->productImage;
-
-        if ($image) {
-            if ($image->image_2) {
-                return Storage::url($image->image_2);
+        if ($this->productImage) {
+            if ($this->productImage->image_2) {
+                return asset('storage/' . $this->productImage->image_2);
             }
-            if ($image->image_1) {
-                return Storage::url($image->image_1);
+    
+            if ($this->productImage->image_1) {
+                return asset('storage/' . $this->productImage->image_1);
             }
         }
-
-        // Nếu không có ảnh trong DB thì dùng luôn main_image_url
+    
         return $this->main_image_url;
     }
+    
 
     public function discountProducts()
     {

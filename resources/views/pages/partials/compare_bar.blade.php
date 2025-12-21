@@ -1,52 +1,3 @@
-@extends('pages.layout')
-@section('content')
-
-<h2 class="title text-center">
-    Sản phẩm hiệu {{ $brand_name }}
-</h2>
-
-{{-- THÔNG BÁO --}}
-@if(session('success'))
-    <div id="cart-alert"
-         style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px;
-                margin-bottom:16px; font-weight:500; font-size:15px; text-align:center;">
-        {{ session('success') }}
-    </div>
-
-    <script>
-        setTimeout(() => {
-            const alertBox = document.getElementById('cart-alert');
-            if (alertBox) {
-                alertBox.style.opacity = '0';
-                alertBox.style.transform = 'translateY(-10px)';
-                alertBox.style.transition = '0.5s';
-                setTimeout(() => alertBox.remove(), 500);
-            }
-        }, 1800);
-    </script>
-@endif
-
-<div class="features_items">
-
-    @php
-        $user_id = Session::get('id');
-        $favorite_ids = \App\Models\Favorite::where('user_id', $user_id)
-                            ->pluck('product_id')
-                            ->toArray();
-    @endphp
-
-    {{-- DANH SÁCH SẢN PHẨM THEO BRAND --}}
-    @foreach($brand_by_id as $product)
-        @include('pages.partials.product_card', [
-            'product' => $product,
-            'favorite_ids' => $favorite_ids
-        ])
-    @endforeach
-
-    <div class="clearfix"></div>
-</div>
-
-{{-- THANH SO SÁNH --}}
 @php
     $compare = session('compare', []);
     $sp1 = isset($compare['sp1']) ? \App\Models\Product::find($compare['sp1']) : null;
@@ -54,12 +5,9 @@
 @endphp
 
 @if($sp1 || $sp2)
-<div id="compare-bar"
-     style="position:fixed; bottom:0; left:300px; right:300px;
-            background:#fff; box-shadow:0 -3px 10px rgba(0,0,0,0.15);
-            padding:15px 20px; z-index:99999;">
+<div class="compare-bar">
 
-    <div class="row">
+    <div class="row align-items-center">
 
         {{-- SLOT SP1 --}}
         <div class="col-sm-4 text-center">
@@ -112,5 +60,3 @@
     </div>
 </div>
 @endif
-
-@endsection

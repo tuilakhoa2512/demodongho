@@ -14,7 +14,7 @@
 	<link href="{{ asset('frontend/css/animate.css') }}" rel="stylesheet">
 	<link href="{{ asset('frontend/css/main.css') }}" rel="stylesheet">
 	<link href="{{ asset('frontend/css/responsive.css') }}" rel="stylesheet">
-	
+	@stack('css')	
 
 	<link rel="shortcut icon" href="{{ asset('frontend/images/ico/favicon.ico')}}">
 	<link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
@@ -429,8 +429,8 @@ $(document).ready(function () {
             {{ floor(request('max_price', 100000000) / 25000) }}
         ],
 
-        tooltip: 'show',    // ✅ HIỆN GIÁ KHI RÊ
-        tooltip_split: true, // ✅ hiện 2 tooltip cho min & max
+        tooltip: 'show',    //  HIỆN GIÁ KHI RÊ
+        tooltip_split: true, //  hiện 2 tooltip cho min & max
 
         formatter: function (value) {
             if (Array.isArray(value)) {
@@ -454,7 +454,6 @@ $(document).ready(function () {
 
         $('#price-filter-form').submit();
     });
-
 });
 </script>
 
@@ -465,6 +464,7 @@ $(document).ready(function () {
 <script src="{{ asset('frontend/js/main.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('frontend/js/bootstrap-slider.js') }}"></script>
+@stack('js')
 
 </body>
 

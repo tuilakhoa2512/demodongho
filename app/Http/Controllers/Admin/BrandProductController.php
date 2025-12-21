@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\Brand;
@@ -228,26 +229,18 @@ class BrandProductController extends Controller
         abort(404, 'Thương hiệu không tồn tại');
     }
 
-    // Lấy sản phẩm theo brand_id
-    $brand_by_id = DB::table('products')
-        ->join('brands', 'products.brand_id', '=', 'brands.id')
-        ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
-        ->where('products.brand_id', $brand->id)
-        ->select(
-            'products.*',
-            'brands.name as brand_name',
-            'product_images.image_1',
-            'product_images.image_2',
-            'product_images.image_3',
-            'product_images.image_4'
-        )
+    //  LẤY SẢN PHẨM ĐÚNG CHUẨN (KHÔNG JOIN ẢNH)
+    $brand_by_id = Product::with('productImage')
+        ->where('brand_id', $brand->id)
+        ->where('status', 1)
         ->get();
 
-    return view('pages.brand.show_brand')
-        ->with('category', $cate_pro)
-        
-        ->with('brand_name', $brand->name)
-        ->with('brand_by_id', $brand_by_id);
+    return view('pages.brand.show_brand', [
+        'category'      => $cate_pro,
+        'brand'         => $brand_pro,
+        'brand_name'    => $brand->name,
+        'brand_by_id'   => $brand_by_id,
+    ]);
 }
 
 }

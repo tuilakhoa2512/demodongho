@@ -12,19 +12,29 @@ class CompareController extends Controller
     public function add($id)
 {
     $product = Product::find($id);
-    if (!$product) return back()->with('error', 'Sản phẩm không tồn tại!');
+    if (!$product) {
+        return back()->with('error', 'Sản phẩm không tồn tại!');
+    }
 
     $compare = session('compare', []);
-    $slot = session('compare_slot'); // slot được chọn từ nút "Chọn sản phẩm"
 
-    // Nếu người dùng chọn slot SP1 / SP2
+    // KIỂM TRA TRÙNG SẢN PHẨM
+    if (
+        (isset($compare['sp1']) && $compare['sp1'] == $product->id) ||
+        (isset($compare['sp2']) && $compare['sp2'] == $product->id)
+    ) {
+        return back()->with('compare_exists', 'Sản phẩm này đã có trong mục so sánh!');
+    }
+
+    $slot = session('compare_slot'); // slot được chọn
+
+    // Nếu người dùng chọn slot
     if ($slot === 'sp1') {
         $compare['sp1'] = $product->id;
     } elseif ($slot === 'sp2') {
         $compare['sp2'] = $product->id;
     } else {
-
-        // Nếu chưa chọn slot → tự động đẩy vào SP1 hoặc SP2
+        // Tự động thêm
         if (!isset($compare['sp1'])) {
             $compare['sp1'] = $product->id;
         } elseif (!isset($compare['sp2'])) {
@@ -34,14 +44,11 @@ class CompareController extends Controller
         }
     }
 
-    // Lưu lại session
     session(['compare' => $compare]);
     session()->forget('compare_slot');
 
-    return redirect()->back()->with('success', 'Đã thêm vào so sánh!');
+    return back()->with('success', 'Đã thêm vào so sánh!');
 }
-
-    
 
     // Xóa slot
     public function remove($slot)

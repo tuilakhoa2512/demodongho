@@ -54,49 +54,44 @@ class FavoriteController extends Controller
     {
         $user_id = Session::get('id');
 
+        if (!$user_id) {
+            return redirect('/login-checkout');
+        }
+
         Favorite::where('user_id', $user_id)
-                ->where('product_id', $product_id)
-                ->delete();
+            ->where('product_id', $product_id)
+            ->delete();
 
         return redirect()->back()->with('success', 'Đã xoá khỏi yêu thích!');
     }
     public function toggle($product_id)
     {
         $user_id = Session::get('id');
-    
-        // ===== CHƯA ĐĂNG NHẬP → LƯU SESSION =====
+
+        //  CHƯA LOGIN → CẤM
         if (!$user_id) {
-    
-            $favorites = Session::get('favorite_guest', []);
-    
-            if (in_array($product_id, $favorites)) {
-                // bỏ thích
-                $favorites = array_diff($favorites, [$product_id]);
-                Session::put('favorite_guest', $favorites);
-                return redirect()->back()->with('yeu-thich', 'removed');
-            } else {
-                // thêm thích
-                $favorites[] = $product_id;
-                Session::put('favorite_guest', array_unique($favorites));
-                return redirect()->back()->with('yeu-thich', 'added');
-            }
+            return redirect('/login-checkout')
+                ->with('error', 'Bạn cần đăng nhập để yêu thích sản phẩm!');
         }
-    
-        // ===== ĐÃ ĐĂNG NHẬP → LƯU DB =====
+
+        //  ĐÃ LOGIN
         $favorite = Favorite::where('user_id', $user_id)
             ->where('product_id', $product_id)
             ->first();
-    
+
         if ($favorite) {
+            // BỎ YÊU THÍCH
             $favorite->delete();
             return redirect()->back()->with('yeu-thich', 'removed');
         } else {
+            // THÊM YÊU THÍCH
             Favorite::create([
                 'user_id'    => $user_id,
                 'product_id' => $product_id
             ]);
             return redirect()->back()->with('yeu-thich', 'added');
         }
+    
     }
     
 

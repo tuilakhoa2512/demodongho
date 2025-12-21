@@ -39,86 +39,14 @@
 @endphp
 
 
-    @forelse($all_product as $product)
-        <div class="col-sm-4">
-            <div class="product-image-wrapper">
-                <div class="single-products">
-
-
-                    @php
-    $salePrice = $product->discounted_price;   // null nếu không có ưu đãi
-    $basePrice = (float) $product->price;
-
-    $hasDiscount = !is_null($salePrice) && $salePrice < $basePrice;
-@endphp
-
-<div class="productinfo text-center">
-    <div class="product-img-box">
-        <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
-    </div> 
-    <br>
-
-                {{-- GIÁ CHÍNH --}}
-                <h2 style="margin-bottom:4px; font-size:18px; font-weight:700;">
-                    @if($hasDiscount)
-                        {{ number_format($salePrice, 0, ',', '.') }} VND
-                    @else
-                        {{ number_format($basePrice, 0, ',', '.') }} VND
-                    @endif
-                </h2>
-                
-                {{-- GIÁ GỐC GẠCH BỎ (chỉ hiện khi có sale) --}}
-                @if($hasDiscount)
-                    <div style="color:#999; font-size:14px; text-decoration:line-through; margin-bottom:4px;">
-                        {{ number_format($basePrice, 0, ',', '.') }} VND
-                    </div>
-                @endif
-
-                <p>{{ $product->name }}</p>
-
-
-                </div>
-                    <div class="product-overlay">
-                        <img class="overlay-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}">
-                        <div class="overlay-content">
-
-                            <a href="{{ url('/product/'.$product->id) }}"
-                            class="btn btn-default add-to-cart">
-                                <i class="fa fa-eye"></i> Xem Chi Tiết
-                            </a>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="choose">
-                    <ul class="nav nav-pills nav-justified">                      
-                        @php 
-                            $is_favorite = in_array($product->id, $favorite_ids);
-                        @endphp
-
-                        <li>
-                        <a href="{{ route('favorite.toggle', $product->id) }}"
-                        style="color: {{ $is_favorite ? 'red' : '#555' }};">
-                            <i class="fa fa-heart"
-                            style="color: {{ $is_favorite ? 'red' : '#999' }};"></i>
-                            {{ $is_favorite ? 'Đã Yêu Thích' : 'Yêu Thích' }}
-                        </a>
-                        </li>
-
-                        <li>
-                            <a href="{{ route('compare.add', $product->id) }}">
-                                <i class="fa fa-plus-square"></i> So Sánh
-                            </a>
-                        </li>
-
-                    </ul>
-                </div>
-            </div>
-        </div>
-    @empty
-        <p class="text-center">Hiện chưa có sản phẩm nào được đăng bán.</p>
-    @endforelse
+@forelse($all_product as $product)
+    @include('pages.partials.product_card', [
+        'product' => $product,
+        'favorite_ids' => $favorite_ids
+    ])
+@empty
+    <p class="text-center">Hiện chưa có sản phẩm nào được đăng bán.</p>
+@endforelse
 
 
     <div class="clearfix"></div>
@@ -340,7 +268,7 @@ style="position:fixed; bottom:0; left:300px; right:300px;
         <div style="margin-top: 4px;" class="col-sm-4 d-flex flex-column align-items-center justify-content-center">
             <br><br>
 
-            <a href="{{ route('compare.view') }}" class="compare-now" style="margin-bottom: 10px;">
+            <a href="{{ route('compare.view') }}" class="compare-now">
                 So sánh ngay
             </a>
 

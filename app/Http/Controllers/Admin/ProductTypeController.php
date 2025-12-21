@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -146,39 +147,40 @@ class ProductTypeController extends Controller
         return redirect()->route('admin.addproducttype')
         ->with('message', 'Cập nhật sản phẩm thành công.');
     }
-    public function show_category_home($category_slug)
-        {
-            $cate_pro = DB::table('categories')->where('status','1')->orderBy('id', 'asc')->get();
-            $brand_pro = DB::table('brands')->where('status','1')->orderBy('id', 'asc')->get();
+public function show_category_home($category_slug)
+{
+    $cate_pro = DB::table('categories')
+        ->where('status', '1')
+        ->orderBy('id', 'asc')
+        ->get();
 
-            // $category_name = DB::table('categories')->where('id', $id)->value('name');
+    $brand_pro = DB::table('brands')
+        ->where('status', '1')
+        ->orderBy('id', 'asc')
+        ->get();
 
-            // lấy category theo slug
-            $category = DB::table('categories')->where('category_slug', $category_slug)->first();
+    // lấy category theo slug
+    $category = DB::table('categories')
+        ->where('category_slug', $category_slug)
+        ->first();
 
-            if (!$category) {
-                abort(404);
-            }
-            $category_by_id = DB::table('products')
-                ->join('categories', 'products.category_id', '=', 'categories.id')
-                ->leftJoin('product_images', 'product_images.product_id', '=', 'products.id')
-                ->where('products.category_id', $category->id)
-                ->select(
-                    'products.*',
-                    'categories.name as category_name',
-                    'product_images.image_1',
-                    'product_images.image_2',
-                    'product_images.image_3',
-                    'product_images.image_4'
-                )
-                ->get();
+    if (!$category) {
+        abort(404);
+    }
 
-            return view('pages.category.show_category')
-                ->with('category', $cate_pro)
-                ->with('brand', $brand_pro)
-                ->with('category_name', $category->name)
-                ->with('category_by_id', $category_by_id);
-        }
+    // CHỈ DÙNG ELOQUENT + RELATION
+    $category_by_id = Product::with('productImage')
+        ->where('category_id', $category->id)
+        ->where('status', 1)
+        ->get();
+
+    return view('pages.category.show_category')
+        ->with('category', $cate_pro)
+        ->with('brand', $brand_pro)
+        ->with('category_name', $category->name)
+        ->with('category_by_id', $category_by_id);
+}
+
 
 
     public function delete_product_type($id){

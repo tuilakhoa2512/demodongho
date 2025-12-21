@@ -1,0 +1,147 @@
+/* ===============================
+   PRODUCT CARD – GIỐNG TRANG CHỦ
+   =============================== */
+
+   .product-image-wrapper {
+    background: transparent !important;
+    border: 2px solid #e60012;
+    border-radius: 12px;
+    position: relative;
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+    padding-top: 6px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.product-image-wrapper:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+}
+
+/* ===============================
+   IMAGE BOX
+   =============================== */
+
+.product-img-box {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+}
+
+.product-img-box img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: all 0.4s ease;
+}
+
+.product-img-box .hover-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.product-image-wrapper:hover .main-img {
+    opacity: 0;
+}
+
+.product-image-wrapper:hover .hover-img {
+    opacity: 1;
+}
+
+/* ===============================
+   PRODUCT INFO
+   =============================== */
+
+.productinfo {
+    padding: 6px 10px;
+    text-align: center;
+}
+
+.productinfo h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e60012;
+    margin: 6px 0 2px;
+}
+
+.productinfo p {
+    font-size: 14px;
+    color: #333;
+    margin: 0;
+    min-height: 36px;
+}
+
+/* ===============================
+   OVERLAY
+   =============================== */
+
+.product-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.0);
+    transition: all 0.35s ease;
+    z-index: 2;
+}
+
+.product-image-wrapper:hover .product-overlay {
+    background: rgba(0,0,0,0.45);
+}
+
+.product-overlay .overlay-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.product-overlay .overlay-content {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.product-overlay .btn {
+    background: #e60012;
+    color: #fff;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    border: none;
+    transition: 0.3s;
+}
+
+.product-overlay .btn:hover {
+    background: #b8000d;
+}
+
+/* ===============================
+   CHOOSE (FAVORITE / COMPARE)
+   =============================== */
+
+.choose {
+    margin-top: 6px;
+    border-top: 1px solid #eee;
+}
+
+.choose ul {
+    margin: 0;
+}
+
+.choose ul li a {
+    font-size: 13px;
+    padding: 6px 0;
+    display: block;
+    transition: color 0.3s;
+}
+
+.choose ul li a:hover {
+    color: #e60012;
+}
