@@ -159,9 +159,13 @@ public function callback_user_google()
     Session::put('image', $user->image);
     Session::put('fullname', $user->fullname);
 
+    // MERGE CART GUEST (Session cart) → DB carts
+    $this->mergeGuestCartToDb((int)$user->id);
+
     return redirect('/trang-chu')
         ->with('message', 'Đăng nhập Google <span style="color:red">'.$user->email.'</span> thành công!');
 }
+
 
 
 public function findOrCreateUser($googleUser, $provider)
@@ -199,4 +203,70 @@ public function findOrCreateUser($googleUser, $provider)
 
     return $social;
 }
+
+private function mergeGuestCartToDb(int $userId): void
+{
+    if ($userId <= 0) return;
+
+    // Cart guest đang lưu ở session key "cart"
+    $guestCart = Session::get('cart', []);
+    if (empty($guestCart)) return;
+
+    // Lấy list product_id từ guest cart
+    $productIds = [];
+    foreach ($guestCart as $key => $item) {
+        $pid = isset($item['id']) ? (int)$item['id'] : (int)$key;
+        if ($pid > 0) $productIds[] = $pid;
+    }
+    $productIds = array_values(array_unique($productIds));
+    if (empty($productIds)) return;
+
+    // Load tồn kho + trạng thái sản phẩm (tránh N+1)
+    $products = DB::table('products')
+        ->whereIn('id', $productIds)
+        ->select('id', 'quantity', 'status', 'stock_status')
+        ->get()
+        ->keyBy('id');
+
+    foreach ($guestCart as $key => $item) {
+        $pid = isset($item['id']) ? (int)$item['id'] : (int)$key;
+        if ($pid <= 0) continue;
+
+        $p = $products->get($pid);
+        if (!$p) continue;
+
+        // Chỉ merge nếu đang bán + còn hàng
+        if ((int)$p->status !== 1 || $p->stock_status !== 'selling' || (int)$p->quantity <= 0) {
+            continue;
+        }
+
+        $qty = max(1, (int)($item['quantity'] ?? 1));
+        $qty = min($qty, (int)$p->quantity);
+
+        // Nếu đã có trong DB cart => cộng dồn nhưng không vượt tồn
+        $existing = DB::table('carts')
+            ->where('user_id', $userId)
+            ->where('product_id', $pid)
+            ->first();
+
+        if ($existing) {
+            $newQty = min(((int)$existing->quantity + $qty), (int)$p->quantity);
+
+            DB::table('carts')
+                ->where('user_id', $userId)
+                ->where('product_id', $pid)
+                ->update(['quantity' => $newQty]);
+        } else {
+            DB::table('carts')->insert([
+                'user_id' => $userId,
+                'product_id' => $pid,
+                'quantity' => $qty,
+            ]);
+        }
+    }
+
+    // Merge xong thì xóa cart guest để CartController đọc DB carts
+    Session::forget('cart');
+}
+
 }

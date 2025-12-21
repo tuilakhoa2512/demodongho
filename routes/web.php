@@ -14,12 +14,14 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
 use App\Http\Controllers\Admin\DiscountProductDetailController;
 use App\Http\Controllers\Admin\DiscountBillController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\MyOrderController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -90,9 +92,19 @@ Route::post('/cart/add/{id}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update'); 
 Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
+
+// Payment
+Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
+Route::post('/payment', [PaymentController::class, 'placeOrder'])->name('payment.place');
+Route::get('/payment/success/{order_code}', [PaymentController::class, 'success'])->name('payment.success');
+
+// My Orders
+Route::get('/my-orders', [MyOrderController::class, 'index']);
+Route::get('/my-orders/{order_code}', [MyOrderController::class, 'show'])->name('myorders.show');;
+
 // Order
-Route::get('/payment', [OrderController::class, 'showPaymentForm'])->name('payment.show');
-Route::post('/payment', [OrderController::class, 'placeOrder'])->name('payment.place');
+// Route::get('/payment', [OrderController::class, 'showPaymentForm'])->name('payment.show');
+// Route::post('/payment', [OrderController::class, 'placeOrder'])->name('payment.place');
 
 
 // ================= BACKEND - AUTH ADMIN =================
