@@ -1,6 +1,27 @@
 @extends('pages.layout')
 @section('content')
 
+@php
+    $statusLabels = [
+        'pending'   => 'Đợi xác nhận',
+        'confirmed' => 'Đã xác nhận',
+        'shipping'  => 'Đang giao',
+        'success'   => 'Hoàn thành',
+        'canceled'  => 'Đã hủy',
+    ];
+
+    // Badge class theo trạng thái
+    function statusBadgeClass($st) {
+        return match($st) {
+            'confirmed' => 'badge-confirmed',
+            'shipping'  => 'badge-shipping',
+            'success'   => 'badge-success',
+            'canceled'  => 'badge-cancel',
+            default     => 'badge-pending',
+        };
+    }
+@endphp
+
 <h2 class="title text-center" style="margin-bottom: 20px;">
     LỊCH SỬ ĐƠN HÀNG
 </h2>
@@ -39,10 +60,10 @@
                 <thead>
                     <tr>
                         <th>Mã đơn</th>
-                        <th style="width:110px; text-align:center;">Trạng thái</th>
-                        <th style="width:110px; text-align:center;">Thanh toán</th>
-                        <th style="width:160px; text-align:center;">Tổng tiền</th>
-                        <th style="width:160px; text-align:center;">Ngày đặt</th>
+                        <th style="width:140px; text-align:center;">Trạng thái</th>
+                        <th style="width:120px; text-align:center;">Thanh toán</th>
+                        <th style="width:170px; text-align:center;">Tổng tiền</th>
+                        <th style="width:170px; text-align:center;">Ngày đặt</th>
                         <th style="width:110px; text-align:center;">Chi tiết</th>
                     </tr>
                 </thead>
@@ -59,11 +80,8 @@
                                 ? \Carbon\Carbon::parse($o->created_at)->format('d/m/Y H:i')
                                 : '—';
 
-                            // badge class theo trạng thái
-                            $badgeClass = 'badge-pending';
-                            if (in_array($status, ['paid','success'])) $badgeClass = 'badge-success';
-                            if (in_array($status, ['shipping','shipped','delivering'])) $badgeClass = 'badge-shipping';
-                            if (in_array($status, ['cancel','canceled','cancelled'])) $badgeClass = 'badge-cancel';
+                            $statusText = $statusLabels[$status] ?? $status;
+                            $badgeClass = statusBadgeClass($status);
                         @endphp
 
                         <tr>
@@ -72,7 +90,9 @@
                             </td>
 
                             <td style="text-align:center;">
-                                <span class="status-badge {{ $badgeClass }}">{{ $status }}</span>
+                                <span class="status-badge {{ $badgeClass }}">
+                                    {{ $statusText }}
+                                </span>
                             </td>
 
                             <td style="text-align:center;">
@@ -132,7 +152,7 @@
 
 .table-responsive{ overflow-x:auto; }
 
-/* Table đồng bộ show */
+/* Table đồng bộ */
 .myorder-table{ width:100%; margin-bottom:0; }
 .myorder-table thead th{
     background:#e60012;
@@ -155,11 +175,17 @@
     font-size:12px;
     font-weight:900;
     border:1px solid #eee;
-    text-transform:lowercase;
 }
+
+/* Pending */
 .badge-pending{ background:#fff5f5; color:#e60012; border-color:#ffd2d2; }
-.badge-success{ background:#f0fff4; color:#0f8a3c; border-color:#b8f1c9; }
+/* Confirmed */
+.badge-confirmed{ background:#eaf6ff; color:#0a66c2; border-color:#b9d7ff; }
+/* Shipping */
 .badge-shipping{ background:#f0f7ff; color:#1f66d1; border-color:#b9d7ff; }
+/* Success */
+.badge-success{ background:#f0fff4; color:#0f8a3c; border-color:#b8f1c9; }
+/* Canceled */
 .badge-cancel{ background:#f7f7f7; color:#555; border-color:#e0e0e0; }
 
 /* Method pill */

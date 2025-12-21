@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\StorageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\BrandProductController;
-use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CartController;
@@ -103,9 +103,6 @@ Route::get('/payment/success/{order_code}', [PaymentController::class, 'success'
 Route::get('/my-orders', [MyOrderController::class, 'index']);
 Route::get('/my-orders/{order_code}', [MyOrderController::class, 'show'])->name('myorders.show');;
 
-// Order
-// Route::get('/payment', [OrderController::class, 'showPaymentForm'])->name('payment.show');
-// Route::post('/payment', [OrderController::class, 'placeOrder'])->name('payment.place');
 
 
 // ================= BACKEND - AUTH ADMIN =================
@@ -202,8 +199,9 @@ Route::get('/filter-price', [HomeController::class, 'filterPrice']);
   Route::get('/unactive-admin-user/{id}', [AdminUserController::class, 'unactive_admin_user'])->name('admin.users.unactive');
   Route::get('/active-admin-user/{id}', [AdminUserController::class, 'active_admin_user'])->name('admin.users.active');
 
-// ================= LÔ HÀNG + CHI TIẾT KHO (TRONG PREFIX ADMIN) =================
 
+
+// ================= TRONG PREFIX ADMIN =================
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -297,6 +295,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/discount-bills/{id}', [\App\Http\Controllers\Admin\DiscountBillController::class, 'update'])->name('discount-bills.update');
 
     Route::patch('/discount-bills/{id}/toggle-status', [\App\Http\Controllers\Admin\DiscountBillController::class, 'toggleStatus'])->name('discount-bills.toggle-status');
+
+    //Quan Ly Don Hang
+    Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');
+
+    Route::get('/orders/{order_code}', [\App\Http\Controllers\Admin\OrderController::class, 'show'])->name('admin.orders.show');
+
+    Route::post('/orders/{order_code}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
 });
 

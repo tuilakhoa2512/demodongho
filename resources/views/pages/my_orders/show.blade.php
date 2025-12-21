@@ -22,6 +22,19 @@
         <div class="order-title">THÔNG TIN ĐƠN HÀNG</div>
     </div>
 
+    @php
+        $statusMap = [
+            'pending'   => 'Đợi xác nhận',
+            'confirmed' => 'Đã xác nhận',
+            'shipping'  => 'Đang giao',
+            'success'   => 'Hoàn thành',
+            'canceled'  => 'Đã hủy',
+        ];
+
+        $rawStatus = $order->status ?? 'pending';
+        $statusVi = $statusMap[$rawStatus] ?? $rawStatus;
+    @endphp
+
     <div class="order-meta">
         <div class="meta-row">
             <span>Mã đơn hàng:</span>
@@ -29,7 +42,7 @@
         </div>
         <div class="meta-row">
             <span>Trạng thái:</span>
-            <strong>{{ $order->status ?? 'pending' }}</strong>
+            <strong>{{ $statusVi }}</strong>
         </div>
         <div class="meta-row">
             <span>Phương thức:</span>
@@ -137,6 +150,10 @@
 </div>
 <br> <br>
 <style>
+/* 
+    .left-sidebar {
+        display: none !important;
+    } */
 /* Quan trọng: KHÔNG để rộng hơn khung layout */
 .order-card, .order-card * { max-width: 100%; box-sizing: border-box; }
 

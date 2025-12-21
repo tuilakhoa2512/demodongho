@@ -189,7 +189,8 @@ body {
                         <span>Đơn Hàng</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="mail.html">Danh Sách Đơn Hàng</a></li>
+                        <li><a href="{{ URL::to('/admin/orders') }}">Danh Sách Đơn Hàng</a></li>
+                        <li><a href="mail.html">Đang Chờ Xử Lí</a></li>
                         <li><a href="mail.html">Đang Đóng Gói</a></li>
                         <li><a href="mail_compose.html">Đang Vận Chuyển</a></li>
                         <li><a href="mail_compose.html">Đơn Hàng Thành Công</a></li>
