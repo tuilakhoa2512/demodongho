@@ -86,14 +86,21 @@
             <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Số lượng nhập</th>
+            <th>SL đang bán</th>
+            <th>SL đã bán</th>
             <th>Trạng thái kho</th>
-            <th>Ghi chú</th>
             <th>Hiển thị</th>
             <th style="width:160px;">Thao tác</th>
           </tr>
         </thead>
         <tbody>
           @forelse ($details as $detail)
+            @php
+              // 2 cột mới: lấy từ query buildIndexQuery()
+              $sellingQty = isset($detail->selling_qty) ? (int)$detail->selling_qty : null;
+              $soldQty    = isset($detail->sold_qty) ? (int)$detail->sold_qty : null;
+            @endphp
+
             <tr>
               <td>{{ $detail->id }}</td>
 
@@ -102,6 +109,16 @@
 
               {{-- Số lượng nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
+
+              {{-- SL đang bán --}}
+              <td>
+                {{ $sellingQty !== null ? number_format($sellingQty) : '—' }}
+              </td>
+
+              {{-- SL đã bán --}}
+              <td>
+                {{ $soldQty !== null ? number_format($soldQty) : '—' }}
+              </td>
 
               {{-- Trạng thái kho --}}
               <td>
@@ -117,9 +134,6 @@
                   <span class="label label-default">—</span>
                 @endif
               </td>
-
-              {{-- Ghi chú --}}
-              <td>{{ $detail->note }}</td>
 
               {{-- Hiển thị --}}
               <td>
@@ -182,7 +196,7 @@
             </tr>
           @empty
             <tr>
-              <td colspan="7" class="text-center">Chưa có sản phẩm nào trong lô này.</td>
+              <td colspan="8" class="text-center">Chưa có sản phẩm nào trong lô này.</td>
             </tr>
           @endforelse
         </tbody>

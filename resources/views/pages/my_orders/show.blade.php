@@ -23,7 +23,8 @@
     </div>
 
     @php
-        $statusMap = [
+        // Ưu tiên lấy mapping từ controller (statusLabels), nếu không có thì fallback
+        $statusMap = $statusLabels ?? [
             'pending'   => 'Đợi xác nhận',
             'confirmed' => 'Đã xác nhận',
             'shipping'  => 'Đang giao',
@@ -84,13 +85,15 @@
 
     <hr>
 
-    <div class="section-title" style="font-weight: bold;">Chi Tiết Đặt Hàng</div>
+    <div class="section-title" style="font-weight: bold;">Chi Tiết Đặt Hàng</div> <br>
 
     <div class="table-responsive">
         <table class="table table-bordered myorder-table">
             <thead>
                 <tr>
+                    <th style="width:90px; text-align:center;">Ảnh</th>
                     <th>Sản phẩm</th>
+                    <th style="width:170px; text-align:center;">Đơn giá</th>
                     <th style="width:90px; text-align:center;">SL</th>
                     <th style="width:160px; text-align:right;">Thành tiền</th>
                 </tr>
@@ -101,24 +104,59 @@
                 @forelse($items as $it)
                     @php
                         $qty   = (int)($it->quantity ?? 0);
-                        $price = (float)($it->price ?? 0);
-                        $line  = $qty * $price;
+
+                        // Giá gốc hiện tại + đơn giá đã chốt trong đơn
+                        $base  = (float)($it->base_price ?? 0);
+                        $unit  = (float)($it->unit_price ?? 0);
+
+                        // line total dùng đơn giá đã chốt
+                        $line  = $qty * $unit;
                         $calcSubtotal += $line;
+
+                        // Nếu đơn giá < giá gốc => có sale
+                        $hasSale = ($unit > 0 && $base > 0 && $unit < $base);
+
+                        // Ảnh
+                        $img = $it->image ?? null;
+                        $imgUrl = $img ? asset('storage/' . $img) : null;
                     @endphp
                     <tr>
+                        <td style="text-align:center;">
+                            @if($imgUrl)
+                                <img src="{{ $imgUrl }}" alt="product" class="od-thumb">
+                            @else
+                                <div class="od-thumb od-thumb--empty">No Image</div>
+                            @endif
+                        </td>
+
                         <td class="col-name">
                             {{ $it->name ?? 'Sản phẩm' }}
                         </td>
+
+                        <td style="text-align:center;">
+                            <div class="od-price">
+                                <span class="od-price-sale">
+                                    {{ number_format($unit, 0, ',', '.') }} đ
+                                </span>
+                                @if($hasSale)
+                                    <div class="od-price-old">
+                                        {{ number_format($base, 0, ',', '.') }} đ
+                                    </div>
+                                @endif
+                            </div>
+                        </td>
+
                         <td style="text-align:center;">
                             x{{ $qty }}
                         </td>
+
                         <td style="text-align:right;" class="text-red">
                             {{ number_format($line, 0, ',', '.') }} đ
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" style="text-align:center;">Không có sản phẩm trong đơn.</td>
+                        <td colspan="5" style="text-align:center;">Không có sản phẩm trong đơn.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -150,7 +188,15 @@
 </div>
 <br> <br>
 <style>
-/* 
+/* ====== ẨN SIDEBAR CHỈ Ở TRANG NÀY (KHÔNG SỬA LAYOUT) ====== */
+.left-sidebar{ display:none !important; }
+section > .container > .row > .col-sm-3{ display:none !important; }
+section > .container > .row > .col-sm-9.padding-right{
+    width: 100% !important;
+    float: none !important;
+}
+
+/*
     .left-sidebar {
         display: none !important;
     } */
@@ -212,6 +258,43 @@
 .myorder-table td{ vertical-align:middle; white-space: normal; }
 .myorder-table .col-name{ font-weight:800; }
 
+/* THÊM: ảnh sản phẩm */
+.od-thumb{
+    width:60px;
+    height:60px;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid #eee;
+    background:#fff;
+}
+.od-thumb--empty{
+    width:60px;
+    height:60px;
+    border-radius:8px;
+    border:1px dashed #ddd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    color:#777;
+    background:#fafafa;
+}
+
+/* THÊM: đơn giá (giá sale + giá gốc gạch ngang) */
+.od-price{ line-height: 1.1; }
+.od-price-sale{
+    color:#e60012;
+    font-weight:900;
+    font-size:14px;
+}
+.od-price-old{
+    margin-top:4px;
+    color:#999;
+    text-decoration: line-through;
+    font-weight:700;
+    font-size:12px;
+}
+
 /* Summary */
 .summary-box{ border-top:1px dashed #ddd; margin-top:12px; padding-top:12px; }
 .sum-row{
@@ -235,6 +318,9 @@
 @media (max-width: 767px){
     .order-meta .meta-row span,
     .ship-grid .ship-row span{ min-width: 90px; }
+    section > .container > .row > .col-sm-9.padding-right{
+        width: 100% !important;
+    }
 }
 </style>
 

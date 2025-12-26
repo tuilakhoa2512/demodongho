@@ -132,7 +132,7 @@ class OrderController extends Controller
 
     /**
      * POST /admin/orders/{order_code}/status
-     * Update theo order_code (đúng theo route + view của bạn)
+     * Update theo order_code
      */
     public function updateStatus(Request $request, $order_code)
     {
@@ -142,28 +142,72 @@ class OrderController extends Controller
             'status' => 'required|string|max:30',
         ]);
 
-        $newStatus = (string) $request->input('status');
+        $newStatus = $request->input('status');
 
-        // chặn status lạ
+        // Chặn status lạ
         if (!array_key_exists($newStatus, $this->statuses)) {
             return redirect()->back()->with('error', 'Trạng thái không hợp lệ.');
         }
 
-        // Update theo order_code
-        $affected = DB::table('orders')
-            ->where('order_code', $order_code)
-            ->update([
-                'status'     => $newStatus,
-                'updated_at' => now(),
-            ]);
+        DB::beginTransaction();
+        try {
+            // Lock đơn để tránh bấm liên tục / race-condition
+            $order = DB::table('orders')
+                ->where('order_code', $order_code)
+                ->lockForUpdate()
+                ->first();
 
-        // Nếu không update được dòng nào => báo rõ
-        if ($affected === 0) {
-            return redirect()->back()->with('error', 'Không tìm thấy đơn hàng để cập nhật (order_code không tồn tại).');
+            if (!$order) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Không tìm thấy đơn hàng.');
+            }
+
+            $currentStatus = $order->status ?? 'pending';
+
+            // 1) Nếu đơn đã hủy -> KHÔNG cho đổi nữa
+            if ($currentStatus === 'canceled') {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Đơn đã hủy, không thể thay đổi trạng thái nữa.');
+            }
+
+            // 2) Nếu chọn lại đúng trạng thái hiện tại -> không làm gì
+            if ($currentStatus === $newStatus) {
+                DB::rollBack();
+                return redirect()->back()->with('success', 'Trạng thái không thay đổi.');
+            }
+
+            // 3) Nếu đổi sang CANCELED -> hoàn kho (chỉ hoàn 1 lần vì đã chặn ở bước 1)
+            if ($newStatus === 'canceled') {
+                $details = DB::table('order_details')
+                    ->where('order_id', $order->id)
+                    ->get(['product_id', 'quantity']);
+
+                foreach ($details as $d) {
+                    $qty = (int)($d->quantity ?? 0);
+                    if ($qty <= 0) continue;
+
+                    // Cộng lại tồn kho
+                    DB::table('products')
+                        ->where('id', (int)$d->product_id)
+                        ->increment('quantity', $qty);
+                }
+            }
+
+            // 4) Update status
+            DB::table('orders')
+                ->where('id', $order->id)
+                ->update([
+                    'status'     => $newStatus,
+                    'updated_at' => now(),
+                ]);
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Đã cập nhật trạng thái đơn hàng!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Lỗi cập nhật trạng thái: ' . $e->getMessage());
         }
-
-        // MyOrders của khách hàng đọc orders.status => tự cập nhật theo
-        return redirect()->back()->with('success', 'Đã cập nhật trạng thái đơn hàng!');
     }
+
 
 }

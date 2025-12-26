@@ -67,8 +67,9 @@
             <th>Mã lô</th>
             <th>Tên sản phẩm</th>
             <th>Số lượng nhập</th>
+            <th>SL đang bán</th>
+            <th>SL đã bán</th>
             <th>Trạng thái kho</th>
-            <th>Ghi chú</th>
             <th>Hiển thị</th>
             <th style="width:150px;">Thao tác</th>
           </tr>
@@ -76,6 +77,11 @@
 
         <tbody>
           @forelse($details as $detail)
+            @php
+              $sellingQty = (int)($detail->selling_qty ?? 0);
+              $soldQty    = (int)($detail->sold_qty ?? 0);
+            @endphp
+
             <tr>
               <td>{{ $detail->id }}</td>
 
@@ -87,6 +93,12 @@
 
               {{-- SL nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
+
+              {{-- SL đang bán (tồn hiện tại của product) --}}
+              <td>{{ number_format($sellingQty) }}</td>
+
+              {{-- SL đã bán (tính từ order_details + orders.status != canceled) --}}
+              <td>{{ number_format($soldQty) }}</td>
 
               {{-- Nhãn trạng thái kho --}}
               <td>
@@ -102,9 +114,6 @@
                   <span class="label label-default">—</span>
                 @endif
               </td>
-
-              {{-- Ghi chú --}}
-              <td>{{ $detail->note }}</td>
 
               {{-- Ẩn/hiện --}}
               <td>
@@ -157,7 +166,6 @@
                     <i class="fa fa-cubes text-info" style="font-size:18px;"></i>
                   </a>
                 @else
-                  {{-- Chưa có Product: hiện thông báo --}}
                   <a href="#"
                      onclick="alert('Sản phẩm này chưa được đăng bán'); return false;"
                      title="Sản phẩm này chưa được đăng bán">
@@ -169,7 +177,7 @@
 
           @empty
             <tr>
-              <td colspan="8" class="text-center">Kho đang trống.</td>
+              <td colspan="9" class="text-center">Kho đang trống.</td>
             </tr>
           @endforelse
         </tbody>

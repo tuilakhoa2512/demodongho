@@ -124,9 +124,26 @@
             * Trạng thái đơn hàng sẽ được cập nhật bởi quản trị viên.
         </div>
     @endif
-</div>
+</div> <br> <br> <br>
 
 <style>
+/* ====== ẨN SIDEBAR TRÁI CHỈ CHO TRANG NÀY (KHÔNG SỬA LAYOUT) ======
+   Layout của bạn: body > section > .container > .row > .col-sm-3 (left)
+                   body > section > .container > .row > .col-sm-9.padding-right (content)
+*/
+body > section > .container > .row > .col-sm-3{
+    display: none !important;
+}
+body > section > .container > .row > .col-sm-9.padding-right{
+    width: 100% !important;
+}
+@media (min-width: 768px){
+    body > section > .container > .row > .col-sm-9.padding-right{
+        float: none !important;
+    }
+}
+
+/* ====== CSS hiện tại của bạn ====== */
 /* Chống tràn layout */
 .order-card, .order-card * { max-width: 100%; box-sizing: border-box; }
 .text-wrap{ word-break: break-word; white-space: normal; }

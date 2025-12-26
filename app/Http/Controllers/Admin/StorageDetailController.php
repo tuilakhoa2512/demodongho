@@ -6,28 +6,65 @@ use App\Http\Controllers\Controller;
 use App\Models\Storage;
 use App\Models\StorageDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class StorageDetailController extends Controller
 {
-    
-   public function index(Request $request)
+    /**
+     * Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
+     * Lưu ý: vì product liên kết storage_detail bằng products.storage_detail_id
+     */
+    private function soldQtySubQuery()
     {
-        // Lấy storage_id từ query (?storage_id=...)
+        return DB::table('order_details as od')
+            ->join('orders as o', 'o.id', '=', 'od.order_id')
+            ->select('od.product_id', DB::raw('SUM(od.quantity) as sold_qty'))
+            // Các trạng thái được tính là "đã bán / đã đặt" (không tính canceled)
+            ->whereIn('o.status', ['pending', 'confirmed', 'shipping', 'success'])
+            ->groupBy('od.product_id');
+    }
+
+    /**
+     * Query chung cho index + các list theo stock_status
+     */
+    private function buildIndexQuery(Request $request, ?string $onlyStockStatus = null)
+    {
         $selectedStorageId = $request->input('storage_id');
 
-        // Base query
-        $query = StorageDetail::with('storage');
+        $soldSub = $this->soldQtySubQuery();
 
-        // Nếu có chọn lô thì lọc theo lô
+        $query = StorageDetail::query()
+            ->with(['storage', 'product']) // để dùng optional($detail->storage)->batch_code và $detail->product
+            // join product theo khóa đúng: products.storage_detail_id = storage_details.id
+            ->leftJoin('products as p', 'p.storage_detail_id', '=', 'storage_details.id')
+            // join sold subquery theo product_id
+            ->leftJoinSub($soldSub, 'sold', function ($join) {
+                $join->on('sold.product_id', '=', 'p.id');
+            })
+            ->addSelect(
+                'storage_details.*',
+                DB::raw('COALESCE(p.quantity, 0) as selling_qty'),
+                DB::raw('COALESCE(sold.sold_qty, 0) as sold_qty')
+            )
+            ->orderByDesc('storage_details.id');
+
         if (!empty($selectedStorageId)) {
-            $query->where('storage_id', $selectedStorageId);
+            $query->where('storage_details.storage_id', $selectedStorageId);
         }
 
-        $details = $query->orderByDesc('id')
-            ->paginate(20)
-            ->appends($request->query()); // để khi phân trang vẫn giữ param lọc
+        if (!empty($onlyStockStatus)) {
+            $query->where('storage_details.stock_status', $onlyStockStatus);
+        }
 
-        // Lấy danh sách lô để đổ vào select
+        return [$query, $selectedStorageId];
+    }
+
+    public function index(Request $request)
+    {
+        [$query, $selectedStorageId] = $this->buildIndexQuery($request);
+
+        $details = $query->paginate(20)->appends($request->query());
+
         $storages = Storage::orderByDesc('id')->get(['id', 'batch_code']);
 
         return view('admin.storage_details.index_all', compact(
@@ -38,71 +75,56 @@ class StorageDetailController extends Controller
     }
 
     /**
-     * GET /admin/storages/{storageId}/details
-     * Route: admin.storage-details.by-storage
-     */
-    public function indexByStorage($storageId)
+ * GET /admin/storages/{storageId}/details
+ * Route: admin.storage-details.by-storage
+ */
+    public function indexByStorage(Request $request, $storageId)
     {
         $storage = Storage::findOrFail($storageId);
 
-        $details = StorageDetail::where('storage_id', $storageId)
-            ->orderByDesc('id')
-            ->paginate(20);
+        // ép storage_id vào request để dùng chung buildIndexQuery()
+        $request->merge(['storage_id' => $storageId]);
+
+        [$query] = $this->buildIndexQuery($request);
+
+        $details = $query
+            ->paginate(20)
+            ->appends($request->query());
 
         return view('admin.storage_details.index', compact('storage', 'details'));
     }
 
-    /**
-     * FORM THÊM SẢN PHẨM VÀO 1 LÔ
-     * GET /admin/storages/{storageId}/details/create
-     * Route: admin.storage-details.create
-     */
+
     public function create($storageId)
     {
         $storage = Storage::findOrFail($storageId);
-
         return view('admin.storage_details.create', compact('storage'));
     }
 
-    /**
-     * LƯU SẢN PHẨM VÀO LÔ
-     * POST /admin/storages/{storageId}/details
-     * Route: admin.storage-details.store
-     */
     public function store(Request $request, $storageId)
     {
-        // 1. Lấy lô hàng
         $storage = Storage::findOrFail($storageId);
 
-        // 2. Validate dữ liệu từ form
         $request->validate([
             'product_name'    => 'required|string|max:255',
             'import_quantity' => 'required|integer|min:1',
             'note'            => 'nullable|string',
         ]);
 
-        // 3. Tạo dòng kho mới
         StorageDetail::create([
             'storage_id'      => $storage->id,
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
-            'stock_status'    => 'pending', 
+            'stock_status'    => 'pending',
             'note'            => $request->note,
-            'status'          => 1,         // hiển thị trong admin
+            'status'          => 1,
         ]);
 
-        // 4. Redirect về danh sách sản phẩm trong lô
         return redirect()
             ->route('admin.storage-details.by-storage', $storage->id)
             ->with('success', 'Thêm sản phẩm vào lô hàng thành công.');
     }
 
-
-    /**
-     * FORM SỬA 1 DÒNG KHO
-     * GET /admin/storage-details/{id}/edit
-     * Route: admin.storage-details.edit
-     */
     public function edit($id)
     {
         $detail  = StorageDetail::findOrFail($id);
@@ -111,14 +133,8 @@ class StorageDetailController extends Controller
         return view('admin.storage_details.edit', compact('detail', 'storage'));
     }
 
-    /**
-     * CẬP NHẬT 1 DÒNG KHO
-     * PUT /admin/storage-details/{id}
-     * Route: admin.storage-details.update
-     */
-   public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
-        // Lấy dòng kho + lô tương ứng
         $detail  = StorageDetail::with('storage')->findOrFail($id);
         $storage = $detail->storage;
 
@@ -127,12 +143,11 @@ class StorageDetailController extends Controller
             'import_quantity' => 'required|integer|min:1',
             'note'            => 'nullable|string',
         ]);
-   
+
         $detail->update([
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
             'note'            => $request->note,
-          
         ]);
 
         return redirect()
@@ -140,53 +155,29 @@ class StorageDetailController extends Controller
             ->with('success', 'Cập nhật sản phẩm trong kho thành công.');
     }
 
-
-    /**
-     * ẨN / HIỆN
-     * PATCH /admin/storage-details/{id}/toggle-status
-     * Route: admin.storage-details.toggle-status
-     */
-   public function toggleStatus($id)
+    public function toggleStatus($id)
     {
-        // Lấy dòng kho + product (nếu có)
-        $detail = StorageDetail::with('product')->findOrFail($id);
+        $detail  = StorageDetail::with('product')->findOrFail($id);
         $product = $detail->product;
 
-        // Đảo trạng thái hiển thị của kho
         $detail->status = $detail->status ? 0 : 1;
 
-        // ============================
-        // TRƯỜNG HỢP 1: ẨN KHO
-        // ============================
         if ($detail->status == 0) {
-
-            // Kho bị ẩn -> ngừng bán
             $detail->stock_status = 'stopped';
 
             if ($product) {
-                // Ẩn luôn sản phẩm + ngừng bán
                 $product->status = 0;
                 $product->stock_status = 'stopped';
                 $product->save();
             }
-
-        }
-        // ============================
-        // TRƯỜNG HỢP 2: HIỆN KHO
-        // ============================
-        else {
-
+        } else {
             if ($product) {
-                // Kho chỉ đồng bộ theo product
-                // (Product không được tự bật)
                 $detail->stock_status = $product->stock_status;
             } else {
-                // Chưa có product => đang chờ bán
                 $detail->stock_status = 'pending';
             }
         }
 
-        // Lưu dòng kho
         $detail->save();
 
         return redirect()
@@ -194,69 +185,57 @@ class StorageDetailController extends Controller
             ->with('success', 'Cập nhật trạng thái kho (và sản phẩm liên quan) thành công.');
     }
 
-    
+    // ====== LIST THEO STOCK_STATUS (dùng chung query builder để có selling_qty/sold_qty) ======
+
     public function listPending(Request $request)
     {
-        $details = StorageDetail::with('storage')
-            ->where('stock_status', 'pending')
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->appends($request->query());
+        [$query] = $this->buildIndexQuery($request, 'pending');
+        $details = $query->paginate(20)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
             'storages' => Storage::orderByDesc('id')->get(['id','batch_code']),
-            'selectedStorageId' => null,
+            'selectedStorageId' => $request->input('storage_id'),
             'currentStatus' => 'pending'
         ]);
     }
 
     public function listSelling(Request $request)
     {
-        $details = StorageDetail::with('storage')
-            ->where('stock_status', 'selling')
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->appends($request->query());
+        [$query] = $this->buildIndexQuery($request, 'selling');
+        $details = $query->paginate(20)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
             'storages' => Storage::orderByDesc('id')->get(['id','batch_code']),
-            'selectedStorageId' => null,
+            'selectedStorageId' => $request->input('storage_id'),
             'currentStatus' => 'selling'
         ]);
     }
 
     public function listSoldOut(Request $request)
     {
-        $details = StorageDetail::with('storage')
-            ->where('stock_status', 'sold_out')
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->appends($request->query());
+        [$query] = $this->buildIndexQuery($request, 'sold_out');
+        $details = $query->paginate(20)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
             'storages' => Storage::orderByDesc('id')->get(['id','batch_code']),
-            'selectedStorageId' => null,
+            'selectedStorageId' => $request->input('storage_id'),
             'currentStatus' => 'sold_out'
         ]);
     }
 
     public function listStopped(Request $request)
     {
-        $details = StorageDetail::with('storage')
-            ->where('stock_status', 'stopped')
-            ->orderByDesc('id')
-            ->paginate(20)
-            ->appends($request->query());
+        [$query] = $this->buildIndexQuery($request, 'stopped');
+        $details = $query->paginate(20)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
             'storages' => Storage::orderByDesc('id')->get(['id','batch_code']),
-            'selectedStorageId' => null,
+            'selectedStorageId' => $request->input('storage_id'),
             'currentStatus' => 'stopped'
         ]);
     }
-
 }
