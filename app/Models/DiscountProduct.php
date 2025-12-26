@@ -28,10 +28,15 @@ class DiscountProduct extends Model
      */
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'discount_product_details', 'discount_product_id', 'product_id')
-                    ->withPivot(['expiration_date', 'status'])
-                    ->withTimestamps();
+        return $this->belongsToMany(
+            \App\Models\Product::class,
+            'discount_product_details',
+            'discount_product_id',
+            'product_id'
+        )->withPivot('expiration_date', 'status')
+         ->withTimestamps();
     }
+    
 
     /**
      * Scope: chỉ lấy các chương trình giảm giá sản phẩm còn hoạt động

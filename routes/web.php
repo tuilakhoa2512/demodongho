@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\ProvinceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -17,12 +18,14 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\StorageDetailController;
 use App\Http\Controllers\Admin\DiscountProductController;
 use App\Http\Controllers\Admin\DiscountProductDetailController;
 use App\Http\Controllers\Admin\DiscountBillController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\MyOrderController;
+use App\Http\Controllers\SaleController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -61,6 +64,14 @@ Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
 Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
+
+//Review
+// Lưu review 
+Route::post('/reviews/{product}', [ReviewController::class, 'store'])->name('reviews.store');
+
+// Hiển thị danh sách review
+Route::get('/review/{product}', [ReviewController::class, 'getReviews'])->name('review.list');
+
 
 
 /// Tỉnh - Huyện - Xã
@@ -189,17 +200,22 @@ Route::get('/so-sanh/chon/{slot}', [CompareController::class, 'select'])->name('
 Route::get('/so-sanh/xoa-tat-ca', [CompareController::class, 'clear'])->name('compare.clear');
 Route::get('/filter-price', [HomeController::class, 'filterPrice']);
 
+//Review
+Route::get(
+  '/toggle-review-status/{id}',[AdminUserController::class, 'toggle_review_status'])->name('admin.review.toggle');
 
+Route::get('/all-reviews-user', [AdminUserController::class, 'all_reviews_user'])->name('admin.reviewuser.index');
 //Quản lý user khách hàng
-
-
   Route::get('/all-admin-user', [AdminUserController::class, 'all_admin_user'])->name('admin.users.index');
   Route::get('/add-admin-user', [AdminUserController::class, 'add_admin_user'])->name('admin.users.create');
   Route::post('/store-admin-user', [AdminUserController::class, 'store_admin_user'])->name('admin.users.store');
   Route::get('/unactive-admin-user/{id}', [AdminUserController::class, 'unactive_admin_user'])->name('admin.users.unactive');
   Route::get('/active-admin-user/{id}', [AdminUserController::class, 'active_admin_user'])->name('admin.users.active');
 
-
+  //Sale
+  Route::get('/sales', [SaleController::class, 'index'])->name('sales.product');
+  Route::get('/product/{id}', [ProductDetailController::class, 'show'])
+    ->name('product.detail');
 
 // ================= TRONG PREFIX ADMIN =================
 

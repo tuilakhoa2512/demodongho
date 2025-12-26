@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Review;
 
 class AdminUserController extends Controller
 {
@@ -112,4 +113,22 @@ class AdminUserController extends Controller
         return redirect()->back()
             ->with('message', 'Đã kích hoạt tài khoản khách hàng');
     }
+    public function all_reviews_user()
+{
+    $reviews = Review::with(['user', 'product'])
+        ->orderByDesc('created_at')
+        ->paginate(10);
+
+    return view('admin.reviews_user.index', compact('reviews'));
+}
+public function toggle_review_status($id)
+{
+    $review = Review::findOrFail($id);
+
+    // Đảo trạng thái
+    $review->status = $review->status == 1 ? 0 : 1;
+    $review->save();
+
+    return redirect()->back()->with('success', 'Cập nhật trạng thái đánh giá thành công');
+}
 }

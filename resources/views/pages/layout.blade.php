@@ -156,7 +156,7 @@
 									</div>
 								</li>
 
-								<li><a href="404.html">Sales</a></li>
+								<li><a href="{{ route('sales.product') }}">Sales</a></li>
 								<li><a href="{{ route('contact.us') }}">Contact</a></li>
 							</ul>
 						</div>

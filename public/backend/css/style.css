@@ -1828,6 +1828,14 @@ ul.labels-info li a i {
 .table-inbox tr td:hover {
     cursor:pointer;
 }
+.star {
+    color: #ddd;
+}
+
+.star.active {
+    color: #ff9800;
+}
+
 .table-inbox tr td .fa-star.inbox-started,.table-inbox tr td .fa-star:hover {
     color:#f78a09;
 }

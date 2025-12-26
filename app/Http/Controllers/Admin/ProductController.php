@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\Review;
 use App\Models\StorageDetail;
 use App\Models\Category;
 use App\Models\Brand;
@@ -71,8 +72,18 @@ class ProductController extends Controller
             'storageDetail.storage',
             'discountProducts',
         ])->findOrFail($id);
+        // Lấy review của sản phẩm
+        $reviews = Review::where('product_id', $id)
+                    ->where('status', 1)
+                    ->orderByDesc('created_at')
+                    ->get();
 
-        return view('admin.products.show', compact('product'));
+        // Tính điểm trung bình
+        $averageRating = round(Review::where('product_id', $id)
+                        ->where('status', 1)
+                        ->avg('rating'), 1);
+
+        return view('admin.products.show', compact('product','reviews', 'averageRating'));
     }
 
     /**

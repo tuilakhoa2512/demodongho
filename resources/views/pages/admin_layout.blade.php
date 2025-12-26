@@ -222,6 +222,10 @@ body {
                         <i class=" fa fa-comments"></i>
                         <span>Đánh Giá</span>
                     </a>
+                    <ul class="sub">
+                    <li><a href="{{ route('admin.reviewuser.index') }}">Danh Sách Reviews</a></li> 
+             
+                    </ul>
                 </li>
                 
                 

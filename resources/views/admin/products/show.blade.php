@@ -224,6 +224,27 @@
 
                 </div>
 
+                {{-- ================== REVIEW ================== --}}
+                <h4 class="product-section-title" style="margin-top:20px;">Đánh giá sản phẩm</h4>
+
+                <div class="well" style="padding:12px 15px;">
+                    <p><strong>Điểm trung bình:</strong> {{ $averageRating }}/5</p>
+
+                    @if($reviews->isEmpty())
+                        <p>Chưa có đánh giá nào.</p>
+                    @else
+                        @foreach($reviews as $review)
+                            <div style="border-bottom:1px solid #eee; padding:8px 0;">
+                                <strong>{{ $review->user ? $review->user->name : $review->guest_name }}</strong>
+                                - <span>{{ $review->rating }}/5</span>
+                                <p>{{ $review->comment }}</p>
+                                <small>{{ $review->created_at->format('d/m/Y H:i') }}</small>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+
+
                 {{-- ================== NÚT ================== --}}
                 <div style="margin-top:15px;">
                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary">

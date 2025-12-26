@@ -125,6 +125,88 @@
                     <i class="fa fa-shopping-cart"></i> Thêm Vào Giỏ
                 </button>
             </form>
+            </div>
+            </div>
+            <div class="row">
+        <div class="col-sm-12">
+
+            {{-- ================== REVIEW ================== --}}
+            <div class="product-reviews" style="margin-top:30px;">
+                <h3>Đánh giá sản phẩm</h3>
+
+                <p>Điểm trung bình: {{ $averageRating ?? 0 }}/5</p>
+
+                @if(!empty($reviews) && $reviews->count() > 0)
+                    @foreach($reviews as $review)
+                        <div style="border-bottom:1px solid #eee; padding:8px 0;">
+                        <strong>{{ $review->user->fullname ?? 'Khách' }}</strong>
+                            - Rating: {{ $review->rating }}/5
+                            <p>{{ $review->comment }}</p>
+                            <small>{{ $review->created_at->format('d/m/Y H:i') }}</small>
+                        </div>
+                    @endforeach
+                @else
+                    <p>Chưa có đánh giá nào.</p>
+                @endif
+            </div>
+
+            {{-- ⭐ CHỌN SAO --}}
+            <div class="star-rating" style="font-size:28px; cursor:pointer; margin-bottom:15px;">
+                @for($i = 1; $i <= 5; $i++)
+                    <i class="star" data-value="{{ $i }}">★</i>
+                @endfor
+                <span id="ratingText" style="margin-left:10px; font-weight:600;"></span>
+            </div>
+
+{{-- 📝 FORM GỬI ĐÁNH GIÁ (TABLE) --}}
+<div id="reviewForm" style="display:none; margin-bottom:30px;">
+
+    <h4>Viết đánh giá của bạn</h4>
+
+    <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+        @csrf
+
+        {{-- product_id --}}
+        <input type="hidden" name="product_id" value="{{ $product->id }}">
+
+        {{-- rating --}}
+        <input type="hidden" name="rating" id="ratingValue">
+
+        <table class="table table-bordered review-table">
+            <tbody>
+                <tr>
+                    <th style="width:180px;">Số sao</th>
+                    <td>
+                        <span id="ratingTextTable" style="font-weight:600;color:#e60012;"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <th>Nội dung đánh giá *</th>
+                    <td>
+                        <textarea name="comment"
+                                  rows="4"
+                                  required
+                                  class="form-control"
+                                  placeholder="Nhập đánh giá của bạn"></textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td colspan="2" class="text-right">
+                        <button type="submit" class="btn btn-danger">
+                            Gửi đánh giá
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+
+</div>
+
+
+
         </div>
 
     </div>
@@ -245,5 +327,30 @@ document.addEventListener('DOMContentLoaded', () => {
     margin-bottom: 20px;
 }
 </style>
+<script>
+document.querySelectorAll('.star').forEach(star => {
+    star.addEventListener('click', function () {
+        const value = this.dataset.value;
 
+        document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+        for (let i = 0; i < value; i++) {
+            document.querySelectorAll('.star')[i].classList.add('active');
+        }
+
+        document.getElementById('ratingValue').value = value;
+        document.getElementById('ratingText').innerText =
+            ['Rất tệ','Tệ','Tạm ổn','Tốt','Rất tốt'][value - 1];
+
+        document.getElementById('reviewForm').style.display = 'block';
+    });
+});
+</script>
+<style>
+.product-review-section{margin-top:50px}
+.review-wrapper{padding:30px;background:#fff;border-top:3px solid #e60012}
+.single-review{border-bottom:1px solid #eee;padding:10px 0}
+.review-rating{color:#e60012;font-weight:600;margin-left:8px}
+.star-rating{font-size:28px;cursor:pointer;margin:15px 0}
+.star.active{color:#e60012}
+</style>
 @endsection

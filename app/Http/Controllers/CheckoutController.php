@@ -21,6 +21,57 @@ class CheckoutController extends Controller
     }
 
     public function add_user(Request $request){
+        $request->validate(
+            [
+                'fullname' => [
+                    'required',
+                    'string',
+                    'max:30',
+                    'regex:/^[\pL\s]+$/u', // chỉ chữ + khoảng trắng
+                ],
+                'email' => [
+                    'required',
+                    'email',
+                    'max:30',
+                    'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/',
+                    'unique:users,email',
+                ],
+                'password' => [
+                    'required',
+                    'string',
+                    'min:6',
+                    'max:30',
+                ],
+                'phone' => [
+                    'required',
+                    'regex:/^[0-9]{10,15}$/',
+                    'unique:users,phone',
+                ],
+            ],
+            [
+                // fullname
+                'fullname.required' => 'Vui lòng nhập họ và tên.',
+                'fullname.max'      => 'Họ và tên không được vượt quá 30 ký tự.',
+                'fullname.regex'    => 'Họ và tên chỉ được chứa chữ cái.',
+    
+                // email
+                'email.required' => 'Vui lòng nhập email.',
+                'email.email'    => 'Email không đúng định dạng.',
+                'email.max'      => 'Email không được vượt quá 30 ký tự.',
+                'email.regex'    => 'Email phải kết thúc bằng @gmail.com.',
+                'email.unique'   => 'Email này đã được sử dụng.',
+    
+                // password
+                'password.required' => 'Vui lòng nhập mật khẩu.',
+                'password.min'      => 'Mật khẩu phải có ít nhất 6 ký tự.',
+                'password.max'      => 'Mật khẩu không được vượt quá 30 ký tự.',
+    
+                // phone
+                'phone.required' => 'Vui lòng nhập số điện thoại.',
+                'phone.regex'    => 'Số điện thoại phải từ 10 đến 15 chữ số.',
+                'phone.unique'   => 'Số điện thoại đã tồn tại.',
+            ]
+        );
         $data = array();
         $data['fullname'] = $request->fullname;
         $data['email'] = $request->email;

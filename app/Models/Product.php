@@ -158,6 +158,14 @@ class Product extends Model
         // nếu bạn muốn làm tròn tiền:
         return round($newPrice, 0);
     }
-
-
+    public function discounts()
+{
+    return $this->belongsToMany(
+        \App\Models\DiscountProduct::class,
+        'discount_product_details',
+        'product_id',
+        'discount_product_id'
+    )->withPivot('expiration_date', 'status')
+     ->withTimestamps();
+}
 }

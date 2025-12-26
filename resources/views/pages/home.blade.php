@@ -140,80 +140,32 @@
 
 </style>
 
-    <h2 class="title text-center">Recommended Items</h2>
+<h2 class="title text-center">Recommended Items</h2>
 
-    <div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
-        <div class="carousel-inner">
+<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
 
-            @foreach($recommended_products->chunk(3) as $chunkIndex => $chunk)
-            <div class="item {{ $chunkIndex == 0 ? 'active' : '' }}">
-                @foreach($chunk as $product)
-                    @php
-                        $main = $product->main_image_url;
-                        $hover = $product->hover_image_url;
-                        $user_id = Session::get('id');
-                        $favorite_ids = \App\Models\Favorite::where('user_id', $user_id)->pluck('product_id')->toArray();
-                        $is_favorite = in_array($product->id, $favorite_ids);
-                    @endphp
-
-                    <div class="col-sm-4">
-                        <div class="product-image-wrapper">
-                            <div class="single-products">
-                                <div class="productinfo text-center">
-                                    <div class="product-img-box">
-                                        <img class="main-img" src="{{ $main }}" alt="{{ $product->name }}">
-                                        <img class="hover-img" src="{{ $hover }}" alt="{{ $product->name }}">
-                                    </div>
-                                    <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
-                                    <p>{{ $product->name }}</p>
-                                </div>
-                                <div class="product-overlay">
-                                    <img class="overlay-img" src="{{ $hover }}" alt="{{ $product->name }}">
-                                    <div class="overlay-content">
-                                        <h2>{{ number_format($product->price, 0, ',', '.') }} VND</h2>
-                                        <p><a href="{{ url('/product/'.$product->id) }}" style="color:#fff;">{{ $product->name }}</a></p>
-                                        <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="quantity" value="1">
-                                            <button type="submit" class="btn btn-default add-to-cart">
-                                                <i class="fa fa-shopping-cart"></i> Thêm Vào Giỏ
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="choose">
-                                <ul class="nav nav-pills nav-justified">
-                                    <li>
-                                        <a href="{{ route('favorite.toggle', $product->id) }}" style="color: {{ $is_favorite ? 'red' : '#555' }};">
-                                            <i class="fa fa-heart" style="color: {{ $is_favorite ? 'red' : '#999' }};"></i>
-                                            {{ $is_favorite ? 'Đã Yêu Thích' : 'Yêu Thích' }}
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a href="{{ route('compare.add', $product->id) }}">
-                                            <i class="fa fa-plus-square"></i> So Sánh
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
+        @foreach($recommended_products->chunk(3) as $index => $chunk)
+            <div class="item {{ $index == 0 ? 'active' : '' }}">
+                <div class="row">
+                    @foreach($chunk as $product)
+                        @include('pages.partials.product_card', ['product' => $product])
+                    @endforeach
+                </div>
             </div>
-            @endforeach
+        @endforeach
 
-        </div>
-
-        <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
-            <i class="fa fa-angle-left"></i>
-        </a>
-        <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
-            <i class="fa fa-angle-right"></i>
-        </a>
     </div>
+
+    <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
+        <i class="fa fa-angle-left"></i>
+    </a>
+
+    <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
+        <i class="fa fa-angle-right"></i>
+    </a>
 </div>
+
 
 
 @php
