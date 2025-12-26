@@ -221,6 +221,7 @@
     padding:6px 0;
     font-size:14px;
 }
+
 .sum-row strong{ font-weight:900; }
 .sum-row.discount{ color:#e60012; }
 .sum-row.total{
