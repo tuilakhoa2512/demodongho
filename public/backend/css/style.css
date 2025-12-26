@@ -162,7 +162,7 @@ ul.sidebar-menu {
     display:none;
 }
 #sidebar .sub-menu>.sub li a {
-    padding-left:46px;
+    padding-left:4px;
 }
 #sidebar>ul>li.active>ul.sub,#sidebar>ul>li>ul.sub>li>a {
     display:block;
@@ -2933,8 +2933,7 @@ div#graph1, div#graph4, div#graph5, div#graph6, div#graph7, div#graph8, div#grap
 .compare-img-box img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;        /* 🔥 KHÔNG CẮT ẢNH */
+    object-fit: contain;        /* KHÔNG CẮT ẢNH */
 }
-
 
 }

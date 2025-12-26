@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\ProductDetailController;
@@ -114,6 +115,10 @@ Route::get('/payment/success/{order_code}', [PaymentController::class, 'success'
 Route::get('/my-orders', [MyOrderController::class, 'index']);
 Route::get('/my-orders/{order_code}', [MyOrderController::class, 'show'])->name('myorders.show');;
 
+//AI Chat
+Route::post('/ai-chat', [AIChatController::class, 'chat']);
+Route::get('/ai-chat/history', [AIChatController::class, 'history']);
+Route::delete('/ai-chat/clear', [AIChatController::class, 'clear']);
 
 
 // ================= BACKEND - AUTH ADMIN =================

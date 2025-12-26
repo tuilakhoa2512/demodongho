@@ -92,6 +92,7 @@ class ProductController extends Controller
      */
     public function create()
     {
+        
         // Chỉ lấy dòng kho:
         // - đang hiển thị (status = 1)
         // - stock_status = pending
@@ -103,9 +104,14 @@ class ProductController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $categories = Category::orderBy('name')->get();
-        $brands     = Brand::orderBy('name')->get();
-
+            $categories = Category::where('status', 1)
+            ->orderBy('name')
+            ->get();
+    
+        $brands = Brand::where('status', 1)
+            ->orderBy('name')
+            ->get();
+            
         return view('admin.products.create', compact(
             'storageDetails',
             'categories',
@@ -183,7 +189,7 @@ class ProductController extends Controller
             'storage_detail_id' => $detail->id,
             'category_id'       => $request->category_id,
             'brand_id'          => $request->brand_id,
-
+            
             'name'              => $name,
             'description'       => $request->description,
             'strap_material'    => $request->strap_material,

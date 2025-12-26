@@ -1,0 +1,37 @@
+/* ===== RESET BOOTSTRAP MENU HEADER ===== */
+.navbar-nav,
+.navbar-nav > li,
+.navbar-nav > li > a {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* Text */
+.navbar-nav > li > a {
+    color: #fff ;
+    font-weight: 500;
+    padding: 15px 18px;
+    transition: none !important;
+}
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:focus,
+.navbar-nav > .active > a,
+.navbar-nav > .active > a:hover,
+.navbar-nav > .active > a:focus {
+   
+    color: #d70018 !important; /* hoặc giữ nguyên #333 */
+}
+.navbar-nav > li > a:hover {
+    color: #333 !important;
+}
+.navbar-nav .dropdown-menu {
+  
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-nav .caret,
+.navbar-nav .dropdown-toggle::after {
+    display: none !important;
+}

@@ -1,0 +1,35 @@
+/* Cho phép nút carousel tràn ra ngoài */
+.recommended_items {
+    position: relative;
+    overflow: visible; /* BẮT BUỘC */
+}
+
+/* Style chung cho nút */
+.recommended_items .carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45px;
+    height: 45px;
+    background: #d70018;
+    opacity: 0.7;
+    border-radius: 0; /* vuông */
+    z-index: 10;
+}
+
+/* NÚT TRÁI – TRÀN RA NGOÀI */
+.recommended_items .carousel-control.left {
+    left: -60px; /* chỉnh số này để tràn nhiều/ít */
+}
+
+/* NÚT PHẢI – TRÀN RA NGOÀI */
+.recommended_items .carousel-control.right {
+    right: -60px;
+}
+
+/* Icon mũi tên */
+.recommended_items .carousel-control i {
+    color: #fff;
+    font-size: 28px;
+    line-height: 45px;
+}
