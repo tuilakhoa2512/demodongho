@@ -1,4 +1,5 @@
-<div class="col-sm-4">
+<div class="col-sm-4 {{ isset($is_recommended) ? 'recommended-card' : '' }}">
+
     <div class="product-image-wrapper">
         <div class="single-products">
             

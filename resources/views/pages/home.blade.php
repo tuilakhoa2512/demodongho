@@ -59,111 +59,43 @@
 </div>
 
 
-<div class="recommended_items"><!--recommended_items-->
-<style>
-.product-img-box {
-    position: relative;
-    width: 100%;
-    height: 240px;
-    overflow: hidden;
-    padding-top: 6px;
-}
+<div class="recommended_items">
+    <h2 class="title text-center">RECOMMENDED ITEMS</h2>
 
+    <div id="recommended-item-carousel"
+         class="carousel slide recommended-carousel"
+         data-ride="carousel">
 
-.product-img-box .hover-img {
-    opacity: 0;
-}
-
-.product-img-box:hover .main-img {
-    opacity: 0;
-}
-
-.product-img-box:hover .hover-img {
-    opacity: 1;
-}
-
-.product-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 280px; 
-    background: rgba(0,0,0,0.0);
-    transition: 0.4s ease-in-out;
-}
-
-.product-overlay .overlay-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-.product-overlay .overlay-content {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 15px;
-    text-align: center;
-    color: #fff;
-}
-
-.product-overlay:hover {
-    background: rgba(0,0,0,0.3);
-}
-.recommended_items {
-    position: relative;
-    overflow: visible !important;
-}
-
-.recommended-item-control {
-    position: absolute;
-    top: 30%;
-    transform: translateY(-50%);
-    background: #d70018;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    z-index: 9999;
-}
-
-.left.recommended-item-control {
-    left: -25px;
-}
-
-.right.recommended-item-control {
-    right: -25px;
-}
-
-</style>
-
-<h2 class="title text-center">Recommended Items</h2>
-
-<div id="recommended-item-carousel" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner">
-
-        @foreach($recommended_products->chunk(3) as $index => $chunk)
-            <div class="item {{ $index == 0 ? 'active' : '' }}">
-                <div class="row">
-                    @foreach($chunk as $product)
-                        @include('pages.partials.product_card', ['product' => $product])
-                    @endforeach
+        <div class="carousel-inner">
+            @foreach($recommended_products->chunk(3) as $index => $chunk)
+                <div class="item {{ $index == 0 ? 'active' : '' }}">
+                    <div class="row">
+                        @foreach($chunk as $product)
+                            @include('pages.partials.product_card', [
+                                'product' => $product,
+                                'is_recommended' => true
+                            ])
+                        @endforeach
+                    </div>
                 </div>
-            </div>
-        @endforeach
+            @endforeach
+        </div>
+
+        {{-- NÚT TRÁI --}}
+        <a class="carousel-control left"
+           href="#recommended-item-carousel"
+           data-slide="prev">
+            <i class="fa fa-angle-left"></i>
+        </a>
+
+        {{-- NÚT PHẢI --}}
+        <a class="carousel-control right"
+           href="#recommended-item-carousel"
+           data-slide="next">
+            <i class="fa fa-angle-right"></i>
+        </a>
 
     </div>
-
-    <a class="left recommended-item-control" href="#recommended-item-carousel" data-slide="prev">
-        <i class="fa fa-angle-left"></i>
-    </a>
-
-    <a class="right recommended-item-control" href="#recommended-item-carousel" data-slide="next">
-        <i class="fa fa-angle-right"></i>
-    </a>
 </div>
 
 
@@ -229,8 +161,6 @@ style="position:fixed; bottom:0; left:300px; right:300px;
             </a>
 
         </div>
-
-
     </div>
 
 </div>

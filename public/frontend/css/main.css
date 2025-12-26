@@ -253,7 +253,7 @@ a#scrollUp i {
 /* chỉ target ul con */
 .mainmenu ul li.has-submenu > ul.sub-menu {
     background: #fff;
-    padding: 12px 0;
+    padding: 12px;
     border-radius: 10px;
     min-width: 260px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.15);
@@ -2812,6 +2812,7 @@ ul.nav.nav-pills.nav-justified i {
     position: absolute;
     top: 100%;
     left: 0;
+    border-radius:12px;
     padding: 15px;
     background: white;
     width: 720px;
@@ -2895,7 +2896,7 @@ ul.nav.nav-pills.nav-justified i {
     margin: 0;
 
     background: #d70018;
-    border-radius: 12px;
+    border-radius: 0;
     width: 340px;                    /* rộng hơn */
     
     position: absolute;
@@ -2904,7 +2905,8 @@ ul.nav.nav-pills.nav-justified i {
     display: none;
 
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-    z-index: 9999;
+    z-index: 999;
+    
 }
 
 /* Hover menu cha → hiện submenu */

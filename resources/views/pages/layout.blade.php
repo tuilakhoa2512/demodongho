@@ -22,6 +22,11 @@
 	<link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
 	<link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
 	<link rel="stylesheet" href="{{ asset('frontend/css/bootstrap-slider.css') }}">
+	<link rel="stylesheet" href="{{ asset('frontend/css/recommended.css') }}">
+	<link rel="stylesheet" href="{{ asset('frontend/css/custom-menu.css') }}">
+	<link rel="stylesheet" href="{{ asset('frontend/css/ai-chatbox.css') }}">
+
+	
 </head><!--/head-->
 
 <body>
@@ -464,8 +469,12 @@ $(document).ready(function () {
 <script src="{{ asset('frontend/js/main.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('frontend/js/bootstrap-slider.js') }}"></script>
-@stack('js')
+<script src="{{ asset('frontend/js/jquery.js') }}"></script>
+<script src="{{ asset('frontend/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('frontend/js/ai-chatbox.js') }}"></script>
 
+@stack('js')
+@include('pages.partials.ai_chatbox')
 </body>
 
 </html>
