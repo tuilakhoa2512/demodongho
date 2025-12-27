@@ -114,10 +114,17 @@ body {
                         <span>Quản Lý Người Dùng</span>
                     </a>
                     <ul class="sub">
-                                <li><a href="{{ route('admin.users.index') }}">Danh Sách người dùng</a></li> 
-                                <li><a href="{{ route('admin.users.create') }}">Thêm người dùng</a></li>                                            
-                    </ul>
-                    
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.users.index') }}" style="width: 160px; text-align: left;">
+                                Danh Sách người dùng
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.users.create') }}" style="width: 160px; text-align: left;">
+                                Thêm người dùng
+                            </a>
+                        </li>                                            
+                    </ul>                  
                 </li>
                 
                 <li class="sub-menu">
@@ -126,8 +133,16 @@ body {
                         <span>Loại Sản Phẩm</span>
                     </a>
                     <ul class="sub">
-                                <li><a href="{{ URL::to('/all-product-type') }}">Danh Sách Loại</a></li> 
-                                <li><a href="{{ URL::to('/add-product-type') }}">Thêm Loại</a></li>
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('/all-product-type') }}" style="width: 160px; text-align: left;">
+                                Danh Sách Loại
+                            </a>
+                    </li> 
+                    <li style="display: flex; justify-content: center;">
+                        <a href="{{ URL::to('/add-product-type') }}" style="width: 160px; text-align: left;">
+                            Thêm Loại
+                        </a>
+                    </li>                           
                                                           
                     </ul>
                 </li>
@@ -139,9 +154,16 @@ body {
                         <span>Thương Hiệu</span>
                     </a>
                     <ul class="sub">
-                                <li><a href="{{ URL::to('/all-brand-product') }}">Danh Sách Thương Hiệu</a></li> 
-                                <li><a href="{{ URL::to('/add-brand-product') }}">Thêm Thương Hiệu</a></li>
-                                                          
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('/all-brand-product') }}" style="width: 160px; text-align: left;">
+                                Danh Sách Thương Hiệu
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('/add-brand-product') }}" style="width: 160px; text-align: left;">
+                                Thêm Thương Hiệu
+                            </a>
+                        </li>                                                                   
                     </ul>
                 </li>
 
@@ -151,8 +173,16 @@ body {
                         <span>Lô Hàng Nhập</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="{{ URL::to('/admin/storages') }}">Danh Sách Lô Hàng</a></li>                                                  
-                        <li><a href="{{ URL::to('/admin/storages/create') }}">Thêm Lô Hàng Mới</a> </li>                                                
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('/admin/storages') }}" style="width: 160px; text-align: left;">
+                                Danh Sách Lô Hàng
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{  URL::to('/admin/storages/create') }}" style="width: 160px; text-align: left;">
+                                Thêm Lô Hàng Mới
+                            </a>
+                        </li>                                             
                     </ul>
                 </li>
 
@@ -162,11 +192,32 @@ body {
                         <span>Kho Hàng</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="{{ route('admin.storage-details.index') }}">Toàn Bộ Hàng Trong Kho</a></li>
-                        <li><a href="{{ route('admin.storage-details.pending') }}">Chưa Bán</a></li>
-                        <li><a href="{{ route('admin.storage-details.selling') }}">Đang Bán</a></li>
-                        <li><a href="{{ route('admin.storage-details.sold-out') }}">Bán Hết</a></li>
-                        <li><a href="{{ route('admin.storage-details.stopped') }}">Ngừng Bán</a></li>
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.storage-details.index') }}" style="width: 160px; text-align: left;">
+                                Toàn Bộ Hàng Trong Kho
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{  route('admin.storage-details.pending')  }}" style="width: 160px; text-align: left;">
+                                Chưa Bán
+                            </a>
+                        </li>  
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.storage-details.selling') }}" style="width: 160px; text-align: left;">
+                                Đang Bán
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{  route('admin.storage-details.sold-out')  }}" style="width: 160px; text-align: left;">
+                                Bán Hết
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.storage-details.stopped') }}" style="width: 160px; text-align: left;">
+                                Ngừng Bán
+                            </a>
+                        </li> 
+                                           
                     </ul>
                 </li>
 
@@ -176,11 +227,18 @@ body {
                         <span>Sản Phẩm</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="{{ URL::to('/admin/products') }}">Danh Sách Sản Phẩm</a></li>
-                        <li><a href="{{ URL::to('/admin/products/create') }}">Thêm Sản Phẩm Mới</a></li>
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{  URL::to('/admin/products')  }}" style="width: 160px; text-align: left;">
+                                Danh Sách Sản Phẩm
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('/admin/products/create') }}" style="width: 160px; text-align: left;">
+                                Thêm Sản Phẩm
+                            </a>
+                        </li> 
                     </ul>
                 </li>
-
 
 
                 <li class="sub-menu">
@@ -189,12 +247,37 @@ body {
                         <span>Đơn Hàng</span>
                     </a>
                     <ul class="sub">
-                        <li><a href="{{ URL::to('/admin/orders') }}">Danh Sách Đơn Hàng</a></li>
-                        <li><a href="mail.html">Đang Chờ Xử Lí</a></li>
-                        <li><a href="mail.html">Đang Đóng Gói</a></li>
-                        <li><a href="mail_compose.html">Đang Vận Chuyển</a></li>
-                        <li><a href="mail_compose.html">Đơn Hàng Thành Công</a></li>
-                        <li><a href="mail_compose.html">Đơn Bị Huỷ</a></li>
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{ (URL::to('/admin/orders'))  }}" style="width: 160px; text-align: left;">
+                                Danh Sách Đơn Hàng
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                                Đang Chờ Xử Lý
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{  URL::to('#')  }}" style="width: 160px; text-align: left;">
+                                Đang Đóng Gói
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                                Đang Vận Chuyển
+                            </a>
+                        </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{  URL::to('#')  }}" style="width: 160px; text-align: left;">
+                                Đơn Hàng Thành Công
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                                Đơn Bị Huỷ
+                            </a>
+                        </li> 
+        
                     </ul>
                 </li>
                 <li class="sub-menu">
@@ -203,8 +286,16 @@ body {
                         <span>Ưu Đãi Sản Phẩm</span>
                     </a>
                       <ul class="sub">
-                        <li><a href="{{ route('admin.discount-products.index') }}">Danh sách ưu đãi</a></li>
-                        <li><a href="{{ route('admin.discount-products.create') }}">Thêm ưu đãi mới</a></li>
+                      <li style="display: flex; justify-content: center;">
+                            <a href="{{  route('admin.discount-products.index')  }}" style="width: 160px; text-align: left;">
+                                Danh Sách Ưu Đãi Sản Phẩm
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.discount-products.create') }}" style="width: 160px; text-align: left;">
+                                Thêm Ưu Đãi Sản Phẩm
+                            </a>
+                        </li> 
                     </ul>
                 </li>
                 <li class="sub-menu">
@@ -213,8 +304,16 @@ body {
                         <span>Ưu Đãi Bill</span>
                     </a>
                       <ul class="sub">
-                        <li><a href="{{ route('admin.discount-bills.index') }}">Danh sách ưu đãi</a></li>
-                        <li><a href="{{ route('admin.discount-bills.create') }}">Thêm ưu đãi mới</a></li>
+                      <li style="display: flex; justify-content: center;">
+                            <a href="{{  route('admin.discount-bills.index')  }}" style="width: 160px; text-align: left;">
+                                Danh Sách Ưu Đãi Bill
+                            </a>
+                        </li>
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.discount-bills.create') }}" style="width: 160px; text-align: left;">
+                                Thêm Ưu Đãi Bill
+                            </a>
+                        </li>                        
                     </ul>
                 </li>
                 <li class="sub-menu">
@@ -223,8 +322,11 @@ body {
                         <span>Đánh Giá</span>
                     </a>
                     <ul class="sub">
-                    <li><a href="{{ route('admin.reviewuser.index') }}">Danh Sách Reviews</a></li> 
-             
+                    <li style="display: flex; justify-content: center;">
+                            <a href="{{  route('admin.reviewuser.index')  }}" style="width: 160px; text-align: left;">
+                                Danh Sách Reviews
+                            </a>
+                    </li>         
                     </ul>
                 </li>
                 
