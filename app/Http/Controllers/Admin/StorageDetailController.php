@@ -135,14 +135,41 @@ class StorageDetailController extends Controller
 
     public function update(Request $request, $id)
     {
-        $detail  = StorageDetail::with('storage')->findOrFail($id);
+        $detail  = StorageDetail::with(['storage', 'product'])->findOrFail($id);
         $storage = $detail->storage;
 
-        $request->validate([
+        // ===== 1) CHẶN SỬA KHI SOLD_OUT =====
+        if ($detail->stock_status === 'sold_out') {
+            return redirect()
+                ->back()
+                ->with('error', 'Sản phẩm đã bán hết, không thể chỉnh sửa số lượng nhập.');
+        }
+
+        // ===== TÍNH SL ĐANG BÁN + ĐÃ BÁN =====
+        $sellingQty = (int) ($detail->selling_qty ?? 0);
+        $soldQty    = (int) ($detail->sold_qty ?? 0);
+        $minImport  = max(1, $sellingQty + $soldQty);
+
+        // ===== 2) GIỚI HẠN MAX (nếu muốn) =====
+        $maxImport = 10000; // nếu không muốn giới hạn → bỏ rule max
+
+        $rules = [
             'product_name'    => 'required|string|max:255',
-            'import_quantity' => 'required|integer|min:1',
-            'note'            => 'nullable|string',
-        ]);
+            'import_quantity' => [
+                'required',
+                'integer',
+                'min:' . $minImport,
+                'max:' . $maxImport,
+            ],
+            'note' => 'nullable|string',
+        ];
+
+        $messages = [
+            'import_quantity.min' => 'Số lượng nhập phải ≥ ' . $minImport,
+            'import_quantity.max' => 'Số lượng nhập không được vượt quá ' . number_format($maxImport),
+        ];
+
+        $request->validate($rules, $messages);
 
         $detail->update([
             'product_name'    => $request->product_name,
@@ -154,6 +181,7 @@ class StorageDetailController extends Controller
             ->route('admin.storage-details.by-storage', $storage->id)
             ->with('success', 'Cập nhật sản phẩm trong kho thành công.');
     }
+
 
     public function toggleStatus($id)
     {
