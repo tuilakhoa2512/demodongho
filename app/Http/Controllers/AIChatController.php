@@ -9,63 +9,76 @@ use App\Models\AIChatMessage;
 
 class AIChatController extends Controller
 {
+    /**
+     * Lấy session id (không dùng Auth)
+     */
     private function sessionId()
     {
         return session()->getId();
     }
 
+    /**
+     * Giới hạn tối đa 50 tin / session
+     */
     private function limitMessages($sessionId, $limit = 50)
     {
         $count = AIChatMessage::where('session_id', $sessionId)->count();
+
         if ($count > $limit) {
-            $deleteCount = $count - $limit;
             AIChatMessage::where('session_id', $sessionId)
                 ->orderBy('id')
-                ->limit($deleteCount)
+                ->limit($count - $limit)
                 ->delete();
         }
     }
 
+    /**
+     * API: load lịch sử chat
+     */
     public function history()
     {
-        $sessionId = $this->sessionId();
-        $messages = AIChatMessage::where('session_id', $sessionId)
-            ->orderBy('id')
-            ->get();
-        return response()->json($messages);
+        return response()->json(
+            AIChatMessage::where('session_id', $this->sessionId())
+                ->orderBy('id')
+                ->get()
+        );
     }
 
+    /**
+     * API: xoá lịch sử chat
+     */
     public function clear()
     {
-        $sessionId = $this->sessionId();
-        AIChatMessage::where('session_id', $sessionId)->delete();
+        AIChatMessage::where('session_id', $this->sessionId())->delete();
         return response()->json(['status' => 'ok']);
     }
 
+    /**
+     * API: xử lý chat AI
+     */
     public function chat(Request $request)
     {
-        $request->validate(['message' => 'required|string']);
+        $request->validate([
+            'message' => 'required|string'
+        ]);
 
-        $sessionId = $this->sessionId();
+        $sessionId   = $this->sessionId();
         $userMessage = trim($request->message);
 
-        // 1️⃣ LƯU MESSAGE USER
+        /* ======================
+           1️⃣ LƯU USER MESSAGE
+        ====================== */
         AIChatMessage::create([
             'session_id' => $sessionId,
             'role'       => 'user',
             'message'    => $userMessage
         ]);
 
-        // 2️⃣ LẤY LỊCH SỬ GẦN NHẤT
-        $history = AIChatMessage::where('session_id', $sessionId)
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get()
-            ->reverse();
-
-        // 3️⃣ LẤY DỮ LIỆU SẢN PHẨM
+        /* ======================
+           2️⃣ LẤY DỮ LIỆU SẢN PHẨM
+        ====================== */
         $products = Product::where('status', 1)
-            ->select('name', 'price', 'description', 'stock')
+            ->select('name', 'price', 'stock')
             ->limit(20)
             ->get();
 
@@ -74,59 +87,64 @@ class AIChatController extends Controller
             $productText .= "- {$p->name} | Giá: {$p->price} | Tồn kho: {$p->stock}\n";
         }
 
-        // 4️⃣ SYSTEM PROMPT
-        $systemPrompt = "
+        /* ======================
+           3️⃣ SYSTEM PROMPT (KHÓA AI)
+        ====================== */
+        $systemPrompt = <<<PROMPT
 Bạn là chatbot tư vấn bán hàng của website.
-CHỈ được sử dụng dữ liệu bên dưới để trả lời.
-KHÔNG được bịa thông tin.
-KHÔNG suy đoán.
-Nếu không có thông tin phù hợp, hãy trả lời:
-'Hiện shop chưa có sản phẩm phù hợp với yêu cầu của bạn.'
+CHỈ được dùng dữ liệu sản phẩm bên dưới.
+KHÔNG bịa thông tin.
+Nếu không có sản phẩm phù hợp, trả lời:
+"Hiện shop chưa có sản phẩm phù hợp với yêu cầu của bạn."
 
 DANH SÁCH SẢN PHẨM:
 $productText
-        ";
+PROMPT;
 
-        // 5️⃣ GHÉP LỊCH SỬ CHAT
-        $messages = [
-            ['role' => 'system', 'content' => $systemPrompt]
-        ];
-
-        foreach ($history as $msg) {
-            $messages[] = [
-                'role'    => $msg->role === 'user' ? 'user' : 'assistant',
-                'content' => $msg->message
-            ];
-        }
-
-        // 6️⃣ GỌI OPENAI (DÙNG LỊCH SỬ THẬT)
+        /* ======================
+           4️⃣ GỌI OPENAI (CHAT COMPLETIONS)
+        ====================== */
         $response = Http::withToken(env('OPENAI_API_KEY'))
             ->post('https://api.openai.com/v1/chat/completions', [
-                'model'       => 'gpt-4o-mini',
+                'model' => 'gpt-4o-mini',
                 'temperature' => 0.2,
-                'messages'    => $messages
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $userMessage],
+                ],
             ]);
 
         if ($response->failed()) {
-            dd('OPENAI FAIL', $response->status(), $response->body());
+            return response()->json([
+                'reply' => 'Xin lỗi, hệ thống AI đang bận. Vui lòng thử lại.'
+            ], 500);
         }
 
+        /* ======================
+           5️⃣ LẤY CÂU TRẢ LỜI AI
+        ====================== */
         $aiReply = data_get(
             $response->json(),
             'choices.0.message.content',
             'Xin lỗi, hiện tôi chưa thể trả lời.'
         );
 
-        // 7️⃣ LƯU TIN NHẮN AI
+        /* ======================
+           6️⃣ LƯU AI MESSAGE
+        ====================== */
         AIChatMessage::create([
             'session_id' => $sessionId,
             'role'       => 'ai',
             'message'    => $aiReply
         ]);
 
-        // 8️⃣ GIỚI HẠN 50 TIN
+        /* ======================
+           7️⃣ GIỚI HẠN 50 TIN
+        ====================== */
         $this->limitMessages($sessionId, 50);
 
-        return response()->json(['reply' => $aiReply]);
+        return response()->json([
+            'reply' => $aiReply
+        ]);
     }
 }
