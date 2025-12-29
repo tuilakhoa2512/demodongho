@@ -165,7 +165,7 @@ class PaymentController extends Controller
             'district_id'      => 'nullable|integer',
             'ward_id'          => 'nullable|integer',
 
-            'payment_method'   => 'required|string|max:30', // COD/BANK
+            'payment_method'   => 'required|string|max:30', // COD/VNPAY
         ]);
 
         // Lấy lại cart & tính tiền (KHÔNG tin dữ liệu client)
@@ -284,6 +284,12 @@ class PaymentController extends Controller
 
             DB::commit();
 
+            if ($request->payment_method === 'VNPAY') {
+                // qua trang tạo url thanh toán VNPay
+                return redirect()->route('vnpay.create', ['order_code' => $orderCode]);
+            }
+
+            // mặc định COD
             return redirect()->route('payment.success', ['order_code' => $orderCode])
                 ->with('success', 'Đặt hàng thành công!');
         } catch (\Throwable $e) {

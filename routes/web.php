@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\DiscountBillController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\VNPayController;
 use Illuminate\Support\Facades\DB;
 
 
@@ -110,6 +111,10 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'placeOrder'])->name('payment.place');
 Route::get('/payment/success/{order_code}', [PaymentController::class, 'success'])->name('payment.success');
+  //VNPAY
+  Route::get('/vnpay/create/{order_code}', [VNPayController::class, 'create'])->name('vnpay.create');
+  Route::get('/vnpay/return', [VNPayController::class, 'vnpayReturn'])->name('vnpay.return');
+  Route::get('/vnpay/ipn', [VNPayController::class, 'ipn'])->name('vnpay.ipn');  
 
 // My Orders
 Route::get('/my-orders', [MyOrderController::class, 'index']);
