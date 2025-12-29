@@ -129,55 +129,45 @@
             </div>
             <div class="row">
         <div class="col-sm-12">
+{{-- ================== REVIEW ================== --}}
+<div class="product-reviews" style="margin-top:30px;">
+<h2 class="title text-center"> Đánh giá sản phẩm</h2>
+    
+    {{-- ================== WRITE REVIEW (LUÔN Ở CUỐI) ================== --}}
+<div class="product-review-section">
 
-            {{-- ================== REVIEW ================== --}}
-            <div class="product-reviews" style="margin-top:30px;">
-                <h3>Đánh giá sản phẩm</h3>
+{{-- ⭐ CHỌN SAO --}}
 
-                <p>Điểm trung bình: {{ $averageRating ?? 0 }}/5</p>
+<div class="star-rating">Đánh Giá: 
+    @for($i = 1; $i <= 5; $i++)
+        <i class="star" data-value="{{ $i }}">★</i>
+    @endfor
+    <span id="ratingText"></span>
+</div>
+<div>
+<p style="font-size:20px; font-style:italic; color:#D70018;font-family: Roboto, sans-serif;font-weight: 700">
+    <strong>Điểm Trung Bình:</strong> {{ $averageRating ?? 0 }}/5★
+</p>
 
-                @if(!empty($reviews) && $reviews->count() > 0)
-                    @foreach($reviews as $review)
-                        <div style="border-bottom:1px solid #eee; padding:8px 0;">
-                        <strong>{{ $review->user->fullname ?? 'Khách' }}</strong>
-                            - Rating: {{ $review->rating }}/5
-                            <p>{{ $review->comment }}</p>
-                            <small>{{ $review->created_at->format('d/m/Y H:i') }}</small>
-                        </div>
-                    @endforeach
-                @else
-                    <p>Chưa có đánh giá nào.</p>
-                @endif
-            </div>
+</div>
 
-            {{-- ⭐ CHỌN SAO --}}
-            <div class="star-rating" style="font-size:28px; cursor:pointer; margin-bottom:15px;">
-                @for($i = 1; $i <= 5; $i++)
-                    <i class="star" data-value="{{ $i }}">★</i>
-                @endfor
-                <span id="ratingText" style="margin-left:10px; font-weight:600;"></span>
-            </div>
+{{-- 📝 FORM --}}
 
-{{-- 📝 FORM GỬI ĐÁNH GIÁ (TABLE) --}}
-<div id="reviewForm" style="display:none; margin-bottom:30px;">
-
+<div id="reviewForm" style="display:none;">
     <h4>Viết đánh giá của bạn</h4>
 
     <form action="{{ route('reviews.store', $product->id) }}" method="POST">
         @csrf
 
-        {{-- product_id --}}
         <input type="hidden" name="product_id" value="{{ $product->id }}">
-
-        {{-- rating --}}
         <input type="hidden" name="rating" id="ratingValue">
 
-        <table class="table table-bordered review-table">
+        <table class="table table-bordered">
             <tbody>
                 <tr>
-                    <th style="width:180px;">Số sao</th>
+                    <th width="180">Số sao</th>
                     <td>
-                        <span id="ratingTextTable" style="font-weight:600;color:#e60012;"></span>
+                        <span id="ratingTextTable" style="color:#e60012;font-weight:600;"></span>
                     </td>
                 </tr>
 
@@ -202,15 +192,38 @@
             </tbody>
         </table>
     </form>
-
+</div>
 </div>
 
+    
 
+    @if($reviews && $reviews->count() > 0)
+        @foreach($reviews as $review)
+            <div class="single-review">
+
+                <strong>{{ $review->user->fullname ?? 'Khách' }}</strong>
+
+                {{-- ⭐ SAO --}}
+                <div class="review-stars">
+                    @for($i = 1; $i <= 5; $i++)
+                        <i class="fa fa-star {{ $i <= $review->rating ? 'filled' : '' }}"></i>
+                    @endfor
+                </div>
+
+                <p>{{ $review->comment }}</p>
+                <small>{{ $review->created_at->format('d/m/Y H:i') }}</small>
+            </div>
+        @endforeach
+    @else
+        <p>Chưa có đánh giá nào.</p>
+    @endif
+</div>
 
         </div>
 
     </div>
 </div>
+
 
 
 <script>
@@ -326,6 +339,8 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 17px;
     margin-bottom: 20px;
 }
+
+
 </style>
 <script>
 document.querySelectorAll('.star').forEach(star => {

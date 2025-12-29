@@ -36,7 +36,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 280px; /* chiều cao thẻ sản phẩm */
+    height: 280px; /* chiều cao thẻ sản phẩm /
     background: rgba(0,0,0,0.0);
     transition: 0.4s ease-in-out;
 }
@@ -52,11 +52,11 @@
 
 .product-overlay .overlay-content {
     position: absolute;
-    bottom: 0; /* cố định chữ & nút dưới cùng */
+    bottom: 0; / cố định chữ & nút dưới cùng /
     left: 0;
     width: 100%;
     padding: 15px;
-    /* background: rgba(0, 0, 0, 0.5); nền mờ để chữ nổi bật */
+    / background: rgba(0, 0, 0, 0.5); nền mờ để chữ nổi bật */
     text-align: center;
     color: #fff;
 }
@@ -88,7 +88,7 @@
                         </div>
                         <h2>{{ number_format($product->price,0,',','.') }} VND</h2>
                         <p>{{ $product->name }}</p>
-                       
+
                     </div>
 
                     <div class="product-overlay">

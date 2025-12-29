@@ -1,5 +1,6 @@
 // ================================
-// AI CHATBOX JS
+// GEMINI AI CHATBOX JS
+// Frontend -> Laravel -> Gemini
 // ================================
 
 /* Toggle hiển thị chatbox */
@@ -13,14 +14,41 @@ function toggleAIChat() {
 /* Thêm message vào UI */
 function addMessage(text, type) {
     const container = document.getElementById('ai-chat-messages');
-    if (!container) return;
+    if (!container) return null;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ai-message-wrap';
 
     const div = document.createElement('div');
     div.className = (type === 'user') ? 'ai-user' : 'ai-bot';
     div.innerText = text;
 
+    wrap.appendChild(div);
+    container.appendChild(wrap);
+    container.scrollTop = container.scrollHeight;
+
+    return wrap; // 🔥 QUAN TRỌNG
+}
+
+
+/* Hiển thị loading */
+function addLoading() {
+    const container = document.getElementById('ai-chat-messages');
+    if (!container) return;
+
+    const div = document.createElement('div');
+    div.className = 'ai-bot ai-loading';
+    div.id = 'ai-loading';
+    div.innerText = 'Đang tư vấn...';
+
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
+}
+
+/* Xoá loading */
+function removeLoading() {
+    const loading = document.getElementById('ai-loading');
+    if (loading) loading.remove();
 }
 
 /* Lấy CSRF token */
@@ -37,16 +65,17 @@ function sendAIMessage() {
     const message = input.value.trim();
     if (!message) return;
 
-    // Hiển thị user message ngay
+    // Hiển thị user message
     addMessage(message, 'user');
     input.value = '';
 
     const csrfToken = getCsrfToken();
     if (!csrfToken) {
-        console.error('CSRF token not found');
         addMessage('Lỗi bảo mật CSRF', 'ai');
         return;
     }
+
+    addLoading();
 
     fetch('/ai-chat', {
         method: 'POST',
@@ -61,17 +90,28 @@ function sendAIMessage() {
         return res.json();
     })
     .then(data => {
-        if (data.reply) {
-            addMessage(data.reply, 'ai');
-        } else {
-            addMessage('Xin lỗi, hiện tôi chưa thể trả lời.', 'ai');
+        removeLoading();
+
+        /* =========================
+           1️⃣ HIỂN THỊ TEXT AI
+        ========================== */
+        const aiWrap = addMessage(
+            data.reply || 'Xin lỗi, hiện tôi chưa thể trả lời.',
+            'ai'
+        );
+        
+        if (data.products && data.products.length > 0) {
+            renderProductCards(data.products, aiWrap); // 🔥 TRUYỀN WRAP
         }
+        
     })
     .catch(err => {
-        console.error('AI chat error:', err);
+        console.error('Gemini AI error:', err);
+        removeLoading();
         addMessage('Xin lỗi, hệ thống AI đang bận.', 'ai');
     });
 }
+
 
 /* Load lịch sử chat */
 function loadChatHistory() {
@@ -86,8 +126,16 @@ function loadChatHistory() {
             container.innerHTML = '';
 
             messages.forEach(m => {
-                addMessage(m.message, m.role === 'user' ? 'user' : 'ai');
+                const wrap = addMessage(
+                    m.message,
+                    m.role === 'user' ? 'user' : 'ai'
+                );
+            
+                if (m.products && m.products.length > 0) {
+                    renderProductCards(m.products, wrap);
+                }
             });
+            
         })
         .catch(err => console.error('Load history error:', err));
 }
@@ -95,10 +143,25 @@ function loadChatHistory() {
 /* Setup nút xoá lịch sử */
 function setupClearChatButton() {
     const btn = document.getElementById('clearChatBtn');
-    if (!btn) return;
+    const popup = document.getElementById('ai-chat-confirm');
+    const cancelBtn = document.getElementById('aiConfirmCancel');
+    const okBtn = document.getElementById('aiConfirmOk');
 
+    if (!btn || !popup) return;
+
+    // 🗑 Click icon → mở popup
     btn.addEventListener('click', () => {
-        if (!confirm('Bạn muốn xoá toàn bộ lịch sử chat?')) return;
+        popup.classList.remove('hidden');
+    });
+
+    // ❌ Huỷ
+    cancelBtn.addEventListener('click', () => {
+        popup.classList.add('hidden');
+    });
+
+    // ✅ Xác nhận xoá
+    okBtn.addEventListener('click', () => {
+        popup.classList.add('hidden');
 
         const csrfToken = getCsrfToken();
         if (!csrfToken) return;
@@ -116,7 +179,9 @@ function setupClearChatButton() {
             if (container) {
                 container.innerHTML = `
                     <div class="ai-bot">
-                        Xin chào 👋 Tôi có thể hỗ trợ bạn về sản phẩm.
+                        Lịch sử chat đã được xoá <br>
+                        Tôi có thể hỗ trợ bạn tiếp nhé!.
+                         Nhập reset để hỏi lại
                     </div>
                 `;
             }
@@ -125,8 +190,36 @@ function setupClearChatButton() {
     });
 }
 
+
 /* DOM READY */
 document.addEventListener('DOMContentLoaded', () => {
     loadChatHistory();
     setupClearChatButton();
 });
+//View1
+function renderProductCards(products, messageWrap) {
+    if (!products || products.length === 0 || !messageWrap) return;
+
+    const list = document.createElement('div');
+    list.className = 'ai-product-list';
+
+    products.forEach(p => {
+        const card = document.createElement('a');
+        card.className = 'ai-product-card';
+        card.href = p.link;
+        card.target = '_self';
+
+        card.innerHTML = `
+            <img src="${p.image}" alt="${p.name}">
+            <div class="info">
+                <div class="name">${p.name}</div>
+                <div class="price">${p.price} đ</div>
+                <div class="view">Xem chi tiết →</div>
+            </div>
+        `;
+
+        list.appendChild(card);
+    });
+
+    messageWrap.appendChild(list);
+}

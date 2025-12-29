@@ -10,7 +10,18 @@ class AIChatMessage extends Model
 
     protected $fillable = [
         'session_id',
+        'user_id',
         'role',
-        'message'
+        'message',
+        'products'
+    ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    protected $casts = [
+        'products' => 'array' // 🔥 TỰ JSON DECODE
     ];
 }
