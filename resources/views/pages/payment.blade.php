@@ -101,11 +101,16 @@
 
                     <hr>
 
+                    {{-- PAYMENT METHOD --}}
                     <h3 class="pay-box-title">Phương Thức Thanh Toán</h3>
                     <div class="form-group">
-                        <select name="payment_method" class="form-control" required>
-                            <option value="COD" {{ old('payment_method') === 'COD' ? 'selected' : '' }}>COD (Thanh toán khi nhận hàng)</option>
-                            <option value="BANK" {{ old('payment_method') === 'BANK' ? 'selected' : '' }}>BANK (Chuyển khoản)</option>
+                        <select name="payment_method" id="payment_method" class="form-control" required>
+                            <option value="COD" {{ old('payment_method') === 'COD' ? 'selected' : '' }}>
+                                COD (Thanh toán khi nhận hàng)
+                            </option>
+                            <option value="VNPAY" {{ old('payment_method') === 'VNPAY' ? 'selected' : '' }}>
+                                Chuyển khoản ngân hàng (VNPay)
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -153,8 +158,18 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn pay-btn">
+                    {{-- COD BUTTON --}}
+                    <button type="submit" id="btn_place_order" class="btn pay-btn">
                         Xác Nhận Đặt Hàng
+                    </button>
+
+                    {{-- VNPAY BUTTON (HIDDEN) --}}
+                    {{-- CÁCH 1: vẫn submit về payment.place, controller sẽ tạo đơn xong redirect qua vnpay/create/{order_code} --}}
+                    <button type="submit"
+                            id="btn_vnpay"
+                            class="btn pay-btn"
+                            style="display:none;">
+                        Thanh toán VNPay
                     </button>
 
                     <a href="{{ route('cart.index') }}" class="pay-back">
@@ -166,7 +181,29 @@
     </form>
 </div>
 
-{{-- AJAX Province/District/Ward giống profile --}}
+{{-- TOGGLE BUTTONS --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('payment_method');
+    const btnOrder = document.getElementById('btn_place_order');
+    const btnVNPay = document.getElementById('btn_vnpay');
+
+    function togglePayButtons() {
+        if (select.value === 'VNPAY') {
+            btnVNPay.style.display = 'block';
+            btnOrder.style.display = 'none';
+        } else {
+            btnVNPay.style.display = 'none';
+            btnOrder.style.display = 'block';
+        }
+    }
+
+    select.addEventListener('change', togglePayButtons);
+    togglePayButtons();
+});
+</script>
+
+{{-- AJAX Province/District/Ward (GIỮ NGUYÊN) --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const province = document.getElementById('province');
