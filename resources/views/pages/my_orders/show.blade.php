@@ -81,6 +81,21 @@
             <span>Địa chỉ:</span>
             <strong class="text-wrap">{{ $order->receiver_address ?? '—' }}</strong>
         </div>
+        <div class="ship-row">
+            <span>Khu vực:</span>
+            <strong class="text-wrap">
+                @php
+                    $areaParts = array_filter([
+                        $order->ward_name ?? null,
+                        $order->district_name ?? null,
+                        $order->province_name ?? null,
+                    ]);
+                @endphp
+
+                {{ !empty($areaParts) ? implode(' - ', $areaParts) : '—' }}
+            </strong>
+        </div>
+
     </div>
 
     <hr>
@@ -192,8 +207,10 @@
 .left-sidebar{ display:none !important; }
 section > .container > .row > .col-sm-3{ display:none !important; }
 section > .container > .row > .col-sm-9.padding-right{
-    width: 100% !important;
-    float: none !important;
+    width: 90% !important;
+    float: none !important;        
+    margin: 0 auto !important;      
+    display: block !important;
 }
 
 /*

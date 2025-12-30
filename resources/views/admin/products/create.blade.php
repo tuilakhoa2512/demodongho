@@ -32,11 +32,15 @@
               <label for="storage_detail_id">
                 Chọn sản phẩm trong kho <span class="text-danger">*</span>
               </label>
+
               <select name="storage_detail_id" id="storage_detail_id" class="form-control" required>
                 <option value="">-- Chọn từ kho --</option>
+
                 @foreach($storageDetails as $detail)
                   <option value="{{ $detail->id }}"
-                    {{ old('storage_detail_id') == $detail->id ? 'selected' : '' }}>
+                          data-name="{{ $detail->product_name ?? '' }}"
+                          data-qty="{{ (int)($detail->import_quantity ?? 0) }}"
+                          {{ old('storage_detail_id') == $detail->id ? 'selected' : '' }}>
                     [Lô {{ optional($detail->storage)->batch_code ?? 'N/A' }}]
                     {{ $detail->product_name ?? 'Chưa đặt tên' }}
                     - SL: {{ $detail->import_quantity ?? 0 }}
@@ -44,6 +48,7 @@
                   </option>
                 @endforeach
               </select>
+
               <small class="text-muted">
                 Chỉ hiển thị các dòng kho <strong>đang hiển thị</strong> và
                 có trạng thái <strong>pending</strong>.
@@ -68,8 +73,7 @@
                      value="{{ old('quantity') }}">
 
               <small class="text-muted">
-                Hệ thống sẽ tự động dùng đúng số lượng đã nhập ở Kho Hàng (Storage Detail)
-                cho dòng sản phẩm bạn chọn.
+                Hệ thống sẽ tự động dùng số lượng đã nhập ở Kho Hàng
               </small>
             </div>
 
@@ -202,40 +206,62 @@
   </div>
 </div>
 
-{{-- JS tự động đổ số lượng theo dòng kho được chọn --}}
+{{-- JS: tự đổ số lượng + tự đổ tên sản phẩm theo kho (nhưng vẫn sửa được) --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const selectDetail    = document.getElementById('storage_detail_id');
     const quantityDisplay = document.getElementById('quantity_display');
     const quantityReal    = document.getElementById('quantity_real');
+    const nameInput       = document.getElementById('name');
 
-    // Map: { storage_detail_id : import_quantity }
-    const storageData = @json(
-        $storageDetails->mapWithKeys(function($d){
-            return [$d->id => $d->import_quantity];
-        })
-    );
+    // admin đã sửa tên hay chưa
+    let nameTouched = false;
 
-    function updateQuantityByDetailId(id) {
-        if (storageData[id]) {
-            quantityDisplay.value = storageData[id];
-            quantityReal.value    = storageData[id];
-        } else {
-            quantityDisplay.value = '';
-            quantityReal.value    = '';
+    // Nếu có old('name') => coi như đã sửa (validate fail quay lại)
+    if (nameInput && nameInput.value.trim() !== '') {
+        nameTouched = true;
+    }
+
+    if (nameInput) {
+        nameInput.addEventListener('input', function () {
+            // nếu user xóa trống -> cho phép auto-fill lại theo kho
+            nameTouched = (this.value.trim() !== '');
+        });
+    }
+
+    function getSelectedOption() {
+        return selectDetail.options[selectDetail.selectedIndex] || null;
+    }
+
+    function updateQuantity() {
+        const opt = getSelectedOption();
+        const qty = opt ? (opt.dataset.qty ?? '') : '';
+        quantityDisplay.value = qty;
+        quantityReal.value    = qty;
+    }
+
+    function updateName() {
+        if (!nameInput) return;
+        const opt = getSelectedOption();
+        const storageName = opt ? (opt.dataset.name ?? '').trim() : '';
+
+        // chỉ auto-fill khi admin chưa gõ tay
+        if (!nameTouched && storageName) {
+            nameInput.value = storageName;
         }
     }
 
-    // Khi chọn dòng kho
     selectDetail.addEventListener('change', function () {
-        updateQuantityByDetailId(this.value);
+        updateQuantity();
+        updateName();
     });
 
-    // Nếu form bị validate lỗi và có old('storage_detail_id') thì set lại luôn
+    // init nếu đã có selected (old)
     if (selectDetail.value) {
-        updateQuantityByDetailId(selectDetail.value);
+        updateQuantity();
+        updateName();
     }
-  } );
+});
 </script>
 
 @endsection

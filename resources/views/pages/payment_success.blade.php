@@ -2,16 +2,47 @@
 
 @section('content')
 
-<div class="pay-success-page">
-    <h2 class="title text-center">Đặt Hàng Thành Công</h2>
+@php
+    $method = strtoupper((string)($order->payment_method ?? 'COD'));
+    $status = (string)($order->status ?? 'pending');
 
+    $isVNPay = ($method === 'VNPAY');
+    $isCanceled = ($status === 'canceled');
+
+    // Tiêu đề theo status
+    if ($isCanceled) {
+        $pageTitle = $isVNPay
+            ? 'Thanh toán VNPay không thành công'
+            : 'Đơn hàng đã bị hủy';
+    } else {
+        $pageTitle = $isVNPay
+            ? 'Thanh toán VNPay thành công'
+            : 'Đặt hàng thành công';
+    }
+
+    // Hiển thị phương thức
+    $methodText = $isVNPay ? 'VNPay (Chuyển khoản)' : 'COD (Thanh toán khi nhận hàng)';
+@endphp
+
+<h2 class="title text-center">{{ $pageTitle }}</h2>
+
+<div class="pay-success-page">
+  
+    {{-- Thông báo --}}
     @if(session('success'))
         <div class="pay-success-alert">
             {{ session('success') }}
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="pay-error-alert">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="pay-success-box">
+
         <div class="pay-success-row">
             <span>Mã đơn hàng:</span>
             <strong style="color:#e60012;">{{ $order->order_code }}</strong>
@@ -19,12 +50,14 @@
 
         <div class="pay-success-row">
             <span>Trạng thái:</span>
-            <strong>{{ $order->status }}</strong>
+            <strong class="{{ $isCanceled ? 'text-danger' : '' }}">
+                {{ $order->status }}
+            </strong>
         </div>
 
         <div class="pay-success-row">
             <span>Phương thức:</span>
-            <strong>{{ $order->payment_method }}</strong>
+            <strong>{{ $methodText }}</strong>
         </div>
 
         <hr>
@@ -56,9 +89,7 @@
 
         <div class="pay-success-items">
             @foreach($items as $it)
-                @php
-                    $line = (float)$it->price * (int)$it->quantity;
-                @endphp
+                @php $line = (float)$it->price * (int)$it->quantity; @endphp
                 <div class="pay-success-item">
                     <div class="item-name">
                         {{ $it->name }}
@@ -93,8 +124,8 @@
                 Tiếp tục mua sắm
             </a>
 
-            <a href="{{ route('cart.index') }}" class="btn btn-default">
-                Xem giỏ hàng
+            <a href="{{ url('/my-orders') }}" class="btn btn-default">
+                Đơn hàng của tôi
             </a>
         </div>
     </div>
@@ -102,6 +133,7 @@
 
 <style>
 .pay-success-page{ padding: 20px 0 40px; }
+
 .pay-success-alert{
     background:#e60012;
     color:#fff;
@@ -111,17 +143,30 @@
     font-weight:600;
     text-align:center;
 }
+.pay-error-alert{
+    background:#ffefef;
+    color:#b80010;
+    border:1px solid #ffd1d1;
+    padding:12px 16px;
+    border-radius:10px;
+    margin: 10px 0 16px;
+    font-weight:700;
+    text-align:center;
+}
+
 .pay-success-box{
     background:#fff;
     border:1px solid #eee;
     border-radius:12px;
     padding: 14px 16px;
 }
+
 .pay-success-title{
     font-size: 18px;
     font-weight: 800;
     margin: 0 0 12px;
 }
+
 .pay-success-row{
     display:flex;
     justify-content: space-between;
@@ -129,11 +174,13 @@
     gap: 12px;
     padding: 6px 0;
 }
+
 .pay-success-items{
     border-top:1px dashed #eee;
     padding-top: 10px;
     margin-top: 6px;
 }
+
 .pay-success-item{
     display:flex;
     justify-content: space-between;
@@ -141,6 +188,7 @@
     padding: 8px 0;
     border-bottom: 1px solid #f3f3f3;
 }
+
 .item-name{ font-weight: 700; }
 .item-qty{ color:#777; font-weight: 800; margin-left: 6px; }
 .item-price{ font-weight: 900; color:#e60012; }
@@ -167,6 +215,8 @@
     gap: 10px;
     flex-wrap: wrap;
 }
+
+.text-danger{ color:#b80010; font-weight:900; }
 </style>
 
 @endsection

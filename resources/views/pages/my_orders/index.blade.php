@@ -127,15 +127,18 @@
 </div> <br> <br> <br>
 
 <style>
-/* ====== ẨN SIDEBAR TRÁI CHỈ CHO TRANG NÀY (KHÔNG SỬA LAYOUT) ======
-   Layout của bạn: body > section > .container > .row > .col-sm-3 (left)
-                   body > section > .container > .row > .col-sm-9.padding-right (content)
+/* body > section > .container > .row > .col-sm-3 (left)
+    body > section > .container > .row > .col-sm-9.padding-right (content)
 */
 body > section > .container > .row > .col-sm-3{
     display: none !important;
 }
 body > section > .container > .row > .col-sm-9.padding-right{
-    width: 100% !important;
+    width: 90% !important;
+    float: none !important;         /* bỏ float của bootstrap */
+    margin: 0 auto !important;      /* căn giữa */
+    display: block !important;
+    
 }
 @media (min-width: 768px){
     body > section > .container > .row > .col-sm-9.padding-right{

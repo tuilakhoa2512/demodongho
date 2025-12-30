@@ -17,9 +17,6 @@ class PaymentController extends Controller
 {
     /**
      * GET /payment
-     * - Bắt buộc login theo session id
-     * - Prefill thông tin giao hàng từ bảng users
-     * - Load cart + tính tiền giống CartController
      */
     public function show()
     {
@@ -28,10 +25,8 @@ class PaymentController extends Controller
             return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để thanh toán.');
         }
 
-        // 1) Load user (prefill)
         $user = DB::table('users')->where('id', $userId)->first();
 
-        // 2) Load provinces + districts + wards theo profile
         $provinces = DB::table('provinces')->orderBy('name')->get();
 
         $districts = [];
@@ -50,7 +45,6 @@ class PaymentController extends Controller
                 ->get();
         }
 
-        // 3) Load cart (raw)
         $raw = $this->getRawCart();
         if (empty($raw)) {
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống.');
@@ -74,20 +68,16 @@ class PaymentController extends Controller
                 continue;
             }
 
-            // Không còn bán / hết hàng => remove
             if ((int)$product->status !== 1 || $product->stock_status !== 'selling' || (int)$product->quantity <= 0) {
                 $this->removeByProductId((int)$pid);
                 continue;
             }
 
-            // tồn kho thật
             $maxQty = max(1, (int)$product->quantity);
 
-            // ép qty theo tồn kho
             $qty = max(1, (int)$qty);
             $qty = min($qty, $maxQty);
 
-            // giá final
             $basePrice = (float)$product->price;
             $salePrice = $product->discounted_price;
             $hasSale   = ($salePrice !== null && (float)$salePrice > 0 && (float)$salePrice < $basePrice);
@@ -107,7 +97,6 @@ class PaymentController extends Controller
                 'line_total'  => $lineTotal,
             ];
 
-            // sync lại qty nếu bị ép
             $this->syncQty((int)$pid, (int)$qty);
         }
 
@@ -115,7 +104,6 @@ class PaymentController extends Controller
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống hoặc sản phẩm không hợp lệ.');
         }
 
-        // Bill discount
         $billDiscount = $this->getBestBillDiscount($subtotal);
         $billDiscountAmount = 0;
 
@@ -142,10 +130,9 @@ class PaymentController extends Controller
 
     /**
      * POST /payment
-     * - Validate thông tin giao hàng
-     * - Tạo orders + order_details
-     * - Trừ kho
-     * - Xóa cart
+     * CÁCH 2:
+     * - COD: tạo order + details + trừ kho + xóa cart
+     * - VNPAY: tạo order + details, KHÔNG trừ kho, KHÔNG xóa cart, chuyển sang /vnpay/create/{order_code}
      */
     public function placeOrder(Request $request)
     {
@@ -154,7 +141,6 @@ class PaymentController extends Controller
             return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để đặt hàng.');
         }
 
-        // Validate giao hàng
         $request->validate([
             'receiver_name'    => 'required|string|max:150',
             'receiver_email'   => 'required|email|max:150',
@@ -165,10 +151,11 @@ class PaymentController extends Controller
             'district_id'      => 'nullable|integer',
             'ward_id'          => 'nullable|integer',
 
-            'payment_method'   => 'required|string|max:30', // COD/VNPAY
+            // chặt hơn: chỉ nhận COD/VNPAY
+            'payment_method'   => 'required|in:COD,VNPAY',
         ]);
 
-        // Lấy lại cart & tính tiền (KHÔNG tin dữ liệu client)
+        // Lấy lại cart & tính tiền (KHÔNG tin client)
         $raw = $this->getRawCart();
         if (empty($raw)) {
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống.');
@@ -211,7 +198,6 @@ class PaymentController extends Controller
                 'price'      => (float)$finalPrice,
             ];
 
-            // sync qty cho sạch
             $this->syncQty((int)$p->id, (int)$qty);
         }
 
@@ -234,12 +220,11 @@ class PaymentController extends Controller
 
         $grandTotal = max(0, $subtotal - $billDiscountAmount);
 
-        // Tạo order_code
         $orderCode = 'DH-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
 
         DB::beginTransaction();
         try {
-            // 1) Create Order
+            // 1) Create Order (LUÔN TẠO)
             $order = Order::create([
                 'order_code' => $orderCode,
                 'user_id' => $userId,
@@ -251,7 +236,6 @@ class PaymentController extends Controller
                 'discount_bill_rate' => $billDiscountRate,
                 'discount_bill_value' => (int)$billDiscountAmount,
 
-                // receiver fields
                 'receiver_name' => $request->receiver_name,
                 'receiver_email' => $request->receiver_email,
                 'receiver_phone' => $request->receiver_phone,
@@ -261,7 +245,7 @@ class PaymentController extends Controller
                 'ward_id' => $request->ward_id,
             ]);
 
-            // 2) Create OrderDetails + trừ kho
+            // 2) Create OrderDetails (LUÔN TẠO)
             foreach ($items as $it) {
                 OrderDetail::create([
                     'order_id'   => $order->id,
@@ -269,27 +253,36 @@ class PaymentController extends Controller
                     'quantity'   => $it['quantity'],
                     'price'      => $it['price'],
                 ]);
-
-                $updated = Product::where('id', $it['product_id'])
-                    ->where('quantity', '>=', $it['quantity'])
-                    ->decrement('quantity', $it['quantity']);
-
-                if (!$updated) {
-                    throw new \Exception('Sản phẩm đã hết hàng hoặc không đủ tồn kho.');
-                }
             }
 
-            // 3) Xóa cart
-            $this->clearCart();
+            /**
+             * ✅ CÁCH 2:
+             * - COD: trừ kho + xóa cart ngay
+             * - VNPAY: KHÔNG trừ kho, KHÔNG xóa cart ở đây
+             *   => VNPayController xử lý khi return success
+             */
+            if ($request->payment_method === 'COD') {
+                foreach ($items as $it) {
+                    $updated = Product::where('id', $it['product_id'])
+                        ->where('quantity', '>=', $it['quantity'])
+                        ->decrement('quantity', $it['quantity']);
+
+                    if (!$updated) {
+                        throw new \Exception('Sản phẩm đã hết hàng hoặc không đủ tồn kho.');
+                    }
+                }
+
+                $this->clearCart();
+            }
 
             DB::commit();
 
+            // VNPAY: đi sang trang tạo URL thanh toán
             if ($request->payment_method === 'VNPAY') {
-                // qua trang tạo url thanh toán VNPay
                 return redirect()->route('vnpay.create', ['order_code' => $orderCode]);
             }
 
-            // mặc định COD
+            // COD: về Payment Success
             return redirect()->route('payment.success', ['order_code' => $orderCode])
                 ->with('success', 'Đặt hàng thành công!');
         } catch (\Throwable $e) {
@@ -300,7 +293,6 @@ class PaymentController extends Controller
 
     /**
      * GET /payment/success/{order_code}
-     * Trang đặt hàng thành công (thuộc Payment)
      */
     public function success($order_code)
     {
@@ -345,7 +337,7 @@ class PaymentController extends Controller
         ));
     }
 
-    // ===================== HÀM PHỤ (cart theo session id, không dùng Auth) =====================
+    // ===================== HÀM PHỤ =====================
 
     private function customerId(): ?int
     {
@@ -360,7 +352,6 @@ class PaymentController extends Controller
 
     private function getRawCart(): array
     {
-        // login => DB carts
         if ($this->isCustomerLoggedIn()) {
             $userId = $this->customerId();
             $rows = Cart::where('user_id', $userId)->get(['product_id', 'quantity']);
@@ -372,7 +363,6 @@ class PaymentController extends Controller
             return $raw;
         }
 
-        // guest => session cart
         $cart = Session::get('cart', []);
         $raw = [];
 
