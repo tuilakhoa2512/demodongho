@@ -81,11 +81,26 @@
           <p><span class="k">SĐT:</span> <span class="v">{{ $receiverPhone }}</span></p>
           <p><span class="k">Địa chỉ:</span> <span class="v">{{ $receiverAddr }}</span></p>
 
-          @if(!empty($order->province_id) || !empty($order->district_id) || !empty($order->ward_id))
-            <p style="margin-top:10px; color:#777;">
-              (Đã lưu province/district/ward theo ID trong orders)
-            </p>
-          @endif
+          @php
+          $wardName = $districtName = $provinceName = null;
+          if (!empty($order->ward_id)) {
+            $wardName = \Illuminate\Support\Facades\DB::table('wards')->where('id', $order->ward_id)->value('name');
+          }
+          if (!empty($order->district_id)) {
+            $districtName = \Illuminate\Support\Facades\DB::table('districts')->where('id', $order->district_id)->value('name');
+          }
+          if (!empty($order->province_id)) {
+            $provinceName = \Illuminate\Support\Facades\DB::table('provinces')->where('id', $order->province_id)->value('name');
+          }
+
+          $locationParts = array_filter([$wardName, $districtName, $provinceName]);
+          $locationText = !empty($locationParts) ? implode(' - ', $locationParts) : null;
+        @endphp
+
+        @if($locationText)
+          <p><span class="k">Khu vực:</span> <span class="v">{{ $locationText }}</span></p>
+        @endif
+
         </div>
       </div>
 

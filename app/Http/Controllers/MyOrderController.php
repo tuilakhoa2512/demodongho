@@ -46,9 +46,19 @@ class MyOrderController extends Controller
             return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để xem đơn hàng.');
         }
 
-        $order = DB::table('orders')
-            ->where('order_code', $order_code)
-            ->where('user_id', $userId)
+        //  JOIN tỉnh/huyện/xã để lấy tên hiển thị
+        $order = DB::table('orders as o')
+            ->leftJoin('provinces as pv', 'pv.id', '=', 'o.province_id')
+            ->leftJoin('districts as dt', 'dt.id', '=', 'o.district_id')
+            ->leftJoin('wards as wd', 'wd.id', '=', 'o.ward_id')
+            ->where('o.order_code', $order_code)
+            ->where('o.user_id', $userId)
+            ->select(
+                'o.*',
+                'pv.name as province_name',
+                'dt.name as district_name',
+                'wd.name as ward_name'
+            )
             ->first();
 
         if (!$order) {
@@ -59,7 +69,6 @@ class MyOrderController extends Controller
          * Lưu ý:
          * - od.price: đơn giá tại thời điểm đặt hàng (giá đã chốt)
          * - p.price : giá gốc hiện tại của sản phẩm (để hiển thị gạch ngang nếu có sale)
-         * - KHÔNG query p.discounted_price (vì DB bạn không có cột này)
          */
         $items = DB::table('order_details as od')
             ->join('products as p', 'p.id', '=', 'od.product_id')
@@ -68,12 +77,19 @@ class MyOrderController extends Controller
             ->select(
                 'p.id as product_id',
                 'p.name',
-                'pi.image_1 as image',          // ảnh default
-                'p.price as base_price',        // giá gốc hiện tại
-                'od.price as unit_price',       // đơn giá đã chốt trong đơn
+                'pi.image_1 as image',
+                'p.price as base_price',
+                'od.price as unit_price',
                 'od.quantity'
             )
             ->get();
+
+        $areaParts = array_filter([
+            $order->ward_name ?? null,
+            $order->district_name ?? null,
+            $order->province_name ?? null,
+        ]);
+        $order->area_text = !empty($areaParts) ? implode(' - ', $areaParts) : null;
 
         return view('pages.my_orders.show', [
             'order'        => $order,
@@ -81,4 +97,5 @@ class MyOrderController extends Controller
             'statusLabels' => $this->statusLabels,
         ]);
     }
+
 }
