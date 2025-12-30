@@ -65,6 +65,8 @@ Route::get('/user/google/callback', [AdminController::class, 'callback_user_goog
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
+Route::get('/tim-kiem', [HomeController::class, 'search'])->name('search');
+
 Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
 
 //Review
@@ -330,8 +332,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/orders/{order_code}/status', [\App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
 });
-
-
-
-    
-

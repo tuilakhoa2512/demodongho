@@ -14,7 +14,7 @@
 
             <div class="single-products">
 
-                {{-- GIỐNG SHOW_BRAND NHƯNG KHÔNG HOVER --}}
+                {{-- chọn sp nhưng ko hover --}}
                 <div class="productinfo text-center">
 
                     <img src="{{ $product->main_image_url }}"

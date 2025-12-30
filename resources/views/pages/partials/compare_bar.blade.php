@@ -5,11 +5,14 @@
 @endphp
 
 @if($sp1 || $sp2)
-<div class="compare-bar">
+<div id="compare-bar" 
+style="position:fixed; bottom:0; left:300px; right:300px; 
+            background:#fff; box-shadow:0 -3px 10px rgba(0,0,0,0.15); 
+            padding:15px 20px; z-index:99999;">
 
-    <div class="row align-items-center">
+    <div class="row">
 
-        {{-- SLOT SP1 --}}
+        {{-- SP1 --}}
         <div class="col-sm-4 text-center">
             @if($sp1)
                 <img src="{{ $sp1->main_image_url }}" width="60" height="60" style="object-fit:cover;">
@@ -27,7 +30,7 @@
 
         <div class="compare-divider"></div>
 
-        {{-- SLOT SP2 --}}
+        {{-- SP2 --}}
         <div class="col-sm-4 text-center">
             @if($sp2)
                 <img src="{{ $sp2->main_image_url }}" width="60" height="60" style="object-fit:cover;">
@@ -56,7 +59,7 @@
             </a>
 
         </div>
-
     </div>
+
 </div>
 @endif

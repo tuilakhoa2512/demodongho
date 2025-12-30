@@ -3,7 +3,7 @@
 
 <div class="panel panel-default">
 
-    {{-- HEADING --}}
+    {{-- heading --}}
     <div class="panel-heading">
         Danh sách đánh giá sản phẩm
         @if(isset($filterStatus) && $filterStatus == 1)
@@ -13,7 +13,7 @@
         @endif
     </div>
 
-    {{-- POPUP SUCCESS --}}
+    {{-- Popup thông báo --}}
     @if (session('success'))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -27,7 +27,7 @@
     </script>
     @endif
 
-    {{-- FORM LỌC --}}
+    {{-- form lọc --}}
     <div class="row" style="padding: 10px 15px;">
         <div class="col-sm-4">
             <form method="GET" action="{{ route('admin.reviewuser.index') }}" class="form-inline">
@@ -68,23 +68,23 @@
                 <tr>
                     <td>{{ $key + 1 }}</td>
 
-                    {{-- USER --}}
+                    {{-- user --}}
                     <td>{{ $review->user->fullname ?? 'Không xác định' }}</td>
 
-                    {{-- PRODUCT --}}
+                    {{-- prpduct --}}
                     <td>{{ $review->product->name ?? 'Đã xoá' }}</td>
 
-                    {{-- RATING --}}
+                    {{-- rating --}}
                     <td style="color:#e60012;font-weight:600;">
                         {{ $review->rating }} ★
                     </td>
 
-                    {{-- COMMENT --}}
+                    {{-- comment --}}
                     <td style="max-width:300px;">
                         {{ $review->comment }}
                     </td>
 
-                    {{-- STATUS --}}
+                    {{-- status --}}
                     <td>
                         @if($review->status == 1)
                             <span class="label label-success">Hiển thị</span>
@@ -93,7 +93,7 @@
                         @endif
                     </td>
 
-                    {{-- ACTION --}}
+                    {{-- action --}}
                     <td>
                         @if($review->status == 1)
                             <a href="{{ route('admin.review.toggle', $review->id) }}"
@@ -124,7 +124,7 @@
         </table>
     </div>
 
-    {{-- PAGINATION --}}
+    {{-- phân trang --}}
     <div class="text-center">
         {{ $reviews->links() }}
     </div>

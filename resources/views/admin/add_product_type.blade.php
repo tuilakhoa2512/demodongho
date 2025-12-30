@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function convertToSlug(str) {
         str = str.toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") //loại bỏ dấu
         .replace(/đ/g, "d")
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '');

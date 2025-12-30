@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
@@ -72,32 +72,43 @@ class HomeController extends Controller
     }
 
     public function search(Request $request)
-    {
-        $keywords = $request->keywords_submit;
+{
+    $keywords = trim($request->keywords);
 
-        $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id', 'asc')->get();
-        $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id', 'asc')->get();
+    $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id')->get();
+    $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id')->get();
 
-        // Search: nếu bạn hiển thị giá khuyến mãi ở trang search thì cũng eager-load discount
-        $search_product = Product::with([
-                'productImage',
-                'category',
-                'brand',
-                'discountProducts' => $this->discountEagerLoadClosure(),
-            ])
-            ->where('name', 'like', '%' . $keywords . '%')
-            ->where('quantity', '>', 0)
-            ->whereHas('category')
-            ->whereHas('brand')
-            ->orderBy('id', 'asc')
-            ->get();
-
-        return view('admin.products.search')
-            ->with('category', $cate_pro)
-            ->with('brand', $brand_pro)
-            ->with('search_product', $search_product)
-            ->with('keywords', $keywords);
+    // ===== FAVORITE =====
+    $favorite_ids = [];
+    if (Session::has('id')) {
+        $favorite_ids = DB::table('favorites')
+            ->where('user_id', Session::get('id'))
+            ->pluck('product_id')
+            ->toArray();
     }
+
+    $search_product = Product::with([
+            'productImage',
+            'category',
+            'brand',
+            'discountProducts' => $this->discountEagerLoadClosure(),
+        ])
+        ->where('name', 'LIKE', "%{$keywords}%")
+        ->where('quantity', '>', 0)
+        ->whereHas('category')
+        ->whereHas('brand')
+        ->orderBy('id', 'desc')
+        ->get();
+
+    return view('admin.products.search', compact(
+        'cate_pro',
+        'brand_pro',
+        'search_product',
+        'keywords',
+        'favorite_ids'
+    ));
+}
+
 
     // Hàm lọc giá
     public function filterPrice(Request $request)

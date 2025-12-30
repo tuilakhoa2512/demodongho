@@ -7,18 +7,6 @@
             <header class="panel-heading">
                 Cập nhật thương hiệu sản phẩm
             </header>
-            @if (session('message'))
-                            <script>
-                                $(document).ready(function() {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Thành công!',
-                                        text: 'Cập nhật thương hiệu sản phẩm thành công!',
-                                        confirmButtonText: 'OK'
-                                    });
-                                });
-                            </script>
-                        @endif
           
             @if (Session::has('message'))
                 <span class="text-alert">{{ Session::get('message') }}</span>

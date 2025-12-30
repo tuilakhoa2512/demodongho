@@ -1,25 +1,28 @@
 <div class="col-sm-4 {{ isset($is_recommended) ? 'recommended-card' : '' }}">
-
     <div class="product-image-wrapper">
         <div class="single-products">
-            
 
             @php
-                // ====== GIÁ ======
+                // ====== giá ======
                 $salePrice   = $product->discounted_price ?? null;
                 $basePrice   = (float) $product->price;
                 $hasDiscount = !is_null($salePrice) && $salePrice < $basePrice;
 
-                // ====== YÊU THÍCH ======
+                // ====== yêu thích ======
                 $user_id     = Session::get('id');
                 $is_favorite = isset($favorite_ids)
                                 ? in_array($product->id, $favorite_ids)
                                 : false;
+
+                // ====== ẩn action ======
+                $hideActions = $hideActions ?? false;
             @endphp
 
             <div class="productinfo text-center">
                 <div class="product-img-box">
-                    <img class="main-img" src="{{ $product->main_image_url }}" alt="{{ $product->name }}">
+                    <img class="main-img"
+                         src="{{ $product->main_image_url }}"
+                         alt="{{ $product->name }}">
                 </div>
                 <br>
 
@@ -40,8 +43,11 @@
                 <p>{{ $product->name }}</p>
             </div>
 
+            @if(!$hideActions)
             <div class="product-overlay">
-                <img class="overlay-img" src="{{ $product->hover_image_url }}" alt="{{ $product->name }}">
+                <img class="overlay-img"
+                     src="{{ $product->hover_image_url }}"
+                     alt="{{ $product->name }}">
                 <div class="overlay-content">
                     <a href="{{ url('/product/'.$product->id) }}"
                        class="btn btn-default add-to-cart">
@@ -49,12 +55,13 @@
                     </a>
                 </div>
             </div>
+            @endif
 
         </div>
 
+        @if(!$hideActions)
         <div class="choose">
             <ul class="nav nav-pills nav-justified">
-                
                 <li>
                     <a href="{{ route('favorite.toggle', $product->id) }}"
                        style="color: {{ $is_favorite ? 'red' : '#555' }};">
@@ -70,5 +77,7 @@
                 </li>
             </ul>
         </div>
+        @endif
+
     </div>
 </div>

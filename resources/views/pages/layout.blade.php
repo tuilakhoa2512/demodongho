@@ -162,28 +162,31 @@
 									</div>
 								</li>
 
-								<li><a href="{{ route('sales.product') }}">Sales</a></li>
-								<li><a href="{{ route('contact.us') }}">Contact</a></li>
+								<li><a href="{{ route('sales.product') }}">Khuyến Mãi</a></li>
+								<li><a href="{{ route('contact.us') }}">Liên Hệ</a></li>
 							</ul>
 						</div>
 					</div>
 					<div class="col-sm-5">
-						<form  action="{{ URL::to('/tim-kiem') }}" method="POST">
-						{{ csrf_field() }}
-						<div class="search_box pull-right" style="position: relative; width: 250px;">
+    <form action="{{ route('search') }}" method="GET">
+        <div class="search_box pull-right" style="position: relative; width: 250px;">
 
-							<input type="text" name="keywords_submit"
-								placeholder="Tìm Kiếm sản phẩm"
-								style="width: 100%; padding: 8px 35px 8px 12px; border-radius: 5px; border: 1px solid #ccc;">
+            <input type="text"
+                   name="keywords"
+                   value="{{ request('keywords') }}"
+                   placeholder="Tìm kiếm sản phẩm"
+                   style="width: 100%; padding: 8px 35px 8px 12px; border-radius: 5px; border: 1px solid #ccc;">
 
-							<button type="submit"
-									style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-										background: none; border: none; color: #555; cursor: pointer; font-size: 16px;">
-								<i class="fa fa-search"></i>
-							</button>
-						</div>
-						</form>
-					</div>
+            <button type="submit"
+                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+                           background: none; border: none; color: #555; cursor: pointer; font-size: 16px;">
+                <i class="fa fa-search"></i>
+            </button>
+
+        </div>
+    </form>
+</div>
+
 				</div>
 			</div>
 		</div><!--/header-bottom-->
@@ -259,7 +262,7 @@
 			<div class="row">
 				<div class="col-sm-3">
 					<div class="left-sidebar">
-						<h2>Category</h2>
+						<h2>Danh mục</h2>
 						<div class="panel-group category-products" id="accordian"><!--category-productsr-->
 							@foreach ($category as $key => $cate)
 
@@ -276,7 +279,7 @@
 						
 
 						
-						<h2>Brand</h2>
+						<h2>Thương Hiệu</h2>
 						<div class="panel-group category-products" id="accordian"><!--brand-productsr-->
 							@foreach ($brand as $key => $brand)
 
@@ -476,6 +479,8 @@ $(document).ready(function () {
 
 @stack('js')
 @include('pages.partials.ai_chatbox')
+@include('pages.partials.compare_bar')
+
 </body>
 
 </html>

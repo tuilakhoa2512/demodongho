@@ -358,12 +358,7 @@ body {
 <script src="{{ asset('backend/js/scripts.js')}}"></script>
 <script src="{{ asset('backend/js/jquery.slimscroll.js')}}"></script>
 <script src="{{ asset('backend/js/jquery.nicescroll.js')}}"></script>
-<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="js/flot-chart/excanvas.min.js"></script><![endif]-->
 <script src="{{ asset('backend/js/jquery.scrollTo.js')}}"></script>
-<!-- morris JavaScript -->	
-
-
-	
 
 </body>
 </html>

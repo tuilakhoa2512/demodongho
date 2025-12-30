@@ -5,7 +5,7 @@
     Sản phẩm hiệu {{ $brand_name }}
 </h2>
 
-{{-- THÔNG BÁO --}}
+{{-- Thông báo --}}
 @if(session('success'))
     <div id="cart-alert"
          style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px;

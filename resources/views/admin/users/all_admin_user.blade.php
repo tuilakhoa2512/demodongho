@@ -12,7 +12,7 @@
         @endif
     </div>
 
-    {{-- POPUP --}}
+    {{-- popup thông báo --}}
     @if (session('message'))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -26,7 +26,7 @@
     </script>
     @endif
 
-    {{-- FORM LỌC TRẠNG THÁI --}}
+    {{-- form lọc trạng thái --}}
     <div class="row" style="padding: 10px 15px;">
         <div class="col-sm-4">
             <form method="GET" action="{{ route('admin.users.index') }}" class="form-inline">
@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    {{-- BẢNG --}}
+    {{-- bảng --}}
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

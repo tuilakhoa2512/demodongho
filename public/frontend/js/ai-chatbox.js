@@ -125,20 +125,31 @@ function loadChatHistory() {
 
             container.innerHTML = '';
 
+            // CHƯA CÓ TIN NHẮN → HIỆN LỜI CHÀO
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="ai-bot">
+                        Xin chào 👋 Tôi có thể hỗ trợ bạn về sản phẩm.
+                    </div>
+                `;
+                return;
+            }
+
+            // CÓ LỊCH SỬ → RENDER BÌNH THƯỜNG
             messages.forEach(m => {
                 const wrap = addMessage(
                     m.message,
                     m.role === 'user' ? 'user' : 'ai'
                 );
-            
+
                 if (m.products && m.products.length > 0) {
                     renderProductCards(m.products, wrap);
                 }
             });
-            
         })
         .catch(err => console.error('Load history error:', err));
 }
+
 
 /* Setup nút xoá lịch sử */
 function setupClearChatButton() {

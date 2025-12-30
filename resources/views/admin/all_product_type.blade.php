@@ -126,24 +126,4 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    function confirmDelete(url) {
-        Swal.fire({
-            title: 'Bạn chắc chắn?',
-                    text: 'Loại Sản phẩm sẽ bị xoá và không thể khôi phục!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Vâng, xoá',
-                    cancelButtonText: 'Huỷ'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Chuyển hướng đến URL xóa
-                window.location.href = url;
-            }
-        });
-    }
-</script>
-
 @endsection

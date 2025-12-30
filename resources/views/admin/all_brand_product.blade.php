@@ -100,30 +100,32 @@
                 @else
                         <span class="label label-danger">Ẩn</span>
                 @endif
-                </span></td>
-                         <td>
-                            <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">
-                                <i class="fa fa-pencil-square-o text-success text-active"></i>
-                            </a>
-                            <!-- Ẩn / Hiện -->
-        @if ($brand_pro->status == 1)
-            <!-- Đang hiện → cho phép chuyển sang Ẩn -->
-            <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"
-               class="active styling edit"
-               style="font-size: 18px;">
-                <i class="fa fa-eye text-warning"></i>
-            </a>
-        @else
-            <!-- Đang ẩn → cho phép chuyển sang Hiện -->
-            <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"
-               class="active styling edit"
-               style="font-size: 18px;">
-                <i class="fa fa-eye-slash text-warning"></i>
-            </a>
-        @endif
-                        </td>
+                </span>
+              </td>
+              <td>
+               <a href="{{ URL::to('/edit-brand-product/'.$brand_pro->id) }}" class="active styling edit">
+               <i class="fa fa-pencil-square-o text-success text-active"></i>
+                </a>
+                <!-- Ẩn / Hiện -->
+                @if ($brand_pro->status == 1)
+                    <!-- Đang hiện → cho phép chuyển sang Ẩn -->
+                    <a href="{{ URL::to('/unactive-brand-product/'.$brand_pro->id) }}"
+                      class="active styling edit"
+                      style="font-size: 18px;">
+                        <i class="fa fa-eye text-warning"></i>
+                    </a>
+                @else
+                    <!-- Đang ẩn → cho phép chuyển sang Hiện -->
+                    <a href="{{ URL::to('/active-brand-product/'.$brand_pro->id) }}"
+                      class="active styling edit"
+                      style="font-size: 18px;">
+                        <i class="fa fa-eye-slash text-warning"></i>
+                    </a>
+                @endif
+              </td>
             </td>
           </tr>
+          
           @endforeach
         </tbody>
       </table>
@@ -152,23 +154,5 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-<script>
-    function confirmDelete(url) {
-        Swal.fire({
-          title: 'Bạn chắc chắn?',
-                    text: 'Thương hiệu Sản phẩm sẽ bị xoá và không thể khôi phục!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Vâng, xoá',
-                    cancelButtonText: 'Huỷ'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Chuyển hướng đến URL xóa
-                window.location.href = url;
-            }
-        });
-    }
-</script>
 
 @endsection

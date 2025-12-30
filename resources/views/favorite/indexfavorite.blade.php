@@ -3,7 +3,7 @@
 @section('content')
 
 <h2 class="title text-center">Sản phẩm yêu thích của bạn</h2>
-
+ 
 <div class="features_items">
 
 @php
@@ -20,9 +20,12 @@
     @endif
 
 @empty
-    <h3 class="text-center" style="margin:50px 0;">
-        Bạn chưa yêu thích sản phẩm nào.
-    </h3>
+        <div class="col-sm-12">
+            <p class="text-center" style="font-size:16px;">
+                Hiện chưa có sản phẩm nào yêu thích
+            </p>
+        </div>
+   
 @endforelse
 
 <div class="clearfix"></div>

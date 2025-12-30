@@ -89,7 +89,7 @@ class CheckoutController extends Controller
         // GỘP CART guest → DB carts
         $this->mergeGuestCartToDb($id);
 
-        return Redirect::to('/checkout');
+        return Redirect::to('/trang-chu');
     }
 
     public function checkout(){
@@ -136,10 +136,10 @@ class CheckoutController extends Controller
         Session::put('fullname', $user->fullname);
         Session::put('role_id', $user->role_id);
 
-        //  GỘP CART guest → DB carts 
+        //  gộp cart vào db 
         $this->mergeGuestCartToDb($user->id);
 
-        // ===== GỘP YÊU THÍCH GUEST → DB =====
+        // gộp yêu thích vào db
         $guest_favorites = Session::get('favorite_guest', []);
 
         if (!empty($guest_favorites)) {
@@ -174,10 +174,7 @@ class CheckoutController extends Controller
         return view('pages.checkout.register');
     }
 
-    /**
-     * Merge cart session (guest) -> DB carts
-     * Chặn tồn kho + chỉ lấy product đang bán
-     */
+    
     private function mergeGuestCartToDb($userId)
     {
         $userId = (int) $userId;
@@ -186,7 +183,7 @@ class CheckoutController extends Controller
         $guestCart = Session::get('cart', []);
         if (empty($guestCart)) return;
 
-        // Lấy product_id list
+        // Lấy danh sách product_id
         $productIds = [];
         foreach ($guestCart as $key => $item) {
             $pid = isset($item['id']) ? (int)$item['id'] : (int)$key;
@@ -195,7 +192,7 @@ class CheckoutController extends Controller
         $productIds = array_values(array_unique($productIds));
         if (empty($productIds)) return;
 
-        // Load sản phẩm 1 lần (để chặn tồn kho + trạng thái)
+        // Load sản phẩm 1 lần để lấy các sản phẩm trong giỏ hàng
         $products = DB::table('products')
             ->whereIn('id', $productIds)
             ->select('id', 'quantity', 'status', 'stock_status')
@@ -218,7 +215,7 @@ class CheckoutController extends Controller
             $qty = max(1, $qty);
             $qty = min($qty, (int)$p->quantity);
 
-            // Upsert vào carts: nếu có rồi thì cộng dồn
+            // Kiểm tra sp đã có chưa, nếu có thì update sl
             $row = DB::table('carts')
                 ->where('user_id', $userId)
                 ->where('product_id', $pid)
