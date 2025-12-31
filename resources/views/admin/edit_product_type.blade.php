@@ -78,7 +78,7 @@
     </div>
 </div>
 
-{{-- JS tạo slug realtime --}}
+{{-- JS tạo slug--}}
 <script>
     function generateSlug(str) {
         str = str.toLowerCase();

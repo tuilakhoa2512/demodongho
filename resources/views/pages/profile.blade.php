@@ -9,7 +9,7 @@
     $last  = mb_substr(end($parts), 0, 1, 'UTF-8');
     $initials = strtoupper($first . $last);
 
-    // Random màu HEX
+    // Random màu
     function randomColor() {
         return sprintf("#%06X", mt_rand(0, 0xFFFFFF));
     }
@@ -150,18 +150,18 @@
 }
 .login-form .form-control {
     width: 130%;
-    max-width: 600px; /* muốn bao nhiêu cũng được */
+    max-width: 600px;
 }
 .btn-block {
     width: 130%;
 }
 .form-group {
-        margin-bottom: 15px; /* tăng hoặc giảm tùy bạn */
+        margin-bottom: 15px;
     }
 </style>
 
 
-{{-- AJAX province/district/ward --}}
+{{-- province/district/ward --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 

@@ -68,7 +68,7 @@ class FavoriteController extends Controller
     {
         $user_id = Session::get('id');
 
-        //  CHƯA LOGIN → CẤM
+        //  CHƯA LOGIN -> CẤM
         if (!$user_id) {
             return redirect('/login-checkout')
                 ->with('error', 'Bạn cần đăng nhập để yêu thích sản phẩm!');

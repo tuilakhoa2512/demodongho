@@ -12,18 +12,14 @@ class CompareController extends Controller
     public function add($id)
 {
     $product = Product::find($id);
-    if (!$product) {
-        return back()->with('error', 'Sản phẩm không tồn tại!');
-    }
-
     $compare = session('compare', []);
 
-    // KIỂM TRA TRÙNG SẢN PHẨM
+    // kiểm tra trùng sản phẩm
     if (
         (isset($compare['sp1']) && $compare['sp1'] == $product->id) ||
         (isset($compare['sp2']) && $compare['sp2'] == $product->id)
     ) {
-        return back()->with('compare_exists', 'Sản phẩm này đã có trong mục so sánh!');
+        return back()->with('success', 'Sản phẩm này đã có trong mục so sánh!');
     }
 
     $slot = session('compare_slot'); // slot được chọn
@@ -40,7 +36,7 @@ class CompareController extends Controller
         } elseif (!isset($compare['sp2'])) {
             $compare['sp2'] = $product->id;
         } else {
-            return back()->with('error', 'Bạn chỉ được so sánh tối đa 2 sản phẩm!');
+            return back()->with('success', 'Bạn chỉ được so sánh tối đa 2 sản phẩm!');
         }
     }
 
@@ -76,10 +72,6 @@ class CompareController extends Controller
 
     public function select($slot)
 {
-    if (!in_array($slot, ['sp1', 'sp2'])) {
-        return redirect()->back()->with('error', 'Slot không hợp lệ!');
-    }
-
     // Lưu slot vào session
     session(['compare_slot' => $slot]);
 

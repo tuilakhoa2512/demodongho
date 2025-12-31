@@ -12,10 +12,7 @@ use App\Models\Cart;
 
 class VNPayController extends Controller
 {
-    /**
-     * GET /vnpay/create/{order_code}
-     * Tạo URL thanh toán và redirect sang VNPay
-     */
+
     public function create(Request $request, string $order_code)
     {
         if (!$order_code) {
@@ -87,12 +84,7 @@ class VNPayController extends Controller
         return redirect()->away($paymentUrl);
     }
 
-    /**
-     * GET /vnpay/return
-     * Cách 2:
-     *  - Thành công: trừ kho + clear cart + status=confirmed
-     *  - Hủy/Fail:   status=canceled
-     */
+
     public function vnpayReturn(Request $request)
     {
         $vnp_HashSecret = config('vnpay.hash_secret');
@@ -132,7 +124,7 @@ class VNPayController extends Controller
 
         $isSuccess = ($respCode === "00" && $txnStatus === "00");
 
-        // ✅ Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
+        // Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
         if (!$isSuccess) {
             // Hủy/Fail => hủy đơn
             if ($order->status === 'pending') {
@@ -147,7 +139,7 @@ class VNPayController extends Controller
                 ->with('error', 'Thanh toán VNPay đã bị hủy hoặc không thành công. Đơn hàng đã được hủy.');
         }
 
-        // ✅ THÀNH CÔNG: trừ kho + clear cart + confirmed
+        // THÀNH CÔNG: trừ kho + clear cart + confirmed
         if ($order->status !== 'pending') {
             // đã confirmed/shipping/... => không làm lại
             return redirect()

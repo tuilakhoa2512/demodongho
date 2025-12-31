@@ -11,9 +11,8 @@ use App\Models\AIChatMessage;
 
 class AIChatController extends Controller
 {
-    /**
-     * Session ID (không dùng Auth)
-     */
+     //Session ID (không dùng Auth)
+     
     private function sessionId()
     {
         return session()->getId();
@@ -40,16 +39,8 @@ class AIChatController extends Controller
 }
 
 
-    /**
-     * Giới hạn số message
-     */
-    /**
- * Chuẩn hoá giới tính từ câu hỏi user
- */
-/**
- * Chuẩn hoá giới tính từ câu hỏi user
- * OUTPUT CHỈ TRẢ: male | female | null
- */
+//Chuẩn hoá giới tính từ câu hỏi userOUTPUT CHỈ TRẢ: male | female | null
+ 
 private function detectGender(string $message): ?string
 {
     $message = mb_strtolower($message);
@@ -90,9 +81,8 @@ private function detectGender(string $message): ?string
         }
     }
 
-    /**
-     * Load lịch sử chat
-     */
+    
+    //Load lịch sử chat
     public function history()
     {
         $messages = AIChatMessage::where('session_id', $this->sessionId())
@@ -115,9 +105,8 @@ private function detectGender(string $message): ?string
     }
 
 
-    /**
-     * Xoá lịch sử chat
-     */
+    //Xoá lịch sử chat
+    
     public function clear()
     {
         AIChatMessage::where('session_id', $this->sessionId())->delete();
@@ -125,9 +114,8 @@ private function detectGender(string $message): ?string
         return response()->json(['status' => 'ok']);
     }
 
-    /**
-     * Chat Gemini AI
-     */
+    
+    //Chat Gemini AI
     public function chat(Request $request)
     {     
         $request->validate([
@@ -137,26 +125,23 @@ private function detectGender(string $message): ?string
         $sessionId   = $this->sessionId();
         $userMessage = trim($request->message);
 
-        /**
-         * Lưu user message
-         */
+        
+        //Lưu user message
         AIChatMessage::create([
             'session_id' => $sessionId,
             'user_id'    => $this->userId(),
             'role'       => 'user',
             'message'    => $userMessage
         ]);
+        //lưu thông tin lọc để bot nhớ ngữ cảnh
         $context = session()->get('ai_filter_context', [
             'gender' => null,
             'strap'  => null,
             'brand'  => null,
             'price'  => null,
         ]);
-        /**
-         * ============================
-         * 1️⃣ PHÂN TÍCH & LỌC SẢN PHẨM (PHP)
-         * ============================
-         */
+
+        //lọc sản phẩm
         $productsForUI = [];
 
         $query = Product::where('status', 1);
@@ -166,9 +151,8 @@ private function detectGender(string $message): ?string
         $brandDetectedThisTurn = false;
 
 
-        /**
-         * 🔥 Lọc hãng tự động từ DB
-         */
+        
+         //Lọc hãng tự động từ DB
         $allBrands = DB::table('brands')
             ->where('status', 1)
             ->select('id', 'name')
@@ -186,7 +170,7 @@ private function detectGender(string $message): ?string
                     empty($context['brand']) ||
                     $context['brand'] !== $brand->id
                 ) {
-                    // 🔥 ĐỔI BRAND → RESET FILTER PHỤ
+                    // ĐỔI BRAND → RESET FILTER PHỤ
                     $context['gender'] = null;
                     $context['strap']  = null;
                     $context['price']  = null;
@@ -199,9 +183,9 @@ private function detectGender(string $message): ?string
                 break;
             }
         }
-        /**
-         * Giới tính
-         */
+        
+         //Giới tính
+         
         $gender = $this->detectGender($userMessage);
 
         if ($gender) {
@@ -211,9 +195,9 @@ private function detectGender(string $message): ?string
             $hasValidFilter = true;
         }
 
-        /**
-         * Dây đeo
-         */
+        
+        //Dây đeo
+         
         $hasStrap = false;
         
         if (str_contains($userMessage, 'nhựa')) {
@@ -221,7 +205,7 @@ private function detectGender(string $message): ?string
             $context['strap'] = 'nhựa';
             $hasValidFilter = true;
             $hasStrap = true;
-            // 🔥 CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
+            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
         session()->forget('ai_filter');
         }
         else if (str_contains($userMessage, 'thép không gỉ')) {
@@ -229,7 +213,7 @@ private function detectGender(string $message): ?string
             $context['strap'] = 'thép không gỉ';
             $hasValidFilter = true;
             $hasStrap = true;
-            // 🔥 CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
+            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
         session()->forget('ai_filter');
         }
         else if (str_contains($userMessage, 'da')) {
@@ -237,14 +221,14 @@ private function detectGender(string $message): ?string
             $context['strap'] = 'da';
             $hasValidFilter = true;
             $hasStrap = true;
-            // 🔥 CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
+            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
         session()->forget('ai_filter');
         }
         
 
-        /**
-         * Giá (triệu)
-         */
+    
+        //Giá (triệu)
+
         if (preg_match('/dưới\s*(\d+)/', $userMessage, $m)) {
             $maxPrice = ((int)$m[1]) * 1_000_000;
             $query->where('price', '<=', $maxPrice);
@@ -288,13 +272,12 @@ private function detectGender(string $message): ?string
             }
         }
         
-        // ✅ LƯU NGỮ CẢNH SAU KHI PARSE USER MESSAGE
+        // LƯU NGỮ CẢNH SAU KHI PARSE USER MESSAGE
         session()->put('ai_filter_context', $context);
 
 
-        /**
- * 🔥 XỬ LÝ TRẢ LỜI TIẾP THEO (dựa trên context cũ)
- */
+ //XỬ LÝ TRẢ LỜI TIẾP THEO (dựa trên context cũ)
+ 
 $sessionFilter = session('ai_filter');
 
 if ($sessionFilter && !$gender) {
@@ -306,9 +289,9 @@ if ($sessionFilter && !$gender) {
     }
 }
 
-        /**
- * 🔥 Xác định user CÓ Ý ĐỊNH HỎI HÃNG hay không
- */
+      
+ //Xác định user có ý định hỏi hãng hay không
+
 $askForBrand = false;
 
 if (
@@ -319,11 +302,7 @@ if (
 }
 
 
-        /**
- * ============================
- * 🚫 PHÁT HIỆN KEYWORD KHÔNG TỒN TẠI TRONG DB
- * ============================
- */
+ // PHÁT HIỆN KEYWORD KHÔNG TỒN TẠI TRONG DB
 
 // Danh sách tên brand (lowercase)
 $brandNames = $allBrands
@@ -336,9 +315,9 @@ $words = preg_split('/\s+/', $userMessage);
 
 // Cờ kiểm tra user có yêu cầu hãng không tồn tại
 $invalidBrand = null;
-/**
- * 🔥 Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại)
- */
+
+ //Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại)
+ 
 $ignoreKeywords = [
     'nam', 'nữ',
     'da',  'nhựa', 'thép', 'không', 'gỉ',
@@ -364,11 +343,8 @@ foreach ($words as $word) {
 }
 
 
-/**
- * ============================
- * ⛔ TRẢ VỀ SỚM NẾU HÃNG KHÔNG TỒN TẠI
- * ============================
- */
+
+ // TRẢ VỀ SỚM NẾU HÃNG KHÔNG TỒN TẠI
 
 if ($invalidBrand) {
     $reply = "Xin lỗi 😥 shop hiện **không có sản phẩm hiệu \"$invalidBrand\"**.";
@@ -407,9 +383,7 @@ if (!$hasValidFilter) {
         'products' => []
     ]);
 }
-/**
- * 🚫 CHẶN CÂU HỎI VÔ NGHĨA (1 từ, không filter)
- */
+
 if (
     !$hasValidFilter &&
     mb_strlen($userMessage) <= 3
@@ -421,10 +395,7 @@ if (
 }
 
         $products = $query->limit(6)->get();
-        /**
- * 🔐 ĐẢM BẢO productsForUI LUÔN ĐƯỢC KHỞI TẠO
- * (tránh lỗi khi return sớm)
- */
+
 if (!isset($productsForUI)) {
     $productsForUI = [];
 }
@@ -432,12 +403,12 @@ if (!isset($productsForUI)) {
         $followUpQuestion = null;
 
 
-/**
- * ✅ HIỆN SẢN PHẨM TRƯỚC + HỎI NGƯỢC
- */
+
+//HIỆN SẢN PHẨM TRƯỚC VÀ HỎI NGƯỢC
+
 if ($products->count() > 0 && !$hasStrap && $gender) {
 
-    // 🔥 LƯU CONTEXT VÀO SESSION
+    //LƯU CONTEXT VÀO SESSION
     session([
         'ai_filter' => [
             'gender' => $gender
@@ -454,7 +425,6 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
         'message'    => $reply
     ]);
 
-    // ⚠️ TRẢ VỀ LUÔN: CÓ SẢN PHẨM + CÂU HỎI
     return response()->json([
         'reply'    => $reply,
         'products' => $productsForUI
@@ -464,11 +434,9 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
         
 
 
-        /**
-         * ============================
-         * 2️⃣ KHÔNG CÓ SẢN PHẨM
-         * ============================
-         */
+
+         // KHÔNG CÓ SẢN PHẨM
+
         if ($products->isEmpty()) {
             $reply = 'Hiện shop chưa có sản phẩm phù hợp với yêu cầu của bạn.';
 
@@ -482,11 +450,8 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
             return response()->json(['reply' => $reply,'products' => []]);
         }
 
-        /**
-         * ============================
-         * 3️⃣ CHUẨN BỊ DATA SẢN PHẨM CHO UI
-         * ============================
-         */
+
+         // CHUẨN BỊ DATA SẢN PHẨM CHO UI
         $productsForUI = [];
 
         foreach ($products as $p) {
@@ -509,11 +474,8 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
             ];
         }
 
-        /**
-         * ============================
-         * 4️⃣ CHUẨN BỊ PROMPT CHO GEMINI
-         * ============================
-         */
+
+         // CHUẨN BỊ PROMPT CHO GEMINI
         $productText = '';
         foreach ($products as $p) {
         $productText .= "- {$p->name}, "
@@ -521,11 +483,6 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
         . "giới tính {$p->gender}, "
         . "dây {$p->strap_material}\n";
 }
-/**
- * ⚠️ PROMPT CHỈ DÙNG ĐỂ DIỄN ĐẠT
- * - KHÔNG dùng để filter
- * - Filter đã được xử lý 100% bằng PHP phía trên
- */
 
  $prompt = <<<PROMPT
 Bạn là chatbot bán đồng hồ của website thương mại điện tử.
@@ -571,19 +528,13 @@ GỢI Ý HỎI NGƯỢC (NẾU CÓ)
 ============================
 {$followUpQuestion}
 
-⚠️ LƯU Ý CUỐI:
+ LƯU Ý CUỐI:
 - Không nói về "AI", "hệ thống", "dữ liệu"
 - Không dùng emoji quá nhiều (tối đa 1–2 cái)
 - Giữ giọng thân thiện như nhân viên shop thật
 
 PROMPT;
-
-
-        /**
-         * ============================
-         * 5️⃣ GỌI GEMINI API
-         * ============================
-         */
+         // GỌI GEMINI API
         try {
             $response = Http::timeout(30)->post(
                 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='
@@ -614,9 +565,7 @@ PROMPT;
             $aiReply = 'Xin lỗi, hệ thống AI đang bận.';
         }
 
-        /**
-         * Lưu AI message
-         */
+        //Lưu AI message
         AIChatMessage::create([
             'session_id' => $sessionId,
             'user_id'    => $this->userId(),
@@ -625,16 +574,12 @@ PROMPT;
             'products'   => $productsForUI
         ]);
 
-        /**
-         * Giới hạn message
-         */
+        
+         //Giới hạn message
+        
         $this->limitMessages($sessionId);
 
-        /**
-         * ============================
-         * 6️⃣ RESPONSE CUỐI
-         * ============================
-         */
+        //response cuối
         return response()->json([
             'reply'    => $aiReply,
             'products' => $productsForUI

@@ -117,7 +117,6 @@ public function callback_google()
                     ->with('error', 'Tài khoản của bạn đã bị đình chỉ!');
             }
 
-            //  OK thì mới login
             Auth::login($user);
 
             return redirect('/')->with('message', 'Đăng nhập Google thành công!');
@@ -212,7 +211,7 @@ private function mergeGuestCartToDb(int $userId): void
     $guestCart = Session::get('cart', []);
     if (empty($guestCart)) return;
 
-    // Lấy list product_id từ guest cart
+    // Lấy danh sách product_id từ guest cart
     $productIds = [];
     foreach ($guestCart as $key => $item) {
         $pid = isset($item['id']) ? (int)$item['id'] : (int)$key;

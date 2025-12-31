@@ -14,28 +14,13 @@ session_start();
 
 class ProductTypeController extends Controller
 {
-    public function AuthLogin(){
-        $id = Session::get('id');
-            if($id){
-                return Redirect::to('dashboard');
-            }else{
-                return Redirect::to('admin')->send();
-            }
-        }   
+    
     public function add_product_type(){
-        // $this->AuthLogin();
+        
         return view('admin.add_product_type');
     }
-    // public function all_product_type(){
-    //     // $this->AuthLogin();
-    //     $all_product_type = DB::table('categories')->get();
-    //     $manager_product_type = view('admin.all_product_type')->with('all_product_type',$all_product_type);
-    //     return view('pages.admin_layout')->with('admin.all_product_type',$manager_product_type);
-        
-    // }
-
     public function all_product_type(Request $request){
-        // $this->AuthLogin();
+        
         $filterStatus = $request->get('status');
         $query = DB::table('categories');
 
@@ -48,12 +33,6 @@ class ProductTypeController extends Controller
         // Lấy kết quả
         $all_product_type = $query->get();
 
-    // Truyền biến qua view
-    $manager_product_type = view('admin.all_product_type')
-        ->with('all_product_type', $all_product_type)
-        ->with('filterStatus', $filterStatus);
-
-    // return view('pages.admin_layout')->with('admin.all_product_type', $manager_product_type);
     return view('admin.all_product_type', [
         'all_product_type' => $all_product_type,
         'filterStatus' => $filterStatus
@@ -61,7 +40,7 @@ class ProductTypeController extends Controller
         
     }
     public function save_product_type(Request $request){
-        // $this->AuthLogin();
+        
         $request->validate([
             'product_type_name' => 'required|max:255',
             'product_type_slug'   => 'nullable|string|max:255',
@@ -85,7 +64,7 @@ class ProductTypeController extends Controller
     {
         $str = mb_strtolower($str, 'UTF-8');
     
-        // Danh sách thay thế tiếng Việt → không dấu
+        // Danh sách thay thế tiếng Việt không dấu
         $unicode = [
             'a' => 'á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ',
             'd' => 'đ',
@@ -123,7 +102,7 @@ class ProductTypeController extends Controller
     }
 
     public function edit_product_type($id){
-        // $this->AuthLogin();
+        
         $edit_product_type = DB::table('categories')->where('id',$id)->get();
         $manager_product_type = view('admin.edit_product_type')->with('edit_product_type',$edit_product_type);
         return view('pages.admin_layout')->with('admin.edit_product_type',$manager_product_type);
@@ -181,18 +160,16 @@ public function show_category_home($category_slug)
         ->with('category_by_id', $category_by_id);
 }
 
-
-
-    public function delete_product_type($id){
-        // $this->AuthLogin();
-        $productType = Category::find($id);
+    // public function delete_product_type($id){
+      
+    //     $productType = Category::find($id);
     
-    if ($productType) {
-        $productType->delete();
-        return redirect()->back()->with('message', 'Xóa sản phẩm thành công!');
-    } else {
-        return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
-    }
+    // if ($productType) {
+    //     $productType->delete();
+    //     return redirect()->back()->with('message', 'Xóa sản phẩm thành công!');
+    // } else {
+    //     return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
+    // }
         
-    }
+    // }
 }

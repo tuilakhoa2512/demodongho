@@ -20,7 +20,6 @@ class OrderController extends Controller
 
     private function requireAdmin()
     {
-        // Admin login của bạn đang lưu Session::put('admin_id', ...)
         if (!Session::has('admin_id')) {
             return Redirect::to('/admin')->send();
         }
@@ -80,7 +79,6 @@ class OrderController extends Controller
     {
         $this->requireAdmin();
 
-        // 1) Lấy order + join user để có fallback fullname/email
         $order = DB::table('orders as o')
             ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
             ->select(
@@ -95,7 +93,7 @@ class OrderController extends Controller
             return redirect('/admin/orders')->with('error', 'Không tìm thấy đơn hàng.');
         }
 
-        // 2) Lấy chi tiết sản phẩm trong đơn (join products)
+        // Lấy chi tiết sản phẩm trong đơn (join products)
         $items = DB::table('order_details as od')
             ->join('products as p', 'p.id', '=', 'od.product_id')
             ->leftJoin('product_images as pi', 'pi.product_id', '=', 'p.id') // nếu bạn có bảng product_images
@@ -110,7 +108,7 @@ class OrderController extends Controller
             )
             ->get();
 
-        // 3) Tính tạm tính
+        // Tính tạm tính
         $subtotal = 0;
         foreach ($items as $it) {
             $subtotal += ((float)$it->price * (int)$it->quantity);
@@ -129,11 +127,6 @@ class OrderController extends Controller
         ]);
     }
 
-
-    /**
-     * POST /admin/orders/{order_code}/status
-     * Update theo order_code
-     */
     public function updateStatus(Request $request, $order_code)
     {
         $this->requireAdmin();
@@ -151,7 +144,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Lock đơn để tránh bấm liên tục / race-condition
+            // Lock đơn để tránh bấm liên tục
             $order = DB::table('orders')
                 ->where('order_code', $order_code)
                 ->lockForUpdate()
@@ -164,19 +157,19 @@ class OrderController extends Controller
 
             $currentStatus = $order->status ?? 'pending';
 
-            // 1) Nếu đơn đã hủy -> KHÔNG cho đổi nữa
+            // Nếu đơn đã hủy -> KHÔNG cho đổi nữa
             if ($currentStatus === 'canceled') {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Đơn đã hủy, không thể thay đổi trạng thái nữa.');
             }
 
-            // 2) Nếu chọn lại đúng trạng thái hiện tại -> không làm gì
+            // Nếu chọn lại đúng trạng thái hiện tại -> không làm gì
             if ($currentStatus === $newStatus) {
                 DB::rollBack();
                 return redirect()->back()->with('success', 'Trạng thái không thay đổi.');
             }
 
-            // 3) Nếu đổi sang CANCELED -> hoàn kho (chỉ hoàn 1 lần vì đã chặn ở bước 1)
+            // Nếu đổi sang CANCELED -> hoàn kho chỉ hoàn 1 lần vì đã chặn ở bước 1
             if ($newStatus === 'canceled') {
                 $details = DB::table('order_details')
                     ->where('order_id', $order->id)
@@ -193,7 +186,7 @@ class OrderController extends Controller
                 }
             }
 
-            // 4) Update status
+            // Update status
             DB::table('orders')
                 ->where('id', $order->id)
                 ->update([

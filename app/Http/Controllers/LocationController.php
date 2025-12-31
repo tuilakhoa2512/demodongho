@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class LocationController extends Controller
 {
-    // LẤY DANH SÁCH TỈNH / THÀNH PHỐ
+    // lấy danh sách / tỉnh thành phố
     public function provinces()
     {
         // API cấu trúc cũ: /api/v1/provinces
@@ -21,12 +21,10 @@ class LocationController extends Controller
         }
 
         $data = $response->json();
-
-        // API trả về { success: true, data: [...] }
         return response()->json($data['data'] ?? []);
     }
 
-    // LẤY QUẬN/HUYỆN THEO MÃ TỈNH
+    // lây quận/huyện theo mã tỉnh
     public function districts($provinceCode)
     {
         // /api/v1/provinces/{provinceCode}/districts
@@ -46,7 +44,7 @@ class LocationController extends Controller
         return response()->json($data['data'] ?? []);
     }
 
-    // LẤY PHƯỜNG/XÃ THEO MÃ QUẬN
+    // lây phường/xã theo mã quận
     public function wards($districtCode)
     {
         // /api/v1/districts/{districtCode}/wards

@@ -22,6 +22,6 @@ class AIChatMessage extends Model
     }
 
     protected $casts = [
-        'products' => 'array' // 🔥 TỰ JSON DECODE
+        'products' => 'array' 
     ];
 }

@@ -10,14 +10,13 @@ use App\Models\Review;
 
 class AdminUserController extends Controller
 {
-    // Danh sách KHÁCH HÀNG
     public function all_admin_user(Request $request)
 {
-    // lấy trạng thái từ URL (?status=1 | 0)
+    // lọc trạng thái 1 / 0
     $filterStatus = $request->get('status');
 
     $query = DB::table('users')
-        ->where('role_id', 2); //chỉ khách hàng
+        ->where('role_id', 2);
 
     // nếu có lọc
     if ($filterStatus === "1") {
@@ -26,18 +25,18 @@ class AdminUserController extends Controller
         $query->where('status', 0);
     }
 
-    $users = $query->orderBy('id', 'desc')->get();
+    $users = $query->orderBy('id', 'asc')->get();
 
     return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
 }
 
-    // Trang thêm KHÁCH HÀNG
+    // Trang thêm khach hang
     public function add_admin_user()
     {
         return view('admin.users.add_admin_user');
     }
 
-    // Lưu KHÁCH HÀNG
+    // Lưu khach hang
     public function store_admin_user(Request $request)
 {
     $request->validate(
@@ -53,7 +52,7 @@ class AdminUserController extends Controller
             'address' => ['nullable','string','max:255',],
         ],
         [
-            // ===== MESSAGE TIẾNG VIỆT =====
+            // ===== tiếng việt =====
             'fullname.required' => 'Vui lòng nhập họ tên.',
             'fullname.max' => 'Họ tên không được vượt quá 30 ký tự.',
             'fullname.regex' => 'Họ tên không được chứa số hoặc ký tự đặc biệt.',
@@ -90,12 +89,12 @@ class AdminUserController extends Controller
 }
 
 
-    // ẨN KHÁCH HÀNG
+    // ẩn khách hàng
     public function unactive_admin_user($id)
     {
         DB::table('users')
             ->where('id', $id)
-            ->where('role_id', 2) // 🔒 CHẮC CHẮN LÀ KHÁCH
+            ->where('role_id', 2)
             ->update(['status' => 0]);
 
         return redirect()->back()

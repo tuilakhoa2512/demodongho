@@ -17,26 +17,16 @@ session_start();
 
 class BrandProductController extends Controller
 {
-    public function AuthLogin()
-    {
-        $id = Session::get('id');
-        if ($id) {
-            return Redirect::to('dashboard');
-        } else {
-            return Redirect::to('admin')->send();
-        }
-    }
-
     public function add_brand_product()
     {
-        // $this->AuthLogin();
+        
         return view('admin.add_brand_product');
     }
 
     public function all_brand_product(Request $request)
     {
-        // $this->AuthLogin();
-        // Lấy trạng thái lọc từ URL, có thể là: null, "1", "0"
+        
+        // Lấy trạng thái lọc từ URL, có thể là: 1,0
         $filterStatus = $request->get('status');
          // Query brands
         $query = DB::table('brands');
@@ -86,7 +76,7 @@ class BrandProductController extends Controller
             $file = $request->file('brand_product_image');
 
             // lưu vào storage/app/public/brands
-            $path = $file->store('brands', 'public'); // vd "brands/logo1.jpg"
+            $path = $file->store('brands', 'public');
             $data['image'] = $path;
         } else {
             $data['image'] = null;
@@ -113,7 +103,6 @@ class BrandProductController extends Controller
 
     public function edit_brand_product($id)
     {
-        // $this->AuthLogin();
         $edit_brand_product = DB::table('brands')->where('id', $id)->get();
         $manager_brand_product = view('admin.edit_brand_product')
             ->with('edit_brand_product', $edit_brand_product);
@@ -124,7 +113,6 @@ class BrandProductController extends Controller
 
     public function update_brand_product(Request $request, $id)
     {
-        // $this->AuthLogin();
 
         $request->validate([
             'brand_product_name'   => 'required|string|max:150',
@@ -140,7 +128,7 @@ class BrandProductController extends Controller
         $data['description'] = $request->brand_product_desc;
        
 
-        // CẬP NHẬT SLUG KHI ĐỔI TÊN
+        // cập nhật slug khi đổi tên
         $newSlug = Str::slug($request->brand_product_name);
 
         // Nếu slug bị trùng (ngoại trừ chính nó)
@@ -175,40 +163,6 @@ class BrandProductController extends Controller
         ->with('message', 'Cập nhật thương hiệu thành công.');
     }
 
-   public function delete_brand_product($id)
-    {
-        // $this->AuthLogin();
-
-        
-        $brand = DB::table('brands')->where('id', $id)->first();
-
-        if ($brand && $brand->image) {
-            Storage::disk('public')->delete($brand->image);
-        }
-
-        $brand = Brand::find($id);
-    
-        if ($brand) {
-            $brand->delete();
-            return redirect()->back()->with('message', 'Xóa sản phẩm thành công!');
-        } else {
-            return redirect()->back()->with('error', 'Sản phẩm không tồn tại!');
-        }
-        
-        return redirect()->route('admin.allbrandproduct')
-        ->with('error', 'Thương hiệu không tồn tại!');
-    }
-    public function destroy($id)
-    {
-        // tim, ko co thi bao 404
-        $product = Brand::findOrFail($id);
-
-        $product->delete();
-
-        // qlai dq
-        return redirect()->to('/admin/brands')
-                        ->with('success', 'Xoá sản phẩm thành công!');
-    }
     public function show_brand_home($brand_slug)
 {
     // Lấy tất cả categories để render menu
@@ -229,7 +183,7 @@ class BrandProductController extends Controller
         abort(404, 'Thương hiệu không tồn tại');
     }
 
-    //  LẤY SẢN PHẨM ĐÚNG CHUẨN (KHÔNG JOIN ẢNH)
+    //  lấy sản phẩm của 1 thương hiệu
     $brand_by_id = Product::with('productImage')
         ->where('brand_id', $brand->id)
         ->where('status', 1)

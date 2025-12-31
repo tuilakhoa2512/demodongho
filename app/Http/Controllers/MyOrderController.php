@@ -7,10 +7,7 @@ use Illuminate\Support\Facades\Session;
 
 class MyOrderController extends Controller
 {
-    /**
-     * Mapping trạng thái đơn hàng (EN → VI)
-     * Dùng chung cho index + show
-     */
+
     private array $statusLabels = [
         'pending'   => 'Đợi Xác Nhận',
         'confirmed' => 'Đã Xác Nhận',
@@ -65,11 +62,6 @@ class MyOrderController extends Controller
             return redirect('/my-orders')->with('error', 'Không tìm thấy đơn hàng.');
         }
 
-        /**
-         * Lưu ý:
-         * - od.price: đơn giá tại thời điểm đặt hàng (giá đã chốt)
-         * - p.price : giá gốc hiện tại của sản phẩm (để hiển thị gạch ngang nếu có sale)
-         */
         $items = DB::table('order_details as od')
             ->join('products as p', 'p.id', '=', 'od.product_id')
             ->leftJoin('product_images as pi', 'pi.product_id', '=', 'p.id')

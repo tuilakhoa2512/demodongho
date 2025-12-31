@@ -15,7 +15,7 @@ class Storage extends Model
         'supplier_email',
         'import_date', 
         'note',
-        'status',                // 1 = active, 0 = inactive/archived
+        'status',           
     ];
 
     // 1 Storage có nhiều StorageDetail

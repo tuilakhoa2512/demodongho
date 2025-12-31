@@ -10,10 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class StorageDetailController extends Controller
 {
-    /**
-     * Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
-     * Lưu ý: vì product liên kết storage_detail bằng products.storage_detail_id
-     */
     private function soldQtySubQuery()
     {
         return DB::table('order_details as od')
@@ -24,9 +20,7 @@ class StorageDetailController extends Controller
             ->groupBy('od.product_id');
     }
 
-    /**
-     * Query chung cho index + các list theo stock_status
-     */
+
     private function buildIndexQuery(Request $request, ?string $onlyStockStatus = null)
     {
         $selectedStorageId = $request->input('storage_id');
@@ -74,10 +68,6 @@ class StorageDetailController extends Controller
         ));
     }
 
-    /**
- * GET /admin/storages/{storageId}/details
- * Route: admin.storage-details.by-storage
- */
     public function indexByStorage(Request $request, $storageId)
     {
         $storage = Storage::findOrFail($storageId);

@@ -11,6 +11,7 @@
         {{ session('success') }}
     </div>
 
+
     <script>
         setTimeout(() => {
             const alertBox = document.getElementById('cart-alert');
@@ -60,7 +61,7 @@
 
 
 <div class="recommended_items">
-    <h2 class="title text-center">RECOMMENDED ITEMS</h2>
+    <h2 class="title text-center">Sản Phẩm Đề Xuất</h2>
 
     <div id="recommended-item-carousel"
          class="carousel slide recommended-carousel"

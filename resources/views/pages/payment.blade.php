@@ -163,8 +163,7 @@
                         Xác Nhận Đặt Hàng
                     </button>
 
-                    {{-- VNPAY BUTTON (HIDDEN) --}}
-                    {{-- CÁCH 1: vẫn submit về payment.place, controller sẽ tạo đơn xong redirect qua vnpay/create/{order_code} --}}
+                    {{-- VNPAY BUTTON--}}
                     <button type="submit"
                             id="btn_vnpay"
                             class="btn pay-btn"
