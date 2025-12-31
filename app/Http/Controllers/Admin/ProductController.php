@@ -15,15 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * DANH SÁCH SẢN PHẨM
-     * Route: admin.products.index
-     */
+   
     public function index()
     {
         $today = now()->toDateString();
 
-        // ✅ Lấy sản phẩm + join ưu đãi đang áp dụng (nếu có)
+        // Lấy sản phẩm + join ưu đãi đang áp dụng (nếu có)
         // Điều kiện ưu đãi được tính là "đang áp dụng":
         // - dp.status = 1 (chương trình ưu đãi đang bật)
         // - dpd.status = 1 (chi tiết đang áp dụng)
@@ -59,10 +56,7 @@ class ProductController extends Controller
         return view('admin.products.index', compact('products'));
     }
 
-    /**
-     * CHI TIẾT SẢN PHẨM
-     * Route: admin.products.show
-     */
+    //show
     public function show($id)
     {
         $product = Product::with([
@@ -86,10 +80,7 @@ class ProductController extends Controller
         return view('admin.products.show', compact('product','reviews', 'averageRating'));
     }
 
-    /**
-     * FORM TẠO SẢN PHẨM MỚI TỪ KHO
-     * Route: admin.products.create
-     */
+    
     public function create()
     {
         
@@ -121,7 +112,6 @@ class ProductController extends Controller
 
     /**
      * LƯU SẢN PHẨM MỚI
-     * Route: admin.products.store
      */
     public function store(Request $request)
     {
@@ -148,31 +138,31 @@ class ProductController extends Controller
             'image_1.required'           => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
         ]);
 
-        // 2) Lấy dòng kho
+        //  Lấy dòng kho
         $detail = StorageDetail::with('storage', 'product')->findOrFail($request->storage_detail_id);
 
-        // ✅ Chặn: kho đang ẩn
+        //  Chặn: kho đang ẩn
         if ((int)$detail->status !== 1) {
             return back()
                 ->withErrors(['storage_detail_id' => 'Dòng kho này đang bị ẩn, không thể đăng bán.'])
                 ->withInput();
         }
 
-        // ✅ Chặn: đã có product rồi
+        //  Chặn: đã có product rồi
         if ($detail->product) {
             return back()
                 ->withErrors(['storage_detail_id' => 'Dòng kho này đã được đăng bán (đã có sản phẩm).'])
                 ->withInput();
         }
 
-        // ✅ Chỉ cho đăng từ pending
+        // Chỉ cho đăng từ pending
         if ($detail->stock_status !== 'pending') {
             return back()
                 ->withErrors(['storage_detail_id' => 'Dòng kho này không còn trạng thái Chờ bán (pending).'])
                 ->withInput();
         }
 
-        // 3) Lấy số lượng từ kho
+        // Lấy số lượng từ kho
         $quantityFromStorage = (int)$detail->import_quantity;
 
         if ($quantityFromStorage <= 0) {
@@ -181,10 +171,10 @@ class ProductController extends Controller
                 ->withInput();
         }
 
-        // 4) Nếu không nhập tên -> dùng tên trong kho
+        // Nếu không nhập tên -> dùng tên trong kho
         $name = $request->name ?: $detail->product_name;
 
-        // 5) Tạo Product
+        // Tạo Product
         $product = Product::create([
             'storage_detail_id' => $detail->id,
             'category_id'       => $request->category_id,
@@ -198,21 +188,21 @@ class ProductController extends Controller
 
             'price'             => $request->price,
 
-            // ✅ quantity = import_quantity
+            // quantity = import_quantity
             'quantity'          => $quantityFromStorage,
 
-            // ✅ mới đăng => đang bán
+            //  mới đăng => đang bán
             'stock_status'      => 'selling',
 
-            // ✅ mặc định hiển thị
+            //  mặc định hiển thị
             'status'            => $request->status ?? 1,
         ]);
 
-        // 6) Đồng bộ kho sang selling
+        //  Đồng bộ kho sang selling
         $detail->stock_status = 'selling';
         $detail->save();
 
-        // 7) Lưu ảnh
+        //  Lưu ảnh
         $folder = "products/{$product->id}";
         $imagesData = ['product_id' => $product->id];
 
@@ -233,7 +223,6 @@ class ProductController extends Controller
 
     /**
      * FORM SỬA SẢN PHẨM
-     * Route: admin.products.edit
      */
     public function edit($id)
     {
@@ -252,7 +241,6 @@ class ProductController extends Controller
 
     /**
      * UPDATE SẢN PHẨM
-     * Route: admin.products.update
      */
     public function update(Request $request, $id)
     {
@@ -270,7 +258,7 @@ class ProductController extends Controller
 
             'price'           => 'required|numeric|min:0',
 
-            // Cho phép đổi trạng thái bán
+            // đổi trạng thái bán
             'stock_status'    => 'nullable|in:selling,sold_out,stopped',
 
             'status'          => 'nullable|in:0,1',
@@ -297,7 +285,7 @@ class ProductController extends Controller
             'status'         => $request->status ?? $product->status,
         ]);
 
-        // 🔁 Đồng bộ stock_status sang kho
+        //  Đồng bộ stock_status sang kho
         if ($product->storageDetail) {
             $product->storageDetail->stock_status = $product->stock_status;
             $product->storageDetail->save();
@@ -332,14 +320,13 @@ class ProductController extends Controller
 
     /**
      * ẨN / HIỆN SẢN PHẨM
-     * Route: admin.products.toggle-status (PATCH)
      */
     public function toggleStatus($id)
     {
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
-        // 1) ĐANG HIỂN THỊ -> ẨN
+        // ĐANG HIỂN THỊ -> ẨN
         if ($product->status == 1) {
 
             $product->status = 0;
@@ -356,7 +343,7 @@ class ProductController extends Controller
                 ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-        // 2) ĐANG ẨN -> HIỆN
+        // ĐANG ẨN -> HIỆN
 
         // Kho đang ẩn -> KHÔNG cho hiện
         if ($detail && $detail->status == 0) {

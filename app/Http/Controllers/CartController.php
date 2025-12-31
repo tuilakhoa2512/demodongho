@@ -12,14 +12,9 @@ use App\Models\DiscountBill;
 
 class CartController extends Controller
 {
-    /**
-     * =========================
-     * GIỎ HÀNG
-     * =========================
-     * - Login: Session::get('id') → DB carts
-     * - Guest: Session::get('cart')
-     * - Luôn load Product thật để lấy giá & tồn kho chuẩn
-     */
+
+     //Luôn load Product thật để lấy giá & tồn kho chuẩn
+    
     public function index()
     {
         $raw = $this->getRawCart(); // [product_id => qty]
@@ -105,9 +100,7 @@ class CartController extends Controller
             $this->syncQty($pid, $qty);
         }
 
-        // =========================
         // ƯU ĐÃI HÓA ĐƠN
-        // =========================
         $billDiscount = $this->getBestBillDiscount($subtotal);
 
         $billDiscountAmount = 0;
@@ -129,11 +122,9 @@ class CartController extends Controller
         ));
     }
 
-    /**
-     * =========================
-     * ADD TO CART
-     * =========================
-     */
+  
+     // them giỏ hàng
+   
     public function add(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -149,7 +140,7 @@ class CartController extends Controller
 
         $qty = max(1, (int)$request->input('quantity', 1));
 
-        // ===== LOGIN (Session id) =====
+        // LOGIN (Session id)
         if ($this->isCustomerLoggedIn()) {
             $userId = $this->customerId();
 
@@ -162,7 +153,7 @@ class CartController extends Controller
             $row->quantity = min($current + $qty, $stock);
             $row->save();
         }
-        // ===== GUEST =====
+        //  GUEST
         else {
             $cart = Session::get('cart', []);
 
@@ -180,11 +171,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
     }
 
-    /**
-     * =========================
-     * UPDATE CART
-     * =========================
-     */
+   //upd cart
     public function update(Request $request)
     {
         $quantities = $request->input('quantities', []);
@@ -254,11 +241,7 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Cập nhật giỏ hàng thành công!');
     }
 
-    /**
-     * =========================
-     * REMOVE ITEM
-     * =========================
-     */
+    //xoa sp 
     public function remove(Request $request)
     {
         $productId = (int)$request->input('product_id');
@@ -267,10 +250,8 @@ class CartController extends Controller
         return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng!');
     }
 
-    // =================================================
-    // =================== HÀM PHỤ ======================
-    // =================================================
-
+  
+    //  HÀM PHỤ 
     private function customerId(): ?int
     {
         return Session::get('id') ? (int)Session::get('id') : null;
@@ -281,9 +262,8 @@ class CartController extends Controller
         return $this->customerId() !== null;
     }
 
-    /**
-     * Lấy raw cart: [product_id => qty]
-     */
+     //Lấy raw cart: [product_id => qty]
+   
     private function getRawCart(): array
     {
         if ($this->isCustomerLoggedIn()) {

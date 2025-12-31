@@ -65,7 +65,6 @@ class DiscountProductController extends Controller
     }
 
     /**
-     * RÀNG BUỘC QUAN TRỌNG:
      * - Tắt DiscountProduct => tất cả pivot status = 0 (tạm ngừng)
      * - Bật DiscountProduct => pivot còn hạn => status = 1, hết hạn => status = 0
      */

@@ -10,10 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class StorageDetailController extends Controller
 {
-    /**
-     * Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
-     * Lưu ý: vì product liên kết storage_detail bằng products.storage_detail_id
-     */
+    
+     // Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
+   
     private function soldQtySubQuery()
     {
         return DB::table('order_details as od')
@@ -24,9 +23,9 @@ class StorageDetailController extends Controller
             ->groupBy('od.product_id');
     }
 
-    /**
-     * Query chung cho index + các list theo stock_status
-     */
+    
+     // Query chung cho index + các list theo stock_status
+     
     private function buildIndexQuery(Request $request, ?string $onlyStockStatus = null)
     {
         $selectedStorageId = $request->input('storage_id');
@@ -74,10 +73,7 @@ class StorageDetailController extends Controller
         ));
     }
 
-    /**
- * GET /admin/storages/{storageId}/details
- * Route: admin.storage-details.by-storage
- */
+  
     public function indexByStorage(Request $request, $storageId)
     {
         $storage = Storage::findOrFail($storageId);
@@ -138,20 +134,20 @@ class StorageDetailController extends Controller
         $detail  = StorageDetail::with(['storage', 'product'])->findOrFail($id);
         $storage = $detail->storage;
 
-        // ===== 1) CHẶN SỬA KHI SOLD_OUT =====
+        // chặn sửa khi sold out
         if ($detail->stock_status === 'sold_out') {
             return redirect()
                 ->back()
                 ->with('error', 'Sản phẩm đã bán hết, không thể chỉnh sửa số lượng nhập.');
         }
 
-        // ===== TÍNH SL ĐANG BÁN + ĐÃ BÁN =====
+        //tính sl đang + đã bán
         $sellingQty = (int) ($detail->selling_qty ?? 0);
         $soldQty    = (int) ($detail->sold_qty ?? 0);
         $minImport  = max(1, $sellingQty + $soldQty);
 
-        // ===== 2) GIỚI HẠN MAX (nếu muốn) =====
-        $maxImport = 10000; // nếu không muốn giới hạn → bỏ rule max
+        // giới hạn max sl
+        $maxImport = 10000;
 
         $rules = [
             'product_name'    => 'required|string|max:255',
@@ -213,7 +209,7 @@ class StorageDetailController extends Controller
             ->with('success', 'Cập nhật trạng thái kho (và sản phẩm liên quan) thành công.');
     }
 
-    // ====== LIST THEO STOCK_STATUS (dùng chung query builder để có selling_qty/sold_qty) ======
+    //LIST THEO STOCK_STATUS (dùng chung query builder để có selling_qty/sold_qty)
 
     public function listPending(Request $request)
     {

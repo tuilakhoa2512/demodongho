@@ -98,7 +98,6 @@ class StorageController extends Controller
             'supplier_email' => $request->supplier_email,
             'import_date'    => $request->import_date ?? $storage->import_date,
             'note'           => $request->note,
-            // status giữ nguyên, quản lý bằng toggle-status riêng
         ]);
 
         return redirect()

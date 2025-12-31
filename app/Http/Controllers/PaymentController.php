@@ -15,9 +15,7 @@ use App\Models\DiscountBill;
 
 class PaymentController extends Controller
 {
-    /**
-     * GET /payment
-     */
+    
     public function show()
     {
         $userId = (int) Session::get('id');
@@ -128,12 +126,10 @@ class PaymentController extends Controller
         ));
     }
 
-    /**
-     * POST /payment
-     * CÁCH 2:
-     * - COD: tạo order + details + trừ kho + xóa cart
-     * - VNPAY: tạo order + details, KHÔNG trừ kho, KHÔNG xóa cart, chuyển sang /vnpay/create/{order_code}
-     */
+    
+     //COD: tạo order + details + trừ kho + xóa cart
+     //VNPAY: tạo order + details, KHÔNG trừ kho, KHÔNG xóa cart, chuyển sang /vnpay/create/{order_code}
+    
     public function placeOrder(Request $request)
     {
         $userId = (int) Session::get('id');
@@ -224,7 +220,7 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1) Create Order (LUÔN TẠO)
+            // Create Order 
             $order = Order::create([
                 'order_code' => $orderCode,
                 'user_id' => $userId,
@@ -245,7 +241,7 @@ class PaymentController extends Controller
                 'ward_id' => $request->ward_id,
             ]);
 
-            // 2) Create OrderDetails (LUÔN TẠO)
+            //  Create OrderDetails 
             foreach ($items as $it) {
                 OrderDetail::create([
                     'order_id'   => $order->id,
@@ -255,12 +251,11 @@ class PaymentController extends Controller
                 ]);
             }
 
-            /**
-             * ✅ CÁCH 2:
-             * - COD: trừ kho + xóa cart ngay
-             * - VNPAY: KHÔNG trừ kho, KHÔNG xóa cart ở đây
-             *   => VNPayController xử lý khi return success
-             */
+           
+            // - COD: trừ kho + xóa cart ngay
+             //- VNPAY: KHÔNG trừ kho, KHÔNG xóa cart ở đây
+             //  => VNPayController xử lý khi return success
+             
             if ($request->payment_method === 'COD') {
                 foreach ($items as $it) {
                     $updated = Product::where('id', $it['product_id'])
@@ -291,9 +286,7 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * GET /payment/success/{order_code}
-     */
+  
     public function success($order_code)
     {
         $userId = (int) Session::get('id');
@@ -337,7 +330,7 @@ class PaymentController extends Controller
         ));
     }
 
-    // ===================== HÀM PHỤ =====================
+    //  HÀM PHỤ 
 
     private function customerId(): ?int
     {

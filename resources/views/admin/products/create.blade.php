@@ -206,7 +206,7 @@
   </div>
 </div>
 
-{{-- JS: tự đổ số lượng + tự đổ tên sản phẩm theo kho (nhưng vẫn sửa được) --}}
+{{-- JS: tự đổ số lượng + tên sản phẩm theo kho --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const selectDetail    = document.getElementById('storage_detail_id');

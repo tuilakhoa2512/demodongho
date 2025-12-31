@@ -27,7 +27,7 @@ class VNPayController extends Controller
             return redirect()->route('payment.show')->with('error', 'Không tìm thấy đơn hàng để thanh toán VNPay.');
         }
 
-        // Cách 2: chỉ cho thanh toán khi pending
+        // chỉ cho thanh toán khi pending
         if (($order->status ?? null) !== 'pending') {
             return redirect()->route('payment.success', ['order_code' => $order_code])
                 ->with('error', 'Đơn này không ở trạng thái chờ xử lý (pending) nên không thể thanh toán VNPay.');
@@ -88,8 +88,6 @@ class VNPayController extends Controller
     }
 
     /**
-     * GET /vnpay/return
-     * Cách 2:
      *  - Thành công: trừ kho + clear cart + status=confirmed
      *  - Hủy/Fail:   status=canceled
      */
@@ -132,7 +130,7 @@ class VNPayController extends Controller
 
         $isSuccess = ($respCode === "00" && $txnStatus === "00");
 
-        // ✅ Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
+        //  Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
         if (!$isSuccess) {
             // Hủy/Fail => hủy đơn
             if ($order->status === 'pending') {
@@ -147,7 +145,7 @@ class VNPayController extends Controller
                 ->with('error', 'Thanh toán VNPay đã bị hủy hoặc không thành công. Đơn hàng đã được hủy.');
         }
 
-        // ✅ THÀNH CÔNG: trừ kho + clear cart + confirmed
+        //  THÀNH CÔNG: trừ kho + clear cart + confirmed
         if ($order->status !== 'pending') {
             // đã confirmed/shipping/... => không làm lại
             return redirect()

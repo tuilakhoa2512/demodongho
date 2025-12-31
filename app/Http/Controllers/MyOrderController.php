@@ -7,10 +7,9 @@ use Illuminate\Support\Facades\Session;
 
 class MyOrderController extends Controller
 {
-    /**
-     * Mapping trạng thái đơn hàng (EN → VI)
-     * Dùng chung cho index + show
-     */
+    
+     // Mapping trạng thái đơn hàng (EN → VI)
+   
     private array $statusLabels = [
         'pending'   => 'Đợi Xác Nhận',
         'confirmed' => 'Đã Xác Nhận',
@@ -46,7 +45,7 @@ class MyOrderController extends Controller
             return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để xem đơn hàng.');
         }
 
-        //  JOIN tỉnh/huyện/xã để lấy tên hiển thị
+        //  JOIN tỉnh/huyện/xã 
         $order = DB::table('orders as o')
             ->leftJoin('provinces as pv', 'pv.id', '=', 'o.province_id')
             ->leftJoin('districts as dt', 'dt.id', '=', 'o.district_id')
@@ -65,11 +64,10 @@ class MyOrderController extends Controller
             return redirect('/my-orders')->with('error', 'Không tìm thấy đơn hàng.');
         }
 
-        /**
-         * Lưu ý:
-         * - od.price: đơn giá tại thời điểm đặt hàng (giá đã chốt)
-         * - p.price : giá gốc hiện tại của sản phẩm (để hiển thị gạch ngang nếu có sale)
-         */
+       
+         //od.price: đơn giá tại thời điểm đặt hàng (giá đã chốt)
+        //p.price : giá gốc hiện tại của sản phẩm (để hiển thị gạch ngang nếu có sale)
+        
         $items = DB::table('order_details as od')
             ->join('products as p', 'p.id', '=', 'od.product_id')
             ->leftJoin('product_images as pi', 'pi.product_id', '=', 'p.id')

@@ -114,6 +114,7 @@
 
               <td>{{ $receiverName }}</td>
               <td>{{ $receiverPhone }}</td>
+              
 
               <td>{{ $o->payment_method ?? '—' }}</td>
 
