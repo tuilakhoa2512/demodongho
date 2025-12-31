@@ -15,7 +15,11 @@ use App\Models\DiscountBill;
 
 class PaymentController extends Controller
 {
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> main
     public function show()
     {
         $userId = (int) Session::get('id');
@@ -126,10 +130,13 @@ class PaymentController extends Controller
         ));
     }
 
+<<<<<<< HEAD
     
      //COD: tạo order + details + trừ kho + xóa cart
      //VNPAY: tạo order + details, KHÔNG trừ kho, KHÔNG xóa cart, chuyển sang /vnpay/create/{order_code}
     
+=======
+>>>>>>> main
     public function placeOrder(Request $request)
     {
         $userId = (int) Session::get('id');
@@ -147,11 +154,10 @@ class PaymentController extends Controller
             'district_id'      => 'nullable|integer',
             'ward_id'          => 'nullable|integer',
 
-            // chặt hơn: chỉ nhận COD/VNPAY
             'payment_method'   => 'required|in:COD,VNPAY',
         ]);
 
-        // Lấy lại cart & tính tiền (KHÔNG tin client)
+   
         $raw = $this->getRawCart();
         if (empty($raw)) {
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống.');
@@ -251,11 +257,15 @@ class PaymentController extends Controller
                 ]);
             }
 
+<<<<<<< HEAD
            
             // - COD: trừ kho + xóa cart ngay
              //- VNPAY: KHÔNG trừ kho, KHÔNG xóa cart ở đây
              //  => VNPayController xử lý khi return success
              
+=======
+
+>>>>>>> main
             if ($request->payment_method === 'COD') {
                 foreach ($items as $it) {
                     $updated = Product::where('id', $it['product_id'])

@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('brands', function (Blueprint $table) {
-            $table->id(); // Id INT(10) UNSIGNED AUTO_INCREMENT
-            $table->string('name', 150); // Tên thương hiệu
-            $table->string('image', 255)->nullable(); // Ảnh, có thể null
-            $table->text('description')->nullable(); // Mô tả, có thể null
-            $table->tinyInteger('status')->unsigned()->default(1); // 1=active, 0=inactive
-            $table->timestamps(); // created_at và updated_at
+            $table->id();
+            $table->string('name', 150); 
+            $table->string('image', 255)->nullable();
+            $table->text('description')->nullable(); 
+            $table->tinyInteger('status')->unsigned()->default(1);
+            $table->timestamps(); 
         });
     }
 

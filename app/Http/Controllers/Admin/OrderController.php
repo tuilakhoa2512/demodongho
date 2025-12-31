@@ -20,7 +20,10 @@ class OrderController extends Controller
 
     private function requireAdmin()
     {
+<<<<<<< HEAD
   
+=======
+>>>>>>> main
         if (!Session::has('admin_id')) {
             return Redirect::to('/admin')->send();
         }
@@ -80,7 +83,10 @@ class OrderController extends Controller
     {
         $this->requireAdmin();
 
+<<<<<<< HEAD
         // Lấy order + join user để có fallback fullname/email
+=======
+>>>>>>> main
         $order = DB::table('orders as o')
             ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
             ->select(
@@ -129,11 +135,6 @@ class OrderController extends Controller
         ]);
     }
 
-
-    /**
-     * POST /admin/orders/{order_code}/status
-     * Update theo order_code
-     */
     public function updateStatus(Request $request, $order_code)
     {
         $this->requireAdmin();
@@ -150,7 +151,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Lock đơn để tránh bấm liên tục / race-condition
+            // Lock đơn để tránh bấm liên tục
             $order = DB::table('orders')
                 ->where('order_code', $order_code)
                 ->lockForUpdate()
@@ -175,7 +176,11 @@ class OrderController extends Controller
                 return redirect()->back()->with('success', 'Trạng thái không thay đổi.');
             }
 
+<<<<<<< HEAD
             // Nếu đổi sang CANCELED -> hoàn kho (chỉ hoàn 1 lần vì đã chặn ở bước 1)
+=======
+            // Nếu đổi sang CANCELED -> hoàn kho chỉ hoàn 1 lần vì đã chặn ở bước 1
+>>>>>>> main
             if ($newStatus === 'canceled') {
                 $details = DB::table('order_details')
                     ->where('order_id', $order->id)
@@ -192,6 +197,10 @@ class OrderController extends Controller
                 }
             }
 
+<<<<<<< HEAD
+=======
+            // Update status
+>>>>>>> main
             DB::table('orders')
                 ->where('id', $order->id)
                 ->update([

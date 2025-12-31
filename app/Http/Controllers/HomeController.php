@@ -8,13 +8,6 @@ use App\Models\Product;
 
 class HomeController extends Controller
 {
-    /**
-     * Closure eager-load discountProducts theo rule:
-     * - discount_products.status = 1
-     * - pivot.status = 1
-     * - expiration_date null hoặc >= hôm nay
-     * - ưu tiên rate cao nhất
-     */
     private function discountEagerLoadClosure()
     {
         $today = now()->toDateString();
@@ -35,7 +28,6 @@ class HomeController extends Controller
         $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id', 'asc')->get();
         $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id', 'asc')->get();
 
-        // 1) ALL PRODUCT: eager-load đầy đủ (ảnh + category + brand + discount)
         $all_product = Product::with([
                 'productImage',
                 'category',
@@ -53,7 +45,7 @@ class HomeController extends Controller
             ->inRandomOrder()
             ->paginate(6);
 
-        // 2) RECOMMENDED: eager-load ảnh + discount (không cần category/brand nếu bạn không dùng)
+            
         $recommended_products = Product::with([
                 'productImage',
                 'discountProducts' => $this->discountEagerLoadClosure(),

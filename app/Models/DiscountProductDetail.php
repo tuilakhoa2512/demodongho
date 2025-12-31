@@ -8,9 +8,9 @@ class DiscountProductDetail extends Model
 {
     protected $table = 'discount_product_details';
 
-    // Không có cột id tự tăng, nên tắt incrementing & primary key dạng đơn
+   
     public $incrementing = false;
-    protected $primaryKey = null; // Laravel sẽ bỏ qua, dùng primary composite
+    protected $primaryKey = null; 
 
     protected $fillable = [
         'discount_product_id',

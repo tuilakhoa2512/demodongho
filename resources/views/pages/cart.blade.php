@@ -175,7 +175,7 @@
     @endif
 </div>
 
-{{-- JS +/- --}}
+{{-- JS --}}
 <script>
 document.querySelectorAll('.qty-control').forEach(c => {
     const input = c.querySelector('input');

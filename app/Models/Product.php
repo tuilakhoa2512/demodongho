@@ -107,14 +107,6 @@ class Product extends Model
 
     // ================== DISCOUNT (ƯU ĐÃI) ==================
 
-    /**
-     * Lấy 1 ưu đãi đang áp dụng cho sản phẩm (nếu có)
-     * Quy tắc:
-     * - discount_products.status = 1 (chương trình đang hoạt động)
-     * - pivot.status = 1 (chi tiết đang áp dụng)
-     * - expiration_date null hoặc >= hôm nay
-     * - Nếu có nhiều ưu đãi cùng lúc (trường hợp hiếm), lấy ưu đãi có rate cao nhất
-     */
     public function activeDiscountProduct()
     {
         $today = now()->toDateString();

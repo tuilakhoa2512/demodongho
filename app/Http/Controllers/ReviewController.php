@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Review;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
-    // Lưu review mới (guest)
+    // Lưu review (user dùng session, KHÔNG dùng auth)
     public function store(Request $request, $product_id)
     {
-        $userId = session('id'); // ✅ ĐÚNG KEY
+        $userId = session('id'); // user id lưu trong session
 
         if (!$userId) {
             return back()->with('error', 'Bạn cần đăng nhập để đánh giá');
@@ -23,26 +22,25 @@ class ReviewController extends Controller
             'comment' => 'required|string|max:1000',
         ]);
 
-        /* ================== THÊM: CHẶN ĐÁNH GIÁ TRÙNG ================== */
-        $exists = DB::table('reviews')
-            ->where('product_id', $product_id)
+        // ================== CHẶN ĐÁNH GIÁ TRÙNG ==================
+        $hasReviewed = Review::where('product_id', $product_id)
             ->where('user_id', $userId)
             ->exists();
 
-        if ($exists) {
-            return back()->with('error', 'Bạn đã đánh giá sản phẩm này rồi');
+        if ($hasReviewed) {
+            return back()->with('error', 'Bạn đã đánh giá sản phẩm này rồi, không thể đánh giá thêm.');
         }
-        /* =============================================================== */
+        // =========================================================
 
-        DB::table('reviews')->insert([
-            'product_id' => $product_id,
-            'user_id'    => $userId, // ✅ sẽ là 2
-            'rating'     => (int) $request->rating, // ✅ ÉP KIỂU – RẤT QUAN TRỌNG
-            'comment'    => $request->comment,
-            'status'     => 1,
-            'created_at'=> now(),
-            'updated_at'=> now(),
-        ]);
+        DB::transaction(function () use ($request, $product_id, $userId) {
+            Review::create([
+                'product_id' => $product_id,
+                'user_id'    => $userId,
+                'rating'     => (int) $request->rating,
+                'comment'    => $request->comment,
+                'status'     => 1,
+            ]);
+        });
 
         return back()->with('success', 'Đánh giá đã được gửi');
     }
@@ -50,13 +48,11 @@ class ReviewController extends Controller
     // Lấy danh sách review cho sản phẩm
     public function getReviews($product_id)
     {
-        /* ================== THÊM: LOAD USER ================== */
         $reviews = Review::with('user')
             ->where('product_id', $product_id)
             ->where('status', 1)
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->get();
-        /* ===================================================== */
 
         $averageRating = round(
             Review::where('product_id', $product_id)

@@ -63,7 +63,6 @@
 
      
         <div class="col-sm-7">
-
             <h1 class="pd-info-title">{{ $product->name }}</h1>
 
             @php
@@ -130,71 +129,51 @@
             <div class="row">
         <div class="col-sm-12">
 {{-- ================== REVIEW ================== --}}
-<div class="product-reviews" style="margin-top:30px;">
-<h2 class="title text-center"> Đánh giá sản phẩm</h2>
-    
-    {{-- ================== WRITE REVIEW (LUÔN Ở CUỐI) ================== --}}
-<div class="product-review-section">
+@php
+        $hasReviewed = false;
+        if (session('id') && $reviews) {
+            $hasReviewed = $reviews->where('user_id', session('id'))->isNotEmpty();
+        }
+    @endphp
 
-{{-- ⭐ CHỌN SAO --}}
+    <div class="product-reviews" style="margin-top:40px;">
+        <h2 class="title text-center">Đánh giá sản phẩm</h2>
 
-<div class="star-rating">Đánh Giá: 
-    @for($i = 1; $i <= 5; $i++)
-        <i class="star" data-value="{{ $i }}">★</i>
-    @endfor
-    <span id="ratingText"></span>
-</div>
-<div>
-<p style="font-size:20px; font-style:italic; color:#D70018;font-family: Roboto, sans-serif;font-weight: 700">
-    <strong>Điểm Trung Bình:</strong> {{ $averageRating ?? 0 }}/5★
-</p>
+        <p style="font-size:20px;color:#D70018;font-weight:700;">
+            Điểm Trung Bình: {{ $averageRating ?? 0 }}/5★
+        </p>
 
-</div>
+        {{-- ===== FORM ===== --}}
+        @if($hasReviewed)
+            <div class="alert alert-info">
+                <i class="fa fa-info-circle"></i>
+                Bạn đã đánh giá sản phẩm này rồi.
+            </div>
+        @else
+            <div class="product-review-section">
 
-{{-- 📝 FORM --}}
+                <div class="star-rating">
+                    @for($i=1;$i<=5;$i++)
+                        <i class="star" data-value="{{ $i }}">★</i>
+                    @endfor
+                    <span id="ratingText"></span>
+                </div>
 
-<div id="reviewForm" style="display:none;">
-    <h4>Viết đánh giá của bạn</h4>
+                <div id="reviewForm" style="display:none;">
+                    <form action="{{ route('reviews.store',$product->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="rating" id="ratingValue">
 
-    <form action="{{ route('reviews.store', $product->id) }}" method="POST">
-        @csrf
+                        <textarea name="comment" rows="4" class="form-control"
+                                  placeholder="Nhập đánh giá của bạn" required></textarea>
 
-        <input type="hidden" name="product_id" value="{{ $product->id }}">
-        <input type="hidden" name="rating" id="ratingValue">
-
-        <table class="table table-bordered">
-            <tbody>
-                <tr>
-                    <th width="180">Số sao</th>
-                    <td>
-                        <span id="ratingTextTable" style="color:#e60012;font-weight:600;"></span>
-                    </td>
-                </tr>
-
-                <tr>
-                    <th>Nội dung đánh giá *</th>
-                    <td>
-                        <textarea name="comment"
-                                  rows="4"
-                                  required
-                                  class="form-control"
-                                  placeholder="Nhập đánh giá của bạn"></textarea>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td colspan="2" class="text-right">
-                        <button type="submit" class="btn btn-danger">
+                        <button type="submit" class="btn btn-danger" style="margin-top:10px;">
                             Gửi đánh giá
                         </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </form>
-</div>
-</div>
-
+                    </form>
+                </div>
+            </div>
+        @endif
     
 
     @if($reviews && $reviews->count() > 0)
@@ -211,7 +190,7 @@
                 </div>
 
                 <p>{{ $review->comment }}</p>
-                <small>{{ $review->created_at->format('d/m/Y H:i') }}</small>
+                <small>{{ $review->created_at->timezone('Asia/Ho_Chi_Minh')->format('d/m/Y H:i') }}</small>
             </div>
         @endforeach
     @else

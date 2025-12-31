@@ -294,41 +294,37 @@
 						</div><!--/brand-products-->
 						
 
-<form action="{{ url('/filter-price') }}" method="GET" id="price-filter-form">
-    <div class="price-range">
-        <h2>Tầm Giá</h2>
-        <div class="text-center">
-    <span id="price-range-text" style="color:#d70018;">
-        @if(request()->has('min_price') || request()->has('max_price'))
-            {{ number_format(request('min_price',0), 0, ',', '.') }} ₫
-            –
-            {{ number_format(request('max_price',100000000), 0, ',', '.') }} ₫
-        @else
-            Tất cả mức giá
-        @endif
-    </span>					 
-				<input type="text"
-					class="span2"
-					data-slider-min="0"
-					data-slider-max="100000000"
-					data-slider-step="500000"
-					data-slider-value="[{{ request('min_price', 0) }},{{ request('max_price', 100000000) }}]"
-					id="sl2">
+					<form action="{{ url('/filter-price') }}" method="GET" id="price-filter-form">
+						<div class="price-range">
+							<h2>Tầm Giá</h2>
+							<div class="text-center">
+						<span id="price-range-text" style="color:#d70018;">
+							@if(request()->has('min_price') || request()->has('max_price'))
+								{{ number_format(request('min_price',0), 0, ',', '.') }} ₫
+								–
+								{{ number_format(request('max_price',100000000), 0, ',', '.') }} ₫
+							@else
+								Tất cả mức giá
+							@endif
+						</span>					 
+									<input type="text"
+										class="span2"
+										data-slider-min="0"
+										data-slider-max="100000000"
+										data-slider-step="500000"
+										data-slider-value="[{{ request('min_price', 0) }},{{ request('max_price', 100000000) }}]"
+										id="sl2">
 
 
-            <input type="hidden" name="min_price" id="min_price">
-            <input type="hidden" name="max_price" id="max_price">
+								<input type="hidden" name="min_price" id="min_price">
+								<input type="hidden" name="max_price" id="max_price">
 
-            <br>
-            <b class="pull-left">0 Tr</b>
-            <b class="pull-right">100 Tr</b>
-        </div>
-    </div>
-</form>
-
-						<div class="shipping text-center"><!--shipping-->
-							<img src="images/home/shipping.jpg" alt="" />
-						</div><!--/shipping-->
+								<br>
+								<b class="pull-left">0 Tr</b>
+								<b class="pull-right">100 Tr</b>
+							</div>
+						</div>
+					</form>
 
 					</div>
 				</div>
@@ -347,7 +343,7 @@
 
 				<div class="col-sm-3">
 					<div class="address">
-						<img src="images/home/map.png" alt="" />
+						
 					</div>
 				</div>
 			</div>
@@ -430,7 +426,7 @@ $(document).ready(function () {
 
     var slider = new Slider("#sl2", {
         min: 0,
-        max: 4000,          // $4000 = 100 triệu VNĐ
+        max: 4000,    // $4000 = 100 triệu VNĐ
         step: 50,
         range: true,
         value: [
@@ -438,7 +434,7 @@ $(document).ready(function () {
             {{ floor(request('max_price', 100000000) / 25000) }}
         ],
 
-        tooltip: 'show',    //  HIỆN GIÁ KHI RÊ
+        tooltip: 'show',    //  hiện giá khi rê
         tooltip_split: true, //  hiện 2 tooltip cho min & max
 
         formatter: function (value) {

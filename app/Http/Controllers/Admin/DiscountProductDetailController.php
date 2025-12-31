@@ -15,8 +15,11 @@ class DiscountProductDetailController extends Controller
         $discount = DiscountProduct::findOrFail($id);
 
         $today = now()->toDateString();
+<<<<<<< HEAD
 
         // hết hạn => ép status = 0 (Ngừng) trong discount hiện tại
+=======
+>>>>>>> main
         DB::table('discount_product_details')
             ->where('discount_product_id', $discount->id)
             ->whereNotNull('expiration_date')
@@ -33,10 +36,13 @@ class DiscountProductDetailController extends Controller
             ->orderByDesc('products.id')
             ->paginate(15);
 
+<<<<<<< HEAD
         /**
          * - Loại bỏ SP còn hạn ở bất kỳ ưu đãi nào (expiration_date null hoặc >= today)
          * - Nhưng nếu SP đã từng gắn vào discount hiện tại và đã hết hạn => vẫn cho hiện lại
          */
+=======
+>>>>>>> main
         $availableProducts = Product::with('productImage')
             ->leftJoin('discount_product_details as dpd_this', function ($join) use ($discount) {
                 $join->on('products.id', '=', 'dpd_this.product_id')
@@ -53,7 +59,11 @@ class DiscountProductDetailController extends Controller
                              ->orWhere('dpd_any.expiration_date', '>=', $today);
                       });
                 })
+<<<<<<< HEAD
                 //  Hoặc: đã từng gắn vào discount này và đã hết hạn => vẫn cho hiện
+=======
+               
+>>>>>>> main
                 ->orWhere(function ($q) use ($today) {
                     $q->whereNotNull('dpd_this.product_id')
                       ->whereNotNull('dpd_this.expiration_date')
@@ -70,6 +80,7 @@ class DiscountProductDetailController extends Controller
             'availableProducts'
         ));
     }
+<<<<<<< HEAD
 
     /**
      * - Chặn: nếu SP còn hạn ở BẤT KỲ ưu đãi nào => không cho gắn
@@ -77,6 +88,8 @@ class DiscountProductDetailController extends Controller
      * - nếu chương trình đang tắt => pivot.status = 0
      * - nếu hết hạn ngay lúc gắn => pivot.status = 0
      */
+=======
+>>>>>>> main
     public function attach(Request $request, $id)
     {
         $discount = DiscountProduct::findOrFail($id);
@@ -91,7 +104,10 @@ class DiscountProductDetailController extends Controller
 
         $today = now()->toDateString();
 
+<<<<<<< HEAD
         // nếu SP đang còn hạn ở bất kỳ ưu đãi nào => không cho gắn thêm
+=======
+>>>>>>> main
         $hasAnyValid = DB::table('discount_product_details')
             ->where('product_id', $productId)
             ->where(function ($q) use ($today) {
@@ -132,11 +148,14 @@ class DiscountProductDetailController extends Controller
         return back()->with('success', 'Đã gán sản phẩm vào ưu đãi.');
     }
 
+<<<<<<< HEAD
     /**
      * - Nếu hết hạn => pivot.status bắt buộc = 0
      * - Nếu chương trình đang tắt => pivot.status bắt buộc = 0
      * - Nếu còn hạn và chương trình bật: giữ nguyên status hiện tại (không auto bật)
      */
+=======
+>>>>>>> main
     public function updateExpiration(Request $request, $id, $productId)
     {
         $discount = DiscountProduct::findOrFail($id);
@@ -183,10 +202,13 @@ class DiscountProductDetailController extends Controller
         return back()->with('success', 'Đã cập nhật hạn ưu đãi.');
     }
 
+<<<<<<< HEAD
     /**
      * - Nếu DiscountProduct đang tắt => KHÔNG cho bật (error)
      * - Nếu đã hết hạn => ép status về 0 và KHÔNG cho bật (error)
      */
+=======
+>>>>>>> main
     public function toggle($id, $productId)
     {
         $discount = DiscountProduct::findOrFail($id);

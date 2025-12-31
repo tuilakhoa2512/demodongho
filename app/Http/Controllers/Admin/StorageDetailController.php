@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class StorageDetailController extends Controller
 {
+<<<<<<< HEAD
     
      // Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
    
+=======
+>>>>>>> main
     private function soldQtySubQuery()
     {
         return DB::table('order_details as od')
@@ -23,9 +26,13 @@ class StorageDetailController extends Controller
             ->groupBy('od.product_id');
     }
 
+<<<<<<< HEAD
     
      // Query chung cho index + các list theo stock_status
      
+=======
+
+>>>>>>> main
     private function buildIndexQuery(Request $request, ?string $onlyStockStatus = null)
     {
         $selectedStorageId = $request->input('storage_id');
@@ -73,7 +80,10 @@ class StorageDetailController extends Controller
         ));
     }
 
+<<<<<<< HEAD
   
+=======
+>>>>>>> main
     public function indexByStorage(Request $request, $storageId)
     {
         $storage = Storage::findOrFail($storageId);
