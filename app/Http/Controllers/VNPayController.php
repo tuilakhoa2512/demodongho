@@ -4,32 +4,56 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Cart;
 
+// ✅ NEW (promotion system)
+use App\Models\PromotionRedemption;
+
 class VNPayController extends Controller
 {
-
+    /**
+     * Tạo URL thanh toán VNPay
+     */
     public function create(Request $request, string $order_code)
     {
+        $userId = (int) Session::get('id');
+        if (!$userId) {
+            return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để thanh toán.');
+        }
+
         if (!$order_code) {
             return redirect()->route('payment.show')->with('error', 'Thiếu mã đơn hàng để thanh toán VNPay.');
         }
 
-        $order = DB::table('orders')->where('order_code', $order_code)->first();
+        $order = Order::where('order_code', $order_code)->first();
         if (!$order) {
             return redirect()->route('payment.show')->with('error', 'Không tìm thấy đơn hàng để thanh toán VNPay.');
+        }
+
+        // ✅ chống pay hộ
+        if ((int)$order->user_id !== $userId) {
+            return redirect()->route('myorders.index')->with('error', 'Bạn không có quyền thanh toán đơn hàng này.');
         }
 
         // chỉ cho thanh toán khi pending
         if (($order->status ?? null) !== 'pending') {
             return redirect()->route('payment.success', ['order_code' => $order_code])
-                ->with('error', 'Đơn này không ở trạng thái chờ xử lý (pending) nên không thể thanh toán VNPay.');
+                ->with('error', 'Đơn này không ở trạng thái pending nên không thể thanh toán VNPay.');
         }
 
+        // Nếu có stock_deducted và đã trừ kho rồi thì không cho thanh toán lại
+        if (Schema::hasColumn('orders', 'stock_deducted') && (int)($order->stock_deducted ?? 0) === 1) {
+            return redirect()->route('payment.success', ['order_code' => $order_code])
+                ->with('error', 'Đơn này đã được xử lý kho trước đó.');
+        }
+
+        // VNPay dùng đơn vị *100
         $amount = (int) round(((float)$order->total_price) * 100);
 
         $vnp_TmnCode    = config('vnpay.tmn_code');
@@ -77,21 +101,17 @@ class VNPayController extends Controller
         $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
         $paymentUrl = $vnp_Url . "?" . $query . "vnp_SecureHash=" . $vnpSecureHash;
 
-        DB::table('orders')->where('id', $order->id)->update([
-            'payment_method' => 'VNPAY',
-        ]);
+        // set payment_method
+        $order->update(['payment_method' => 'VNPAY']);
 
         return redirect()->away($paymentUrl);
     }
 
-<<<<<<< HEAD
     /**
-     *  - Thành công: trừ kho + clear cart + status=confirmed
-     *  - Hủy/Fail:   status=canceled
+     * VNPay return
+     * - Success: trừ kho + clear cart + status=confirmed + set promotion_redemptions.used_at
+     * - Fail: status=canceled
      */
-=======
-
->>>>>>> main
     public function vnpayReturn(Request $request)
     {
         $vnp_HashSecret = config('vnpay.hash_secret');
@@ -114,6 +134,7 @@ class VNPayController extends Controller
         $orderCode = $request->get('vnp_TxnRef');
         $respCode  = $request->get('vnp_ResponseCode');
         $txnStatus = $request->get('vnp_TransactionStatus');
+        $vnpAmount = (int)($request->get('vnp_Amount') ?? 0);
 
         if (!$orderCode) {
             return redirect('/my-orders')->with('error', 'VNPay return thiếu mã đơn.');
@@ -129,15 +150,18 @@ class VNPayController extends Controller
             return redirect('/my-orders')->with('error', 'Không tìm thấy đơn để cập nhật thanh toán.');
         }
 
+        // ✅ check amount khớp
+        $expectedAmount = (int) round(((float)$order->total_price) * 100);
+        if ($vnpAmount > 0 && $vnpAmount !== $expectedAmount) {
+            return redirect()
+                ->route('payment.success', ['order_code' => $orderCode])
+                ->with('error', 'Sai số tiền VNPay so với đơn hàng.');
+        }
+
         $isSuccess = ($respCode === "00" && $txnStatus === "00");
 
-<<<<<<< HEAD
-        //  Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
-=======
-        // Nếu đơn đã được xử lý trước đó (tránh trừ kho 2 lần khi refresh)
->>>>>>> main
+        // Fail => hủy đơn (chỉ khi pending)
         if (!$isSuccess) {
-            // Hủy/Fail => hủy đơn
             if ($order->status === 'pending') {
                 $order->update([
                     'payment_method' => 'VNPAY',
@@ -150,13 +174,8 @@ class VNPayController extends Controller
                 ->with('error', 'Thanh toán VNPay đã bị hủy hoặc không thành công. Đơn hàng đã được hủy.');
         }
 
-<<<<<<< HEAD
-        //  THÀNH CÔNG: trừ kho + clear cart + confirmed
-=======
-        // THÀNH CÔNG: trừ kho + clear cart + confirmed
->>>>>>> main
+        // Nếu đã xử lý rồi thì thôi
         if ($order->status !== 'pending') {
-            // đã confirmed/shipping/... => không làm lại
             return redirect()
                 ->route('payment.success', ['order_code' => $orderCode])
                 ->with('success', 'Thanh toán VNPay thành công.');
@@ -164,10 +183,19 @@ class VNPayController extends Controller
 
         DB::beginTransaction();
         try {
-            // Lấy chi tiết đơn
+            // lock order để tránh return/ipn đụng nhau
+            $order = Order::where('id', $order->id)->lockForUpdate()->first();
+
+            // anti double tuyệt đối nếu có stock_deducted
+            if (Schema::hasColumn('orders', 'stock_deducted') && (int)($order->stock_deducted ?? 0) === 1) {
+                DB::commit();
+                return redirect()
+                    ->route('payment.success', ['order_code' => $orderCode])
+                    ->with('success', 'Thanh toán VNPay thành công.');
+            }
+
             $details = OrderDetail::where('order_id', $order->id)->get();
 
-            // Trừ kho
             foreach ($details as $d) {
                 $updated = Product::where('id', $d->product_id)
                     ->where('quantity', '>=', $d->quantity)
@@ -178,14 +206,24 @@ class VNPayController extends Controller
                 }
             }
 
-            // Clear cart của user (vì cách 2 lúc đặt VNPAY chưa xóa)
+            // clear cart
             Cart::where('user_id', $order->user_id)->delete();
 
-            // Update trạng thái đơn
-            $order->update([
+            // promotion_redemptions used_at
+            PromotionRedemption::where('order_id', $order->id)
+                ->whereNull('used_at')
+                ->update(['used_at' => now()]);
+
+            // update order
+            $update = [
                 'payment_method' => 'VNPAY',
                 'status'         => 'confirmed',
-            ]);
+            ];
+            if (Schema::hasColumn('orders', 'stock_deducted')) {
+                $update['stock_deducted'] = 1;
+            }
+
+            $order->update($update);
 
             DB::commit();
 
@@ -195,7 +233,7 @@ class VNPayController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            // Nếu trừ kho fail => hủy đơn (để không treo pending)
+            // nếu fail xử lý kho => hủy đơn để không treo pending
             $order->update([
                 'payment_method' => 'VNPAY',
                 'status'         => 'canceled',
@@ -208,8 +246,7 @@ class VNPayController extends Controller
     }
 
     /**
-     * GET /vnpay/ipn
-     * IPN tối thiểu (nếu VNPay gọi tới)
+     * IPN (server-to-server) — tối thiểu
      */
     public function ipn(Request $request)
     {
@@ -233,6 +270,7 @@ class VNPayController extends Controller
         $orderCode = $request->get('vnp_TxnRef');
         $respCode  = $request->get('vnp_ResponseCode');
         $txnStatus = $request->get('vnp_TransactionStatus');
+        $vnpAmount = (int)($request->get('vnp_Amount') ?? 0);
 
         if (!$orderCode) return response()->json(["RspCode" => "01", "Message" => "Order not found"]);
         if (!$vnp_SecureHash || $secureHash !== $vnp_SecureHash) {
@@ -242,9 +280,15 @@ class VNPayController extends Controller
         $order = Order::where('order_code', $orderCode)->first();
         if (!$order) return response()->json(["RspCode" => "01", "Message" => "Order not found"]);
 
+        // check amount
+        $expectedAmount = (int) round(((float)$order->total_price) * 100);
+        if ($vnpAmount > 0 && $vnpAmount !== $expectedAmount) {
+            return response()->json(["RspCode" => "04", "Message" => "Invalid amount"]);
+        }
+
         $isSuccess = ($respCode === "00" && $txnStatus === "00");
 
-        // Chỉ xử lý khi còn pending để tránh trừ kho 2 lần
+        // Nếu đã xử lý rồi => OK
         if ($order->status !== 'pending') {
             return response()->json(["RspCode" => "00", "Message" => "Confirm Success"]);
         }
@@ -256,6 +300,13 @@ class VNPayController extends Controller
 
         DB::beginTransaction();
         try {
+            $order = Order::where('id', $order->id)->lockForUpdate()->first();
+
+            if (Schema::hasColumn('orders', 'stock_deducted') && (int)($order->stock_deducted ?? 0) === 1) {
+                DB::commit();
+                return response()->json(["RspCode" => "00", "Message" => "Confirm Success"]);
+            }
+
             $details = OrderDetail::where('order_id', $order->id)->get();
 
             foreach ($details as $d) {
@@ -270,7 +321,15 @@ class VNPayController extends Controller
 
             Cart::where('user_id', $order->user_id)->delete();
 
-            $order->update(['payment_method' => 'VNPAY', 'status' => 'confirmed']);
+            PromotionRedemption::where('order_id', $order->id)
+                ->whereNull('used_at')
+                ->update(['used_at' => now()]);
+
+            $update = ['payment_method' => 'VNPAY', 'status' => 'confirmed'];
+            if (Schema::hasColumn('orders', 'stock_deducted')) {
+                $update['stock_deducted'] = 1;
+            }
+            $order->update($update);
 
             DB::commit();
             return response()->json(["RspCode" => "00", "Message" => "Confirm Success"]);

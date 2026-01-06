@@ -23,7 +23,6 @@
     </div>
 
     @php
-        // Ưu tiên lấy mapping từ controller (statusLabels), nếu không có thì fallback
         $statusMap = $statusLabels ?? [
             'pending'   => 'Đợi xác nhận',
             'confirmed' => 'Đã xác nhận',
@@ -34,6 +33,17 @@
 
         $rawStatus = $order->status ?? 'pending';
         $statusVi = $statusMap[$rawStatus] ?? $rawStatus;
+
+        // ✅ NEW: promo fields (từ MyOrderController đã join)
+        $promoCode = $order->promo_code ?? null;
+        $promoName = $order->promo_campaign_name ?? null;
+
+        // số tiền giảm (ưu tiên hệ mới)
+        $promoDiscount = (int)($order->promo_discount_amount ?? 0);
+        // (nếu controller gắn thêm order->promo_discount thì cũng nhận)
+        if ($promoDiscount <= 0 && isset($order->promo_discount)) {
+            $promoDiscount = (int)$order->promo_discount;
+        }
     @endphp
 
     <div class="order-meta">
@@ -91,11 +101,9 @@
                         $order->province_name ?? null,
                     ]);
                 @endphp
-
                 {{ !empty($areaParts) ? implode(' - ', $areaParts) : '—' }}
             </strong>
         </div>
-
     </div>
 
     <hr>
@@ -119,19 +127,14 @@
                 @forelse($items as $it)
                     @php
                         $qty   = (int)($it->quantity ?? 0);
-
-                        // Giá gốc hiện tại + đơn giá đã chốt trong đơn
                         $base  = (float)($it->base_price ?? 0);
                         $unit  = (float)($it->unit_price ?? 0);
 
-                        // line total dùng đơn giá đã chốt
                         $line  = $qty * $unit;
                         $calcSubtotal += $line;
 
-                        // Nếu đơn giá < giá gốc => có sale
                         $hasSale = ($unit > 0 && $base > 0 && $unit < $base);
 
-                        // Ảnh
                         $img = $it->image ?? null;
                         $imgUrl = $img ? asset('storage/' . $img) : null;
                     @endphp
@@ -179,9 +182,14 @@
     </div>
 
     @php
-        $subtotalShow = isset($subtotal) ? (float)$subtotal : (float)$calcSubtotal;
-        $discountShow = isset($discountValue) ? (int)$discountValue : (int)($order->discount_bill_value ?? 0);
-        $grandShow = isset($grandTotal) ? (float)$grandTotal : (float)($order->total_price ?? max(0, $subtotalShow - $discountShow));
+        // subtotal ưu tiên controller tính sẵn (order->subtotal) hoặc biến $subtotal, fallback calc
+        $subtotalShow = isset($order->subtotal) ? (float)$order->subtotal : (isset($subtotal) ? (float)$subtotal : (float)$calcSubtotal);
+
+        // discount ưu tiên hệ mới: promotion_redemptions
+        $discountShow = $promoDiscount;
+
+        // grand total ưu tiên order.total_price (đã chốt)
+        $grandShow = (float)($order->total_price ?? max(0, $subtotalShow - $discountShow));
     @endphp
 
     <div class="summary-box">
@@ -191,7 +199,15 @@
         </div>
 
         <div class="sum-row discount">
-            <span>Ưu đãi hóa đơn</span>
+            <span>
+                Ưu đãi hóa đơn
+                @if(!empty($promoCode))
+                    <span style="color:#555; font-weight:900;">(Code: {{ $promoCode }})</span>
+                @endif
+                @if(!empty($promoName))
+                    <span style="color:#555; font-weight:900;">- {{ $promoName }}</span>
+                @endif
+            </span>
             <strong>-{{ number_format($discountShow, 0, ',', '.') }} đ</strong>
         </div>
 
@@ -201,39 +217,33 @@
         </div>
     </div>
 </div>
-<br> <br>
+
+<br><br>
+
 <style>
-/* ====== ẨN SIDEBAR CHỈ Ở TRANG NÀY (KHÔNG SỬA LAYOUT) ====== */
 .left-sidebar{ display:none !important; }
 section > .container > .row > .col-sm-3{ display:none !important; }
 section > .container > .row > .col-sm-9.padding-right{
     width: 90% !important;
-    float: none !important;        
-    margin: 0 auto !important;      
+    float: none !important;
+    margin: 0 auto !important;
     display: block !important;
 }
 
-/*
-    .left-sidebar {
-        display: none !important;
-    } */
-/* Quan trọng: KHÔNG để rộng hơn khung layout */
 .order-card, .order-card * { max-width: 100%; box-sizing: border-box; }
 
-/* Button */
 .btn-back{
     border:1px solid #e60012 !important;
     color:#e60012 !important;
     background:#fff !important;
 }
 
-/* Card */
 .order-card{
     background:#fff;
     border:1px solid #eee;
     border-radius:5px;
     padding:16px;
-    overflow:hidden; /* chặn tràn */
+    overflow:hidden;
 }
 
 .order-header{
@@ -243,7 +253,6 @@ section > .container > .row > .col-sm-9.padding-right{
     gap:10px;
 }
 .order-title{ font-size:16px; font-weight:900; color:#222; }
-.order-code{ font-weight:900; color:#e60012; word-break: break-all; }
 
 .text-red{ color:#e60012; font-weight:900; }
 .text-wrap{ word-break: break-word; white-space: normal; }
@@ -263,7 +272,6 @@ section > .container > .row > .col-sm-9.padding-right{
     min-width:110px;
 }
 
-/* Table: bỏ nowrap để không tràn */
 .table-responsive{ overflow-x:auto; }
 .myorder-table{ width:100%; margin-bottom: 0; }
 .myorder-table thead th{
@@ -275,7 +283,6 @@ section > .container > .row > .col-sm-9.padding-right{
 .myorder-table td{ vertical-align:middle; white-space: normal; }
 .myorder-table .col-name{ font-weight:800; }
 
-/* THÊM: ảnh sản phẩm */
 .od-thumb{
     width:60px;
     height:60px;
@@ -297,7 +304,6 @@ section > .container > .row > .col-sm-9.padding-right{
     background:#fafafa;
 }
 
-/* THÊM: đơn giá (giá sale + giá gốc gạch ngang) */
 .od-price{ line-height: 1.1; }
 .od-price-sale{
     color:#e60012;
@@ -312,7 +318,6 @@ section > .container > .row > .col-sm-9.padding-right{
     font-size:12px;
 }
 
-/* Summary */
 .summary-box{ border-top:1px dashed #ddd; margin-top:12px; padding-top:12px; }
 .sum-row{
     display:flex;
@@ -321,7 +326,6 @@ section > .container > .row > .col-sm-9.padding-right{
     padding:6px 0;
     font-size:14px;
 }
-
 .sum-row strong{ font-weight:900; }
 .sum-row.discount{ color:#e60012; }
 .sum-row.total{
@@ -331,7 +335,6 @@ section > .container > .row > .col-sm-9.padding-right{
     font-size:16px;
 }
 
-/* Mobile fix: giảm min-width của label để đỡ đẩy tràn */
 @media (max-width: 767px){
     .order-meta .meta-row span,
     .ship-grid .ship-row span{ min-width: 90px; }

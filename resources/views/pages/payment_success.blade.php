@@ -22,12 +22,20 @@
 
     // Hiển thị phương thức
     $methodText = $isVNPay ? 'VNPay (Chuyển khoản)' : 'COD (Thanh toán khi nhận hàng)';
+
+    // ✅ NEW: promo info (nếu controller có truyền/join)
+    // - Ưu tiên dữ liệu từ DB (ổn định hơn session)
+    $promoCode = $promoCode ?? ($order->promo_code ?? null);
+    $promoName = $promoName ?? ($order->promo_campaign_name ?? null);
+
+    // discountValue đang là số tiền giảm (controller success tính/đưa vào)
+    $discountValue = (int)($discountValue ?? 0);
 @endphp
 
 <h2 class="title text-center">{{ $pageTitle }}</h2>
 
 <div class="pay-success-page">
-  
+
     {{-- Thông báo --}}
     @if(session('success'))
         <div class="pay-success-alert">
@@ -108,8 +116,17 @@
                 <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
             </div>
 
+            {{-- ✅ NEW: Ưu đãi hệ Promotion (đọc từ DB nếu có) --}}
             <div class="sum-row sum-discount">
-                <span>Ưu đãi hóa đơn</span>
+                <span>
+                    Ưu đãi hóa đơn
+                    @if(!empty($promoCode))
+                        <span style="color:#555; font-weight:900;">(Code: {{ $promoCode }})</span>
+                    @endif
+                    @if(!empty($promoName))
+                        <span style="color:#555; font-weight:900;">- {{ $promoName }}</span>
+                    @endif
+                </span>
                 <strong>-{{ number_format($discountValue, 0, ',', '.') }} đ</strong>
             </div>
 

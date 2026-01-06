@@ -11,7 +11,6 @@
       @endif
     </div>
 
-    {{-- SweetAlert success --}}
     @if (session('success'))
       <script>
         Swal.fire({
@@ -29,7 +28,6 @@
       </div>
     @endif
 
-    {{-- FILTER + SEARCH --}}
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <form method="GET" action="{{ URL::to('/admin/orders') }}" class="form-inline">
@@ -69,7 +67,6 @@
       </div>
     </div>
 
-    {{-- TABLE --}}
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
         <thead>
@@ -103,6 +100,10 @@
 
               $receiverName  = $o->receiver_name  ?? ($o->user_fullname ?? '—');
               $receiverPhone = $o->receiver_phone ?? '—';
+
+              $promoDiscount = (int)($o->promo_discount_amount ?? 0);
+              $promoCode     = $o->promo_code ?? null;
+              $promoName     = $o->promo_campaign_name ?? null;
             @endphp
 
             <tr>
@@ -114,7 +115,6 @@
 
               <td>{{ $receiverName }}</td>
               <td>{{ $receiverPhone }}</td>
-              
 
               <td>{{ $o->payment_method ?? '—' }}</td>
 
@@ -124,19 +124,16 @@
 
               <td>
                 @if($o->created_at)
-                    <div style="line-height:1.2;">
-                    <div>
-                        {{ \Carbon\Carbon::parse($o->created_at)->format('H:i') }}
+                  <div style="line-height:1.2;">
+                    <div>{{ \Carbon\Carbon::parse($o->created_at)->format('H:i') }}</div>
+                    <div style="font-size:12px; color:#777; font-weight: bold;">
+                      {{ \Carbon\Carbon::parse($o->created_at)->format('d/m/Y') }}
                     </div>
-                    <div style="font: size 12px; color:#777; font-weight: bold;">
-                        {{ \Carbon\Carbon::parse($o->created_at)->format('d/m/Y') }}
-                    </div>
-                    </div>
+                  </div>
                 @else
-                    —
+                  —
                 @endif
-            </td>
-
+              </td>
 
               <td>
                 <span class="label-status {{ $badgeClass }}">
@@ -144,7 +141,6 @@
                 </span>
               </td>
 
-              {{-- ĐỔI TRẠNG THÁI --}}
               <td>
                 <form method="POST"
                       action="{{ URL::to('/admin/orders/'.$o->order_code.'/status') }}"
@@ -175,7 +171,6 @@
       </table>
     </div>
 
-    {{-- PAGINATION --}}
     <footer class="panel-footer">
       <div class="row">
         <div class="col-sm-5 text-center">
@@ -194,7 +189,6 @@
   </div>
 </div>
 
-{{-- SweetAlert confirm đổi trạng thái --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.js-status-select').forEach(select => {
@@ -225,35 +219,35 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-    <style>
-      table td, table th {
-        text-align: center !important;
-        vertical-align: middle !important;
-      }
+<style>
+table td, table th {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
 
-      /* badge trạng thái */
-      .label-status {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-weight: 600;
-        display: inline-block;
-        white-space: nowrap;
-      }
+/* badge trạng thái */
+.label-status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
 
-      .st-pending   { background:#eee;     color:#333; }
-      .st-confirmed { background:#5bc0de;  color:#fff; }
-      .st-shipping  { background:#f0ad4e;  color:#fff; }
-      .st-success   { background:#5cb85c;  color:#fff; }
-      .st-canceled  { background:#d9534f;  color:#fff; }
+.st-pending   { background:#eee;     color:#333; }
+.st-confirmed { background:#5bc0de;  color:#fff; }
+.st-shipping  { background:#f0ad4e;  color:#fff; }
+.st-success   { background:#5cb85c;  color:#fff; }
+.st-canceled  { background:#d9534f;  color:#fff; }
 
-      /* dropdown đổi trạng thái gọn */
-      .order-status-select {
-        width: 130px;
-        min-width: 130px;
-        height: 32px;
-        padding: 4px 6px;
-        font-size: 13px;
-      }
-    </style>
+/* dropdown đổi trạng thái gọn */
+.order-status-select {
+  width: 130px;
+  min-width: 130px;
+  height: 32px;
+  padding: 4px 6px;
+  font-size: 13px;
+}
+</style>
 
 @endsection

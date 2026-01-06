@@ -1,3 +1,4 @@
+reviews_user/index.blade.php
 @extends('pages.admin_layout')
 @section('admin_content')
 
@@ -83,8 +84,7 @@
                     <td style="max-width:300px;">
                         {{ $review->comment }}
                     </td>
-
-                    {{-- status --}}
+{{-- status --}}
                     <td>
                         @if($review->status == 1)
                             <span class="label label-success">Hiển thị</span>

@@ -20,10 +20,6 @@ class OrderController extends Controller
 
     private function requireAdmin()
     {
-<<<<<<< HEAD
-  
-=======
->>>>>>> main
         if (!Session::has('admin_id')) {
             return Redirect::to('/admin')->send();
         }
@@ -39,6 +35,12 @@ class OrderController extends Controller
 
         $query = DB::table('orders as o')
             ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
+
+            // ✅ NEW promotion system
+            ->leftJoin('promotion_redemptions as pr', 'pr.order_id', '=', 'o.id')
+            ->leftJoin('promotion_campaigns as pcamp', 'pcamp.id', '=', 'pr.campaign_id')
+            ->leftJoin('promotion_codes as pcode', 'pcode.id', '=', 'pr.code_id')
+
             ->select(
                 'o.id',
                 'o.order_code',
@@ -50,7 +52,12 @@ class OrderController extends Controller
                 'o.receiver_phone',
                 'o.receiver_email',
                 'u.fullname as user_fullname',
-                'u.email as user_email'
+                'u.email as user_email',
+
+                // promo snapshot
+                DB::raw('COALESCE(pr.discount_amount, 0) as promo_discount_amount'),
+                'pcode.code as promo_code',
+                'pcamp.name as promo_campaign_name'
             )
             ->orderByDesc('o.id');
 
@@ -83,16 +90,43 @@ class OrderController extends Controller
     {
         $this->requireAdmin();
 
-<<<<<<< HEAD
-        // Lấy order + join user để có fallback fullname/email
-=======
->>>>>>> main
         $order = DB::table('orders as o')
             ->leftJoin('users as u', 'u.id', '=', 'o.user_id')
+
+            
+            ->leftJoin('provinces as pv', 'pv.id', '=', 'o.province_id')
+            ->leftJoin('districts as dt', 'dt.id', '=', 'o.district_id')
+            ->leftJoin('wards as wd', 'wd.id', '=', 'o.ward_id')
+
+            // promotion system (lấy snapshot từ promotion_redemptions)
+            ->leftJoin('promotion_redemptions as pr', 'pr.order_id', '=', 'o.id')
+            ->leftJoin('promotion_rules as r', 'r.id', '=', 'pr.rule_id')
+            // campaign: ưu tiên campaign_id lưu trong redemption, fallback theo rule
+            ->leftJoin('promotion_campaigns as c', function ($join) {
+                $join->on('c.id', '=', 'pr.campaign_id')
+                    ->orOn('c.id', '=', 'r.campaign_id');
+            })
+            ->leftJoin('promotion_codes as pc', 'pc.id', '=', 'pr.code_id')
+
             ->select(
                 'o.*',
                 'u.fullname as user_fullname',
-                'u.email as user_email'
+                'u.email as user_email',
+
+                // location names
+                'pv.name as province_name',
+                'dt.name as district_name',
+                'wd.name as ward_name',
+
+                // promo snapshot
+                DB::raw('COALESCE(pr.discount_amount, 0) as promo_discount_amount'),
+                'pr.used_at as promo_used_at',
+                'c.name as promo_campaign_name',
+                'pc.code as promo_code',
+
+                // optional info (để admin biết rule giảm gì)
+                'r.discount_type as promo_discount_type',
+                'r.discount_value as promo_discount_value'
             )
             ->where('o.order_code', $order_code)
             ->first();
@@ -101,10 +135,9 @@ class OrderController extends Controller
             return redirect('/admin/orders')->with('error', 'Không tìm thấy đơn hàng.');
         }
 
-        // Lấy chi tiết sản phẩm trong đơn (join products)
         $items = DB::table('order_details as od')
             ->join('products as p', 'p.id', '=', 'od.product_id')
-            ->leftJoin('product_images as pi', 'pi.product_id', '=', 'p.id') // nếu bạn có bảng product_images
+            ->leftJoin('product_images as pi', 'pi.product_id', '=', 'p.id')
             ->where('od.order_id', $order->id)
             ->select(
                 'od.product_id',
@@ -116,14 +149,17 @@ class OrderController extends Controller
             )
             ->get();
 
-        // Tính tạm tính
+        //  Subtotal = sum(order_details.price * qty)
         $subtotal = 0;
         foreach ($items as $it) {
             $subtotal += ((float)$it->price * (int)$it->quantity);
         }
 
-        $discountValue = (int)($order->discount_bill_value ?? 0);
-        $grandTotal    = (float)($order->total_price ?? 0);
+        //  Discount theo hệ mới (promotion_redemptions)
+        $discountValue = (int)($order->promo_discount_amount ?? 0);
+
+        // Grand total: ưu tiên orders.total_price (đã chốt khi đặt)
+        $grandTotal = (float)($order->total_price ?? max(0, $subtotal - $discountValue));
 
         return view('admin.orders.show', [
             'order'         => $order,
@@ -134,6 +170,7 @@ class OrderController extends Controller
             'statuses'      => $this->statuses,
         ]);
     }
+
 
     public function updateStatus(Request $request, $order_code)
     {
@@ -151,7 +188,6 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Lock đơn để tránh bấm liên tục
             $order = DB::table('orders')
                 ->where('order_code', $order_code)
                 ->lockForUpdate()
@@ -164,23 +200,16 @@ class OrderController extends Controller
 
             $currentStatus = $order->status ?? 'pending';
 
-            // Nếu đơn đã hủy -> KHÔNG cho đổi nữa
             if ($currentStatus === 'canceled') {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Đơn đã hủy, không thể thay đổi trạng thái nữa.');
             }
 
-            // Nếu chọn lại đúng trạng thái hiện tại -> không làm gì
             if ($currentStatus === $newStatus) {
                 DB::rollBack();
                 return redirect()->back()->with('success', 'Trạng thái không thay đổi.');
             }
 
-<<<<<<< HEAD
-            // Nếu đổi sang CANCELED -> hoàn kho (chỉ hoàn 1 lần vì đã chặn ở bước 1)
-=======
-            // Nếu đổi sang CANCELED -> hoàn kho chỉ hoàn 1 lần vì đã chặn ở bước 1
->>>>>>> main
             if ($newStatus === 'canceled') {
                 $details = DB::table('order_details')
                     ->where('order_id', $order->id)
@@ -190,17 +219,15 @@ class OrderController extends Controller
                     $qty = (int)($d->quantity ?? 0);
                     if ($qty <= 0) continue;
 
-                    // Cộng lại tồn kho
                     DB::table('products')
                         ->where('id', (int)$d->product_id)
                         ->increment('quantity', $qty);
                 }
+
+                // (optional): hủy redemption nếu bạn muốn
+                // DB::table('promotion_redemptions')->where('order_id', $order->id)->update(['status' => 'canceled']);
             }
 
-<<<<<<< HEAD
-=======
-            // Update status
->>>>>>> main
             DB::table('orders')
                 ->where('id', $order->id)
                 ->update([
@@ -215,6 +242,4 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Lỗi cập nhật trạng thái: ' . $e->getMessage());
         }
     }
-
-
 }

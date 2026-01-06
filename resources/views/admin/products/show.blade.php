@@ -6,14 +6,16 @@
     $storage       = optional($storageDetail->storage);
     $images        = $product->productImage;
 
-    // ====== ƯU ĐÃI ======
-    $hasDiscount = !empty($product->discount_id) && !is_null($product->discount_rate);
-    $discountRate = $hasDiscount ? (int)$product->discount_rate : null;
+    // ✅ NEW: ƯU ĐÃI (PromotionService gắn runtime từ controller)
+    $hasPromo   = !empty($product->promo_has_sale);
+    $promoName  = $product->promo_name ?? null;
+    $promoLabel = $product->promo_label ?? null;
 
-    $discountPrice = null;
-    if ($hasDiscount && $discountRate > 0) {
-        $discountPrice = (float)$product->price * (100 - $discountRate) / 100;
-    }
+    // final_price luôn fallback về price để view không bị null
+    $finalPrice = isset($product->final_price) ? (float)$product->final_price : (float)$product->price;
+
+    // Nếu muốn “chắc chắn” là có giảm thật mới hiện giá sau ưu đãi:
+    $showFinalPrice = $hasPromo && ($finalPrice < (float)$product->price);
 @endphp
 
 <style>
@@ -106,28 +108,36 @@
                                 <div>{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             </div>
 
+                            {{-- ✅ NEW: Ưu đãi (promotion) --}}
                             <div class="info-row">
                                 <div class="info-label">Ưu đãi</div>
                                 <div>
-                                    @if($product->discount_label)
-                                        <span class="label label-info">{{ $product->discount_label }}</span>
+                                    @if($hasPromo)
+                                        <span class="label label-info">
+                                            {{ $promoName ?? 'Ưu đãi' }}
+                                            @if(!empty($promoLabel))
+                                                ({{ $promoLabel }})
+                                            @endif
+                                        </span>
                                     @else
                                         —
                                     @endif
                                 </div>
                             </div>
 
+                            {{-- ✅ NEW: Giá sau ưu đãi (đồng bộ với index) --}}
                             <div class="info-row">
                                 <div class="info-label">Giá sau ưu đãi</div>
                                 <div>
-                                    @if(!is_null($product->discounted_price))
-                                        {{ number_format($product->discounted_price, 0, ',', '.') }} đ
+                                    @if($showFinalPrice)
+                                        <strong style="color:#e60012;">
+                                            {{ number_format($finalPrice, 0, ',', '.') }} đ
+                                        </strong>
                                     @else
                                         —
                                     @endif
                                 </div>
                             </div>
-
 
                             <div class="info-row">
                                 <div class="info-label">Số lượng tồn kho</div>
@@ -243,7 +253,6 @@
                         @endforeach
                     @endif
                 </div>
-
 
                 {{-- ================== NÚT ================== --}}
                 <div style="margin-top:15px;">

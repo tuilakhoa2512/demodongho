@@ -74,6 +74,7 @@
                         @foreach($chunk as $product)
                             @include('pages.partials.product_card', [
                                 'product' => $product,
+                                'favorite_ids' => $favorite_ids,
                                 'is_recommended' => true
                             ])
                         @endforeach

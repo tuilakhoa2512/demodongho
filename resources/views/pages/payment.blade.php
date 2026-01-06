@@ -2,6 +2,7 @@
 
 @section('content')
 <h2 class="title text-center">Thông Tin Thanh Toán</h2>
+
 <div class="payment-page">
 
     {{-- ERROR / SUCCESS --}}
@@ -26,7 +27,7 @@
             {{-- LEFT: SHIPPING INFO --}}
             <div class="col-sm-7">
                 <div class="pay-box">
-                    <h3 class="pay-box-title" style="text-align: center;">Thông Tin Giao Hàng</h3>
+                    <h3 class="pay-box-title" style="text-align:center;">Thông Tin Giao Hàng</h3>
 
                     <div class="form-group">
                         <label>Họ và tên người nhận *</label>
@@ -102,11 +103,11 @@
                     <hr>
 
                     {{-- PAYMENT METHOD --}}
-                    <h3 class="pay-box-title">Phương Thức Thanh Toán</h3>
+                    <h3 class="pay-box-title" style="text-align:center;">Phương Thức Thanh Toán</h3>
                     <div class="form-group">
                         <select name="payment_method" id="payment_method" class="form-control" required>
                             <option value="COD" {{ old('payment_method') === 'COD' ? 'selected' : '' }}>
-                                COD (Thanh toán khi nhận hàng)
+                                Thanh toán khi nhận hàng (COD)
                             </option>
                             <option value="VNPAY" {{ old('payment_method') === 'VNPAY' ? 'selected' : '' }}>
                                 Chuyển khoản ngân hàng (VNPay)
@@ -116,10 +117,36 @@
                 </div>
             </div>
 
-            {{-- RIGHT: ORDER SUMMARY --}}
+            {{-- RIGHT: ORDER SUMMARY + PROMO CODE --}}
             <div class="col-sm-5">
                 <div class="pay-box">
-                    <h3 class="pay-box-title" style="text-align: center;">Đơn Hàng Của Bạn</h3>
+                    <h3 class="pay-box-title" style="text-align:center;">Đơn Hàng Của Bạn</h3>
+
+                    {{-- PROMO CODE (moved to right) --}}
+                    <div class="promo-wrap">
+                        <label style="font-weight:800; margin-bottom:6px; display:block;">Mã giảm giá</label>
+
+                        <div class="promo-row">
+                            <input type="text"
+                                   name="promo_code"
+                                   id="promo_code"
+                                   class="form-control"
+                                   placeholder="VD: TET2026"
+                                   value="{{ old('promo_code', $promoCode ?? '') }}">
+
+                            <button type="button" class="btn promo-btn" id="btn_apply_promo">
+                                Áp dụng
+                            </button>
+                        </div>
+
+                        <div id="promo_feedback" class="promo-feedback" style="display:none;"></div>
+
+                        <small style="display:block; margin-top:6px; color:#777; font-weight:600;">
+                            * Bấm “Áp dụng” để kiểm tra mã trước khi đặt hàng.
+                        </small>
+                    </div>
+
+                    <hr style="margin:12px 0;">
 
                     <div class="pay-items">
                         @foreach($cart as $it)
@@ -135,26 +162,33 @@
                         @endforeach
                     </div>
 
+                    @php
+                        $appliedCode = old('promo_code', $promoCode ?? '');
+                    @endphp
+
                     <div class="pay-summary">
                         <div class="sum-row">
                             <span>Tạm tính</span>
-                            <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+                            <strong id="subtotal_text">{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
                         </div>
 
                         <div class="sum-row sum-discount">
                             <span>
-                                @if(!empty($billDiscount))
-                                    Ưu đãi hóa đơn ({{ $billDiscount->name }} - {{ $billDiscount->rate }}%)
-                                @else
-                                    Ưu đãi hóa đơn
-                                @endif
+                                Ưu đãi hóa đơn
+                                <span id="applied_code"
+                                      style="color:#555; font-weight:800; {{ !empty($appliedCode) ? '' : 'display:none;' }}">
+                                    (Code: {{ $appliedCode }})
+                                </span>
+                                <span id="bill_discount_name" style="color:#555; font-weight:800; {{ !empty($billDiscount) ? '' : 'display:none;' }}">
+                                    - {{ $billDiscount->name ?? '' }}
+                                </span>
                             </span>
-                            <strong>-{{ number_format($billDiscountAmount ?? 0, 0, ',', '.') }} đ</strong>
+                            <strong id="discount_text">-{{ number_format($billDiscountAmount ?? 0, 0, ',', '.') }} đ</strong>
                         </div>
 
                         <div class="sum-row sum-total">
                             <span>Tổng thanh toán</span>
-                            <strong>{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+                            <strong id="total_text">{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
                         </div>
                     </div>
 
@@ -163,11 +197,8 @@
                         Xác Nhận Đặt Hàng
                     </button>
 
-                    {{-- VNPAY BUTTON--}}
-                    <button type="submit"
-                            id="btn_vnpay"
-                            class="btn pay-btn"
-                            style="display:none;">
+                    {{-- VNPAY BUTTON --}}
+                    <button type="submit" id="btn_vnpay" class="btn pay-btn" style="display:none;">
                         Thanh toán VNPay
                     </button>
 
@@ -199,6 +230,100 @@ document.addEventListener('DOMContentLoaded', function () {
 
     select.addEventListener('change', togglePayButtons);
     togglePayButtons();
+});
+</script>
+
+{{-- APPLY PROMO (AJAX) --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('btn_apply_promo');
+    const input = document.getElementById('promo_code');
+    const feedback = document.getElementById('promo_feedback');
+
+    const subtotalText = document.getElementById('subtotal_text');
+    const discountText = document.getElementById('discount_text');
+    const totalText = document.getElementById('total_text');
+
+    const appliedCode = document.getElementById('applied_code');
+    const billName = document.getElementById('bill_discount_name');
+
+    function fmtVND(n) {
+        try { return (Number(n) || 0).toLocaleString('vi-VN') + ' đ'; }
+        catch(e){ return (Number(n) || 0) + ' đ'; }
+    }
+
+    function showMsg(ok, msg) {
+        feedback.style.display = 'block';
+        feedback.className = 'promo-feedback ' + (ok ? 'promo-ok' : 'promo-err');
+        feedback.textContent = msg || '';
+    }
+
+    async function applyPromo() {
+        btn.disabled = true;
+        btn.textContent = 'Đang kiểm tra...';
+
+        const code = (input.value || '').trim();
+
+        try {
+            const res = await fetch("{{ route('payment.applyPromo') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ promo_code: code })
+            });
+
+            const data = await res.json().catch(() => null);
+
+            if (!res.ok || !data) {
+                showMsg(false, (data && data.message) ? data.message : 'Không thể kiểm tra mã lúc này.');
+                return;
+            }
+
+            // Update money UI
+            subtotalText.textContent = fmtVND(data.subtotal);
+            discountText.textContent = '-' + fmtVND(data.discount_amount);
+            totalText.textContent = fmtVND(data.total);
+
+            // Update code label (only show when code exists + server says has_code)
+            if (data.promo_code && data.has_code) {
+                appliedCode.style.display = 'inline';
+                appliedCode.textContent = '(Code: ' + data.promo_code + ')';
+            } else {
+                appliedCode.style.display = 'none';
+                appliedCode.textContent = '';
+            }
+
+            // Optional: promo name (if server returns)
+            if (data.promo_name) {
+                billName.style.display = 'inline';
+                billName.textContent = '- ' + data.promo_name;
+            } else {
+                billName.style.display = 'none';
+                billName.textContent = '';
+            }
+
+            showMsg(true, data.message || 'Đã cập nhật ưu đãi.');
+
+        } catch (e) {
+            showMsg(false, 'Lỗi mạng hoặc server.');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Áp dụng';
+        }
+    }
+
+    btn.addEventListener('click', applyPromo);
+
+    // Enter to apply
+    input.addEventListener('keydown', function(e){
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyPromo();
+        }
+    });
 });
 </script>
 
@@ -324,6 +449,43 @@ document.addEventListener('DOMContentLoaded', function () {
     font-weight: 600;
 }
 .pay-back:hover{ color:#e60012; }
+
+/* PROMO UI */
+.promo-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+.promo-row .form-control{ flex: 1; }
+
+.promo-btn{
+    background:#111;
+    border:1px solid #111;
+    color:#fff;
+    font-weight:800;
+    border-radius:8px;
+    padding:10px 14px;
+    white-space:nowrap;
+}
+.promo-btn:hover{ opacity:0.9; color:#fff; }
+
+.promo-feedback{
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-weight:800;
+    display:none;
+}
+.promo-ok{
+    background:#eafff1;
+    border:1px solid #b7f0cc;
+    color:#0f6b2f;
+}
+.promo-err{
+    background:#ffefef;
+    border:1px solid #ffd1d1;
+    color:#b80010;
+}
 </style>
 
 @endsection

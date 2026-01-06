@@ -2,7 +2,7 @@
 @section('content')
 
 @php
-    $fullname = Session::get('fullname');
+    $fullname = Session::get('fullname','id');
     $parts = explode(' ', trim($fullname));
 
     $first = mb_substr($parts[0], 0, 1, 'UTF-8');
@@ -11,11 +11,12 @@
 
     // Random màu
     function randomColor() {
-        return sprintf("#%06X", mt_rand(0, 0xFFFFFF));
+        return sprintf("#%06X"  , mt_rand(0, 0xFFFFFF));
     }
     $bgColor = randomColor();
 @endphp
-
+'
+'
 <h2 class="title text-center" style="margin-bottom: 20px;">
         Thông Tin Cá Nhân: 
          {{ Session::get('fullname') }}

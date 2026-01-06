@@ -21,9 +21,11 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\StorageDetailController;
-use App\Http\Controllers\Admin\DiscountProductController;
-use App\Http\Controllers\Admin\DiscountProductDetailController;
-use App\Http\Controllers\Admin\DiscountBillController;
+use App\Http\Controllers\Admin\PromotionCampaignController;
+use App\Http\Controllers\Admin\PromotionController;
+use App\Http\Controllers\Admin\PromotionRedemptionController;
+use App\Http\Controllers\Admin\PromotionTargetController;
+use App\Http\Controllers\Admin\PromotionCodeController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\SaleController;
@@ -112,6 +114,9 @@ Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remov
 // Payment
 Route::get('/payment', [PaymentController::class, 'show'])->name('payment.show');
 Route::post('/payment', [PaymentController::class, 'placeOrder'])->name('payment.place');
+Route::post('/payment/apply-code', [PaymentController::class, 'applyCode'])->name('payment.applyCode');
+Route::post('/payment/remove-code', [PaymentController::class, 'removeCode'])->name('payment.removeCode');
+Route::post('/payment/apply-promo', [PaymentController::class, 'applyPromo'])->name('payment.applyPromo');
 Route::get('/payment/success/{order_code}', [PaymentController::class, 'success'])->name('payment.success');
   //VNPAY
   Route::get('/vnpay/create/{order_code}', [VNPayController::class, 'create'])->name('vnpay.create');
@@ -288,41 +293,73 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('/products/{id}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
 
 
-    //  DISCOUNT PRODUCT 
-    Route::get('/discount-products', [DiscountProductController::class, 'index'])->name('discount-products.index');
+    // ======== PROMOTIONS (campaigns -> rules -> targets/codes) ========
 
-    Route::get('/discount-products/create', [DiscountProductController::class, 'create'])->name('discount-products.create');
+    // Campaigns 
+    Route::get('/promotions', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'index'])
+        ->name('promotions.index');
 
-    Route::post('/discount-products', [DiscountProductController::class, 'store'])->name('discount-products.store');
+    Route::get('/promotions/create', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'create'])
+        ->name('promotions.create');
 
-    Route::get('/discount-products/{id}/edit', [DiscountProductController::class, 'edit'])->name('discount-products.edit');
+    Route::post('/promotions', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'store'])
+        ->name('promotions.store');
 
-    Route::put('/discount-products/{id}', [DiscountProductController::class, 'update'])->name('discount-products.update');
+    Route::get('/promotions/{id}/edit', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'edit'])
+        ->name('promotions.edit');
 
-    Route::patch('/discount-products/{id}/toggle-status', [DiscountProductController::class, 'toggleStatus'])->name('discount-products.toggle-status');
+    Route::put('/promotions/{id}', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'update'])
+        ->name('promotions.update');
 
-        //  DISCOUNT PRODUCT DETAIL (pivot) 
-    Route::get('/discount-products/{id}/products', [DiscountProductDetailController::class, 'index'])->name('discount-products.products.index');
-
-    Route::post('/discount-products/{id}/products/attach', [DiscountProductDetailController::class, 'attach'])->name('discount-products.products.attach');
-
-    Route::put('/discount-products/{id}/products/{productId}', [DiscountProductDetailController::class, 'updateExpiration'])->name('discount-products.products.update');
-
-    Route::patch('/discount-products/{id}/products/{productId}/toggle', [DiscountProductDetailController::class, 'toggle'])->name('discount-products.products.toggle');
+    Route::patch('/promotions/{id}/toggle-status', [\App\Http\Controllers\Admin\PromotionCampaignController::class, 'toggleStatus'])
+        ->name('promotions.toggle-status');
 
 
-        // DISCOUNT BILL
-    Route::get('/discount-bills', [\App\Http\Controllers\Admin\DiscountBillController::class, 'index'])->name('discount-bills.index');
+    // Rules (thuộc Campaign)
+    Route::post('/promotions/{id}/rules', [\App\Http\Controllers\Admin\PromotionRuleController::class, 'store'])
+        ->name('promotions.rules.store');
 
-    Route::get('/discount-bills/create', [\App\Http\Controllers\Admin\DiscountBillController::class, 'create'])->name('discount-bills.create');
+    Route::put('/promotions/{id}/rules/{ruleId}', [\App\Http\Controllers\Admin\PromotionRuleController::class, 'update'])
+        ->name('promotions.rules.update');
 
-    Route::post('/discount-bills', [\App\Http\Controllers\Admin\DiscountBillController::class, 'store'])->name('discount-bills.store');
+    Route::patch('/promotions/{id}/rules/{ruleId}/toggle-status', [\App\Http\Controllers\Admin\PromotionRuleController::class, 'toggleStatus'])
+        ->name('promotions.rules.toggle-status');
 
-    Route::get('/discount-bills/{id}/edit', [\App\Http\Controllers\Admin\DiscountBillController::class, 'edit'])->name('discount-bills.edit');
+    Route::delete('/promotions/{id}/rules/{ruleId}', [\App\Http\Controllers\Admin\PromotionRuleController::class, 'destroy'])
+        ->name('promotions.rules.destroy');
 
-    Route::put('/discount-bills/{id}', [\App\Http\Controllers\Admin\DiscountBillController::class, 'update'])->name('discount-bills.update');
 
-    Route::patch('/discount-bills/{id}/toggle-status', [\App\Http\Controllers\Admin\DiscountBillController::class, 'toggleStatus'])->name('discount-bills.toggle-status');
+    // Targets (thuộc Rule)
+    Route::post('/promotions/{id}/rules/{ruleId}/targets', [\App\Http\Controllers\Admin\PromotionTargetController::class, 'store'])
+        ->name('promotions.targets.store');
+
+    Route::patch('/promotions/{id}/rules/{ruleId}/targets/{targetId}/toggle-status', [\App\Http\Controllers\Admin\PromotionTargetController::class, 'toggleStatus'])
+        ->name('promotions.targets.toggle-status');
+
+    Route::delete('/promotions/{id}/rules/{ruleId}/targets/{targetId}', [\App\Http\Controllers\Admin\PromotionTargetController::class, 'destroy'])
+        ->name('promotions.targets.destroy');
+
+
+    // Codes (thuộc Rule)
+    Route::post('/promotions/{id}/rules/{ruleId}/codes', [\App\Http\Controllers\Admin\PromotionCodeController::class, 'store'])
+        ->name('promotions.codes.store');
+
+    Route::put('/promotions/{id}/rules/{ruleId}/codes/{codeId}', [\App\Http\Controllers\Admin\PromotionCodeController::class, 'update'])
+        ->name('promotions.codes.update');
+
+    Route::patch('/promotions/{id}/rules/{ruleId}/codes/{codeId}/toggle-status', [\App\Http\Controllers\Admin\PromotionCodeController::class, 'toggleStatus'])
+        ->name('promotions.codes.toggle-status');
+
+    Route::delete('/promotions/{id}/rules/{ruleId}/codes/{codeId}', [\App\Http\Controllers\Admin\PromotionCodeController::class, 'destroy'])
+        ->name('promotions.codes.destroy');
+
+
+    // Redemptions (log)
+    Route::get('/promotion-redemptions', [\App\Http\Controllers\Admin\PromotionRedemptionController::class, 'index'])
+        ->name('promotion-redemptions.index');
+
+    Route::get('/promotion-redemptions/{id}', [\App\Http\Controllers\Admin\PromotionRedemptionController::class, 'show'])
+        ->name('promotion-redemptions.show');
 
     //Quan Ly Don Hang
     Route::get('/orders', [\App\Http\Controllers\Admin\OrderController::class, 'index'])->name('admin.orders.index');

@@ -13,25 +13,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 
+// ✅ NEW (promotion system)
+use App\Services\PromotionService;
+
 class ProductController extends Controller
 {
-<<<<<<< HEAD
-   
-    public function index()
+    // ✅ CHỈ SỬA: index() (bỏ join discount cũ, dùng PromotionService)
+    public function index(PromotionService $promoService)
     {
-        $today = now()->toDateString();
-
-        // Lấy sản phẩm + join ưu đãi đang áp dụng (nếu có)
-        // Điều kiện ưu đãi được tính là "đang áp dụng":
-        // - dp.status = 1 (chương trình ưu đãi đang bật)
-        // - dpd.status = 1 (chi tiết đang áp dụng)
-        // - expiration_date null hoặc >= hôm nay
-=======
-
-    public function index()
-    {
-        $today = now()->toDateString();
->>>>>>> main
         $products = Product::query()
             ->with([
                 'brand',
@@ -39,61 +28,84 @@ class ProductController extends Controller
                 'storageDetail.storage',
                 'productImage',
             ])
-            ->leftJoin('discount_product_details as dpd', function ($join) use ($today) {
-                $join->on('dpd.product_id', '=', 'products.id')
-                    ->where('dpd.status', 1)
-                    ->where(function ($q) use ($today) {
-                        $q->whereNull('dpd.expiration_date')
-                          ->orWhere('dpd.expiration_date', '>=', $today);
-                    });
-            })
-            ->leftJoin('discount_products as dp', function ($join) {
-                $join->on('dp.id', '=', 'dpd.discount_product_id')
-                     ->where('dp.status', 1);
-            })
-            ->select([
-                'products.*',
-                DB::raw('dp.id as discount_id'),
-                DB::raw('dp.name as discount_name'),
-                DB::raw('dp.rate as discount_rate'),
-            ])
-            ->orderByDesc('products.id')
+            ->orderByDesc('id')
             ->paginate(20);
+
+        // ✅ Gắn field runtime để view dùng (không query thêm trong view)
+        foreach ($products as $p) {
+            $pack     = $promoService->calcProductFinalPrice($p);
+            $campaign = $pack['campaign'] ?? null;
+            $rule     = $pack['rule'] ?? null;
+
+            $p->final_price           = (int)($pack['final_price'] ?? (int)$p->price);
+            $p->promo_has_sale        = $rule ? 1 : 0;
+
+            if ($rule) {
+                $p->promo_name            = $campaign?->name;          // tên campaign
+                $p->promo_discount_type   = $rule->discount_type;      // percent|fixed
+                $p->promo_discount_value  = (int)$rule->discount_value;
+                $p->promo_label           = $pack['promo_label'] ?? null;
+                $p->promo_discount_amount = (int)($pack['discount_amount'] ?? max(0, (int)$p->price - (int)$p->final_price));
+            } else {
+                $p->promo_name            = null;
+                $p->promo_discount_type   = null;
+                $p->promo_discount_value  = null;
+                $p->promo_label           = null;
+                $p->promo_discount_amount = 0;
+            }
+        }
 
         return view('admin.products.index', compact('products'));
     }
 
-<<<<<<< HEAD
-    //show
-=======
->>>>>>> main
-    public function show($id)
+
+    public function show($id, PromotionService $promoService)
     {
         $product = Product::with([
             'brand',
             'category',
             'productImage',
             'storageDetail.storage',
-            'discountProducts',
         ])->findOrFail($id);
+
+        // ✅ promo pack theo hệ mới
+        $pack     = $promoService->calcProductFinalPrice($product);
+        $campaign = $pack['campaign'] ?? null;
+        $rule     = $pack['rule'] ?? null;
+
+        // ✅ gắn field runtime để view dùng giống index
+        $product->promo_has_sale        = $rule ? 1 : 0;
+        $product->promo_name            = $campaign?->name;                 // tên chiến dịch
+        $product->promo_discount_type   = $rule?->discount_type;            // percent|fixed
+        $product->promo_discount_value  = $rule?->discount_value;           // int
+        $product->promo_label           = $pack['promo_label'] ?? null;
+
+        $product->final_price           = (int)($pack['final_price'] ?? (int)$product->price);
+        $product->promo_discount_amount = (int)($pack['discount_amount'] ?? 0);
+
         // Lấy review của sản phẩm
         $reviews = Review::where('product_id', $id)
-                    ->where('status', 1)
-                    ->orderByDesc('created_at')
-                    ->get();
+            ->where('status', 1)
+            ->orderByDesc('created_at')
+            ->get();
 
         // Tính điểm trung bình
-        $averageRating = round(Review::where('product_id', $id)
-                        ->where('status', 1)
-                        ->avg('rating'), 1);
+        $averageRating = round(
+            Review::where('product_id', $id)
+                ->where('status', 1)
+                ->avg('rating'),
+            1
+        );
 
-        return view('admin.products.show', compact('product','reviews', 'averageRating'));
+        return view('admin.products.show', compact('product', 'reviews', 'averageRating'));
     }
 
-<<<<<<< HEAD
-    
-=======
->>>>>>> main
+
+
+    // =========================
+    // CÁC PHẦN DƯỚI GIỮ NGUYÊN
+    // =========================
+
     public function create()
     {
         $storageDetails = StorageDetail::with('storage')
@@ -103,14 +115,14 @@ class ProductController extends Controller
             ->orderByDesc('id')
             ->get();
 
-            $categories = Category::where('status', 1)
+        $categories = Category::where('status', 1)
             ->orderBy('name')
             ->get();
-    
+
         $brands = Brand::where('status', 1)
             ->orderBy('name')
             ->get();
-            
+
         return view('admin.products.create', compact(
             'storageDetails',
             'categories',
@@ -118,12 +130,6 @@ class ProductController extends Controller
         ));
     }
 
-<<<<<<< HEAD
-    /**
-     * LƯU SẢN PHẨM MỚI
-     */
-=======
->>>>>>> main
     public function store(Request $request)
     {
         $request->validate([
@@ -149,25 +155,17 @@ class ProductController extends Controller
             'image_1.required'           => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
         ]);
 
-        //  Lấy dòng kho
+        // 2) Lấy dòng kho
         $detail = StorageDetail::with('storage', 'product')->findOrFail($request->storage_detail_id);
 
-<<<<<<< HEAD
-        //  Chặn: kho đang ẩn
-=======
         // Chặn: kho đang ẩn
->>>>>>> main
         if ((int)$detail->status !== 1) {
             return back()
                 ->withErrors(['storage_detail_id' => 'Dòng kho này đang bị ẩn, không thể đăng bán.'])
                 ->withInput();
         }
 
-<<<<<<< HEAD
-        //  Chặn: đã có product rồi
-=======
         //Chặn: đã có product rồi
->>>>>>> main
         if ($detail->product) {
             return back()
                 ->withErrors(['storage_detail_id' => 'Dòng kho này đã được đăng bán (đã có sản phẩm).'])
@@ -181,11 +179,7 @@ class ProductController extends Controller
                 ->withInput();
         }
 
-<<<<<<< HEAD
-        // Lấy số lượng từ kho
-=======
         //Lấy số lượng từ kho
->>>>>>> main
         $quantityFromStorage = (int)$detail->import_quantity;
 
         if ($quantityFromStorage <= 0) {
@@ -202,7 +196,7 @@ class ProductController extends Controller
             'storage_detail_id' => $detail->id,
             'category_id'       => $request->category_id,
             'brand_id'          => $request->brand_id,
-            
+
             'name'              => $name,
             'description'       => $request->description,
             'strap_material'    => $request->strap_material,
@@ -211,23 +205,6 @@ class ProductController extends Controller
 
             'price'             => $request->price,
 
-<<<<<<< HEAD
-            // quantity = import_quantity
-            'quantity'          => $quantityFromStorage,
-
-            //  mới đăng => đang bán
-            'stock_status'      => 'selling',
-
-            //  mặc định hiển thị
-            'status'            => $request->status ?? 1,
-        ]);
-
-        //  Đồng bộ kho sang selling
-        $detail->stock_status = 'selling';
-        $detail->save();
-
-        //  Lưu ảnh
-=======
             //quantity = import_quantity
             'quantity'          => $quantityFromStorage,
 
@@ -243,7 +220,6 @@ class ProductController extends Controller
         $detail->save();
 
         //Lưu ảnh
->>>>>>> main
         $folder = "products/{$product->id}";
         $imagesData = ['product_id' => $product->id];
 
@@ -262,12 +238,6 @@ class ProductController extends Controller
             ->with('success', 'Đăng sản phẩm mới thành công.');
     }
 
-<<<<<<< HEAD
-    /**
-     * FORM SỬA SẢN PHẨM
-     */
-=======
->>>>>>> main
     public function edit($id)
     {
         $product = Product::with(['productImage', 'storageDetail.storage', 'brand', 'category'])
@@ -283,12 +253,6 @@ class ProductController extends Controller
         ));
     }
 
-<<<<<<< HEAD
-    /**
-     * UPDATE SẢN PHẨM
-     */
-=======
->>>>>>> main
     public function update(Request $request, $id)
     {
         $product = Product::with('productImage', 'storageDetail')->findOrFail($id);
@@ -305,7 +269,7 @@ class ProductController extends Controller
 
             'price'           => 'required|numeric|min:0',
 
-            // đổi trạng thái bán
+            // Cho phép đổi trạng thái bán
             'stock_status'    => 'nullable|in:selling,sold_out,stopped',
 
             'status'          => 'nullable|in:0,1',
@@ -332,11 +296,7 @@ class ProductController extends Controller
             'status'         => $request->status ?? $product->status,
         ]);
 
-<<<<<<< HEAD
-        //  Đồng bộ stock_status sang kho
-=======
         // Đồng bộ stock_status sang kho
->>>>>>> main
         if ($product->storageDetail) {
             $product->storageDetail->stock_status = $product->stock_status;
             $product->storageDetail->save();
@@ -369,18 +329,12 @@ class ProductController extends Controller
             ->with('success', 'Cập nhật sản phẩm thành công.');
     }
 
-<<<<<<< HEAD
-    /**
-     * ẨN / HIỆN SẢN PHẨM
-     */
-=======
->>>>>>> main
     public function toggleStatus($id)
     {
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
-        // ĐANG HIỂN THỊ -> ẨN
+        // 1) ĐANG HIỂN THỊ -> ẨN
         if ($product->status == 1) {
 
             $product->status = 0;
@@ -397,11 +351,7 @@ class ProductController extends Controller
                 ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-<<<<<<< HEAD
-        // ĐANG ẨN -> HIỆN
-=======
         //ĐANG ẨN -> HIỆN
->>>>>>> main
 
         // Kho đang ẩn -> KHÔNG cho hiện
         if ($detail && $detail->status == 0) {

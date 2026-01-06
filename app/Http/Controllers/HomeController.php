@@ -1,60 +1,61 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Support\Facades\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Services\PromotionService;
 
 class HomeController extends Controller
 {
-    private function discountEagerLoadClosure()
+    /**
+     * Gắn runtime promo fields để view dùng:
+     * - final_price
+     * - promo_has_sale
+     * - promo_name
+     * - promo_label
+     */
+    private function attachProductPromos($products, PromotionService $promoService)
     {
-        $today = now()->toDateString();
+        foreach ($products as $p) {
+            $pack = $promoService->calcProductFinalPrice($p);
 
-        return function ($q) use ($today) {
-            $q->where('discount_products.status', 1)
-              ->wherePivot('status', 1)
-              ->where(function ($qq) use ($today) {
-                  $qq->whereNull('discount_product_details.expiration_date')
-                     ->orWhere('discount_product_details.expiration_date', '>=', $today);
-              })
-              ->orderByDesc('discount_products.rate');
-        };
+            // ✅ dùng float để không mất phần thập phân
+            $p->final_price    = (float) ($pack['final_price'] ?? $p->price);
+            $p->promo_has_sale = !empty($pack['promotion']) ? 1 : 0;
+
+            $promo = $pack['promotion'] ?? null;
+            $p->promo_name  = $promo?->name;
+            $p->promo_label = $pack['promo_label'] ?? null;
+        }
+
+        return $products;
     }
 
-    public function index()
+    public function index(PromotionService $promoService)
     {
         $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id', 'asc')->get();
         $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id', 'asc')->get();
 
-        $all_product = Product::with([
-                'productImage',
-                'category',
-                'brand',
-                'discountProducts' => $this->discountEagerLoadClosure(),
-            ])
+        $all_product = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
-            ->whereHas('category', function ($q) {
-                $q->where('status', 1);
-            })
-            ->whereHas('brand', function ($q) {
-                $q->where('status', 1);
-            })
+            ->whereHas('category', fn($q) => $q->where('status', 1))
+            ->whereHas('brand', fn($q) => $q->where('status', 1))
             ->inRandomOrder()
             ->paginate(6);
 
-            
-        $recommended_products = Product::with([
-                'productImage',
-                'discountProducts' => $this->discountEagerLoadClosure(),
-            ])
+        $recommended_products = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->take(6)
             ->get();
+
+        $all_product = $this->attachProductPromos($all_product, $promoService);
+        $recommended_products = $this->attachProductPromos($recommended_products, $promoService);
 
         return view('pages.home')
             ->with('category', $cate_pro)
@@ -63,81 +64,73 @@ class HomeController extends Controller
             ->with('recommended_products', $recommended_products);
     }
 
-    public function search(Request $request)
-{
-    $keywords = trim($request->keywords);
+    public function search(Request $request, PromotionService $promoService)
+    {
+        $keywords = trim($request->keywords);
 
-    $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id')->get();
-    $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id')->get();
+        $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id')->get();
+        $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id')->get();
 
-    // ===== FAVORITE =====
-    $favorite_ids = [];
-    if (Session::has('id')) {
-        $favorite_ids = DB::table('favorites')
-            ->where('user_id', Session::get('id'))
-            ->pluck('product_id')
-            ->toArray();
+        // FAVORITE
+        $favorite_ids = [];
+        if (Session::has('id')) {
+            $favorite_ids = DB::table('favorites')
+                ->where('user_id', Session::get('id'))
+                ->pluck('product_id')
+                ->toArray();
+        } else {
+            $favorite_ids = Session::get('favorite_guest', []);
+        }
+
+        $search_product = Product::with(['productImage','category','brand'])
+            ->where('status', 1)
+            ->where('stock_status', 'selling')
+            ->where('name', 'LIKE', "%{$keywords}%")
+            ->whereHas('category', fn($q) => $q->where('status', 1))
+            ->whereHas('brand', fn($q) => $q->where('status', 1))
+            ->orderByDesc('id')
+            ->paginate(6)
+            ->appends(['keywords' => $keywords]);
+
+        $search_product = $this->attachProductPromos($search_product, $promoService);
+
+        // ✅ FE search: trả về pages.home (tạm dùng chung layout)
+        return view('pages.home', [
+            'category'             => $cate_pro,
+            'brand'                => $brand_pro,
+            'all_product'          => $search_product,       // dùng chung vòng lặp
+            'recommended_products' => collect(),             // hoặc bạn query lại nếu muốn
+            'keywords'             => $keywords,
+            'favorite_ids'         => $favorite_ids,
+        ]);
     }
 
-    $search_product = Product::with([
-            'productImage',
-            'category',
-            'brand',
-            'discountProducts' => $this->discountEagerLoadClosure(),
-        ])
-        ->where('name', 'LIKE', "%{$keywords}%")
-        ->where('quantity', '>', 0)
-        ->whereHas('category')
-        ->whereHas('brand')
-        ->orderBy('id', 'desc')
-        ->get();
-
-    return view('admin.products.search', compact(
-        'cate_pro',
-        'brand_pro',
-        'search_product',
-        'keywords',
-        'favorite_ids'
-    ));
-}
-
-
-    // Hàm lọc giá
-    public function filterPrice(Request $request)
+    public function filterPrice(Request $request, PromotionService $promoService)
     {
         $min = (float) $request->get('min_price', 0);
         $max = (float) $request->get('max_price', 100000000);
-
         $max = min($max, 100000000);
 
-        $cate_pro = DB::table('categories')->where('status', 1)->get();
+        $cate_pro  = DB::table('categories')->where('status', 1)->get();
         $brand_pro = DB::table('brands')->where('status', 1)->get();
 
-        // Filter: eager-load discount để trang home hiển thị đúng giá sau ưu đãi
-        $all_product = Product::with([
-                'productImage',
-                'category',
-                'brand',
-                'discountProducts' => $this->discountEagerLoadClosure(),
-            ])
+        // ✅ NOTE: đang lọc theo price gốc (nhanh). Nếu muốn lọc theo final_price mình sẽ nâng cấp sau.
+        $all_product = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
             ->whereBetween('price', [$min, $max])
             ->paginate(6)
-            ->appends([
-                'min_price' => $min,
-                'max_price' => $max,
-            ]);
+            ->appends(['min_price' => $min, 'max_price' => $max]);
 
-        $recommended_products = Product::with([
-                'productImage',
-                'discountProducts' => $this->discountEagerLoadClosure(),
-            ])
+        $recommended_products = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
             ->latest()
             ->take(6)
             ->get();
+
+        $all_product = $this->attachProductPromos($all_product, $promoService);
+        $recommended_products = $this->attachProductPromos($recommended_products, $promoService);
 
         return view('pages.home', [
             'all_product'          => $all_product,

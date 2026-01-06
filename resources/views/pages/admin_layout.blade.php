@@ -280,7 +280,7 @@ body {
         
                     </ul>
                 </li>
-                <li class="sub-menu">
+                {{-- <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class=" fa fa-ticket"></i>
                         <span>Ưu Đãi Sản Phẩm</span>
@@ -297,8 +297,8 @@ body {
                             </a>
                         </li> 
                     </ul>
-                </li>
-                <li class="sub-menu">
+                </li> --}}
+                {{-- <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class=" fa fa-ticket"></i>
                         <span>Ưu Đãi Bill</span>
@@ -315,7 +315,31 @@ body {
                             </a>
                         </li>                        
                     </ul>
+                </li> --}}
+                <li class="sub-menu">
+                    <a href="javascript:;">	
+                        <i class="fa fa-ticket"></i>
+                        <span>Ưu Đãi</span>
+                    </a>
+                    <ul class="sub">
+
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.promotions.index') }}"
+                            style="width: 160px; text-align: left;">
+                                Danh Sách Ưu Đãi
+                            </a>
+                        </li>
+
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.promotions.create') }}"
+                            style="width: 160px; text-align: left;">
+                                Thêm Ưu Đãi
+                            </a>
+                        </li>
+
+                    </ul>
                 </li>
+
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class=" fa fa-comments"></i>

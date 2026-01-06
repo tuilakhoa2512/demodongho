@@ -13,8 +13,6 @@
       </a>
     </div>
 
-  
-
     @php
       $st = $order->status ?? 'pending';
       $badgeClass = match($st) {
@@ -29,22 +27,54 @@
       $receiverEmail = $order->receiver_email ?? ($order->user_email ?? '—');
       $receiverPhone = $order->receiver_phone ?? '—';
       $receiverAddr  = $order->receiver_address ?? '—';
+
+      // ✅ NEW promotion fields (hệ mới)
+      $promoDiscount = (int)($order->promo_discount_amount ?? 0);
+      $promoCode     = $order->promo_code ?? null;
+      $promoCampaign = $order->promo_campaign_name ?? null;
+      $promoUsedAt   = $order->promo_used_at ?? null;
+
+      $promoType  = $order->promo_discount_type ?? null;   // percent|fixed
+      $promoValue = $order->promo_discount_value ?? null;
+
+      $promoLabel = null;
+      if (!empty($promoType) && $promoValue !== null) {
+          if ($promoType === 'percent') $promoLabel = '-' . (int)$promoValue . '%';
+          else $promoLabel = '-' . number_format((int)$promoValue, 0, ',', '.') . ' đ';
+      }
+
+      // ✅ location text (ƯU TIÊN đã join sẵn từ controller: ward_name/district_name/province_name)
+      $locationParts = array_filter([
+        $order->ward_name ?? null,
+        $order->district_name ?? null,
+        $order->province_name ?? null,
+      ]);
+
+      // fallback (không query DB trong view)
+      if (empty($locationParts)) {
+        $fallbackParts = array_filter([
+          !empty($order->ward_id) ? ('Ward#'.$order->ward_id) : null,
+          !empty($order->district_id) ? ('District#'.$order->district_id) : null,
+          !empty($order->province_id) ? ('Province#'.$order->province_id) : null,
+        ]);
+        $locationParts = $fallbackParts;
+      }
+
+      $locationText = !empty($locationParts) ? implode(' - ', $locationParts) : null;
     @endphp
 
-    {{-- THÔNG TIN ĐƠN + GIAO HÀNG --}}
     <div class="panel-body">
 
       <div class="row-flex">
         <div class="col-box box">
-          <h4 style="margin-top:0;">Thông Tin Đơn Hàng</h4> <br>
+          <h4 style="margin-top:0;">Thông Tin Đơn Hàng</h4>
+          <br>
 
           <p><span class="k">Mã đơn:</span> <span class="v">{{ $order->order_code }}</span></p>
+
           <p><span class="k">Ngày đặt:</span>
             <span class="v">
-            {{ $order->created_at
-                ? \Carbon\Carbon::parse($order->created_at)->format('H:i - d/m/Y')
-                : '—'
-            }}
+              {{ $order->created_at ? \Carbon\Carbon::parse($order->created_at)->format('H:i - d/m/Y') : '—' }}
             </span>
           </p>
 
@@ -55,12 +85,10 @@
             <span class="label-status {{ $badgeClass }}">{{ $statuses[$st] ?? $st }}</span>
           </p>
 
-          {{-- ĐỔI TRẠNG THÁI NGAY TRONG SHOW --}}
-          <p>
           <form method="POST" action="{{ URL::to('/admin/orders/'.$order->order_code.'/status') }}" style="margin-top:10px;">
             @csrf
             <div style="display:flex; gap:8px; align-items:center;">
-            <span class="k"> Cập nhật Trạng thái:</span>
+              <span class="k">Cập nhật:</span>
               <select name="status" class="form-control input-sm status-select" id="statusSelect">
                 @foreach($statuses as $key => $label)
                   <option value="{{ $key }}" {{ $st === $key ? 'selected' : '' }}>{{ $label }}</option>
@@ -69,42 +97,62 @@
               <button class="btn btn-sm btn-primary" type="submit">Cập Nhật</button>
             </div>
           </form>
-          </p>
-
         </div>
 
         <div class="col-box box">
-          <h4 style="margin-top:0;">Thông Tin Giao Hàng</h4> <br>
+          <h4 style="margin-top:0;">Thông Tin Giao Hàng</h4>
+          <br>
 
           <p><span class="k">Người nhận:</span> <span class="v">{{ $receiverName }}</span></p>
           <p><span class="k">Email:</span> <span class="v">{{ $receiverEmail }}</span></p>
           <p><span class="k">SĐT:</span> <span class="v">{{ $receiverPhone }}</span></p>
           <p><span class="k">Địa chỉ:</span> <span class="v">{{ $receiverAddr }}</span></p>
 
-          @php
-          $wardName = $districtName = $provinceName = null;
-          if (!empty($order->ward_id)) {
-            $wardName = \Illuminate\Support\Facades\DB::table('wards')->where('id', $order->ward_id)->value('name');
-          }
-          if (!empty($order->district_id)) {
-            $districtName = \Illuminate\Support\Facades\DB::table('districts')->where('id', $order->district_id)->value('name');
-          }
-          if (!empty($order->province_id)) {
-            $provinceName = \Illuminate\Support\Facades\DB::table('provinces')->where('id', $order->province_id)->value('name');
-          }
-
-          $locationParts = array_filter([$wardName, $districtName, $provinceName]);
-          $locationText = !empty($locationParts) ? implode(' - ', $locationParts) : null;
-        @endphp
-
-        @if($locationText)
-          <p><span class="k">Khu vực:</span> <span class="v">{{ $locationText }}</span></p>
-        @endif
-
+          @if($locationText)
+            <p><span class="k">Khu vực:</span> <span class="v">{{ $locationText }}</span></p>
+          @endif
         </div>
       </div>
 
-      {{-- CHI TIẾT SẢN PHẨM --}}
+      {{-- ✅ NEW: THÔNG TIN ƯU ĐÃI (HỆ MỚI) --}}
+      <div class="box">
+        <h4 style="margin-top:0;">Ưu Đãi Áp Dụng</h4>
+        <br>
+
+        @if($promoDiscount > 0)
+          <p>
+            <span class="k">Số tiền giảm:</span>
+            <span class="v money">- {{ number_format($promoDiscount, 0, ',', '.') }} đ</span>
+          </p>
+
+          <p>
+            <span class="k">Chiến dịch:</span>
+            <span class="v">{{ $promoCampaign ?? '—' }}</span>
+          </p>
+
+          <p>
+            <span class="k">Mã code:</span>
+            <span class="v">{{ $promoCode ?? '—' }}</span>
+          </p>
+
+          <p>
+            <span class="k">Loại giảm:</span>
+            <span class="v">{{ $promoLabel ?? '—' }}</span>
+          </p>
+
+          <p>
+            <span class="k">Thời điểm dùng:</span>
+            <span class="v">
+              {{ $promoUsedAt ? \Carbon\Carbon::parse($promoUsedAt)->format('H:i - d/m/Y') : '—' }}
+            </span>
+          </p>
+        @else
+          <p style="margin:0; color:#777; font-weight:700;">
+            Không có ưu đãi hóa đơn được áp dụng cho đơn này.
+          </p>
+        @endif
+      </div>
+
       <div class="box">
         <h4 style="margin-top:0;">Chi Tiết Đơn Hàng</h4>
 
@@ -115,16 +163,14 @@
                 <th style="width:70px;">Ảnh</th>
                 <th>Sản phẩm</th>
                 <th style="width:110px;">SL</th>
-                <th style="width:160px;"> Đơn Giá</th>
+                <th style="width:160px;">Đơn Giá</th>
                 <th style="width:180px;">Thành tiền</th>
               </tr>
             </thead>
 
             <tbody>
               @foreach($items as $it)
-                @php
-                  $line = (float)$it->price * (int)$it->quantity;
-                @endphp
+                @php $line = (float)$it->price * (int)$it->quantity; @endphp
                 <tr>
                   <td>
                     @if(!empty($it->product_image))
@@ -162,7 +208,7 @@
 
             <p style="display:flex; justify-content:space-between;">
               <span>Ưu đãi hóa đơn</span>
-              <b>- {{ number_format((float)$discountValue, 0, ',', '.') }} đ</b>
+              <b class="money">- {{ number_format((float)$discountValue, 0, ',', '.') }} đ</b>
             </p>
 
             <hr style="margin:8px 0;">
@@ -173,14 +219,12 @@
             </p>
           </div>
         </div>
-
       </div>
 
     </div>
   </div>
 </div>
 
-{{-- confirm đổi trạng thái cho đẹp --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.querySelector('form[action*="/status"]');
@@ -188,10 +232,6 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!form || !select) return;
 
   const current = select.value;
-
-  select.addEventListener('change', function (e) {
-    // chỉ đổi select, chưa submit
-  });
 
   form.addEventListener('submit', function (e) {
     const next = select.value;
@@ -213,23 +253,23 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <style>
-      .box { background:#fff; border:1px solid #eee; border-radius:8px; padding:15px; margin-bottom:15px; }
-      .row-flex { display:flex; gap:15px; flex-wrap:wrap; }
-      .col-box { flex:1; min-width:320px; }
-      .k { color:#666; width:150px; display:inline-block; }
-      .v { font-weight:600; }
+.box { background:#fff; border:1px solid #eee; border-radius:8px; padding:15px; margin-bottom:15px; }
+.row-flex { display:flex; gap:15px; flex-wrap:wrap; }
+.col-box { flex:1; min-width:320px; }
+.k { color:#666; width:150px; display:inline-block; }
+.v { font-weight:600; }
 
-      table td, table th { text-align:center !important; vertical-align:middle !important; }
-      .label-status { padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; }
-      .st-pending   { background:#eee;     color:#333; }
-      .st-confirmed { background:#5bc0de;  color:#fff; }
-      .st-shipping  { background:#f0ad4e;  color:#fff; }
-      .st-success   { background:#5cb85c;  color:#fff; }
-      .st-canceled  { background:#d9534f;  color:#fff; }
+table td, table th { text-align:center !important; vertical-align:middle !important; }
+.label-status { padding: 4px 10px; border-radius: 6px; font-weight: 600; display: inline-block; }
+.st-pending   { background:#eee;     color:#333; }
+.st-confirmed { background:#5bc0de;  color:#fff; }
+.st-shipping  { background:#f0ad4e;  color:#fff; }
+.st-success   { background:#5cb85c;  color:#fff; }
+.st-canceled  { background:#d9534f;  color:#fff; }
 
-      .money { color:#e60012; font-weight:800; }
-      .img-thumb { width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
-      .status-select { width:180px; margin:0 auto; }
+.money { color:#e60012; font-weight:800; }
+.img-thumb { width:50px; height:50px; object-fit:cover; border-radius:6px; border:1px solid #eee; }
+.status-select { width:180px; margin:0 auto; }
 </style>
 
 @endsection

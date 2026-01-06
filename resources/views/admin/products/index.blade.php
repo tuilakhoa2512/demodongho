@@ -93,13 +93,11 @@
               $storageDetail = optional($product->storageDetail);
               $storage       = optional($storageDetail->storage);
 
-              $hasDiscount = !empty($product->discount_id) && !is_null($product->discount_rate);
-              $discountRate = $hasDiscount ? (int)$product->discount_rate : null;
-
-              $discountPrice = null;
-              if ($hasDiscount && $discountRate > 0) {
-                $discountPrice = (float)$product->price * (100 - $discountRate) / 100;
-              }
+              // ✅ NEW promotion fields from controller (PromotionService)
+              $hasPromo = !empty($product->promo_has_sale);
+              $finalPrice = isset($product->final_price) ? (float)$product->final_price : (float)$product->price;
+              $promoName = $product->promo_name ?? null;
+              $promoLabel = $product->promo_label ?? null;
             @endphp
 
             <tr>
@@ -125,21 +123,34 @@
 
               <td>{{ number_format($product->quantity) }}</td>
 
-              <td>{{ number_format($product->price, 0, ',', '.') }} đ</td>
-
               <td>
-                @if($hasDiscount)
+                <div style="line-height:1.2;">
+                  <div style="font-weight:800;">
+                    {{ number_format($product->price, 0, ',', '.') }} đ
+                  </div>
+                </div>
+              </td>
+
+              {{-- ✅ NEW: Ưu đãi (promotion) --}}
+              <td>
+                @if($hasPromo)
                   <span class="label label-info">
-                    {{ $product->discount_name }} ({{ $discountRate }}%)
+                    {{ $promoName ?? 'Ưu đãi' }}
+                    @if(!empty($promoLabel))
+                      ({{ $promoLabel }})
+                    @endif
                   </span>
                 @else
                   —
                 @endif
               </td>
 
+              {{-- ✅ NEW: Giá sau ưu đãi --}}
               <td>
-                @if($hasDiscount && !is_null($discountPrice))
-                  <strong>{{ number_format($discountPrice, 0, ',', '.') }} đ</strong>
+                @if($hasPromo)
+                  <strong style="color:#e60012;">
+                    {{ number_format($finalPrice, 0, ',', '.') }} đ
+                  </strong>
                 @else
                   —
                 @endif

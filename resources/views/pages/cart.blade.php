@@ -10,21 +10,21 @@
 
     {{-- ALERT --}}
     @if(session('success'))
-    <div id="cart-alert" 
-         style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px; 
-                margin-bottom:16px; font-weight:500; font-size:15px; text-align:center;">
-        {{ session('success') }}
-    </div>
+        <div id="cart-alert"
+             style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px;
+                    margin-bottom:16px; font-weight:500; font-size:15px; text-align:center;">
+            {{ session('success') }}
+        </div>
         <script>
-        setTimeout(() => {
-            const alertBox = document.getElementById('cart-alert');
-            if (alertBox) {
-                alertBox.style.opacity = '0';
-                alertBox.style.transform = 'translateY(-10px)';
-                alertBox.style.transition = '0.5s';
-                setTimeout(() => alertBox.remove(), 500);
-            }
-        }, 1800);
+            setTimeout(() => {
+                const alertBox = document.getElementById('cart-alert');
+                if (alertBox) {
+                    alertBox.style.opacity = '0';
+                    alertBox.style.transform = 'translateY(-10px)';
+                    alertBox.style.transition = '0.5s';
+                    setTimeout(() => alertBox.remove(), 500);
+                }
+            }, 1800);
         </script>
     @endif
 
@@ -40,152 +40,216 @@
         </div>
     @else
 
-    <form action="{{ route('cart.update') }}" method="POST">
-        @csrf
+        @php
+            // đảm bảo không null
+            $subtotal = (float) ($subtotal ?? 0);
+            $billDiscountAmount = (float) ($billDiscountAmount ?? 0);
+            $grandTotal = (float) ($grandTotal ?? $subtotal);
 
-        <div class="order-card">
-            <div class="order-header">
-                <div class="order-title">Danh Sách Sản Phẩm</div>
-                <div class="order-sub">
-                    @php $count = is_countable($cart ?? null) ? count($cart) : 0; @endphp
-                    {{ $count }} sản phẩm
+            // billDiscount là Promotion|null (order scope)
+            $orderPromoName = $billDiscount ? ($billDiscount->name ?? null) : null;
+
+            // promoCode từ session
+            $promoCode = $promoCode ?? null;
+
+            $count = is_countable($cart ?? null) ? count($cart) : 0;
+        @endphp
+
+        <form action="{{ route('cart.update') }}" method="POST">
+            @csrf
+
+            <div class="order-card">
+
+                <div class="order-header">
+                    <div class="order-title">Danh Sách Sản Phẩm</div>
+                    <div class="order-sub">{{ $count }} sản phẩm</div>
                 </div>
-            </div>
 
-            <div class="table-responsive">
-                <table class="table table-bordered myorder-table">
-                    <thead>
+                <div class="table-responsive">
+                    <table class="table table-bordered myorder-table">
+                        <thead>
                         <tr>
                             <th style="width:90px; text-align:center;">Ảnh</th>
                             <th>Sản phẩm</th>
-                            <th style="width:170px; text-align:center;">Đơn giá</th>
+                            <th style="width:150px; text-align:center;">Đơn giá</th>
                             <th style="width:160px; text-align:center;">Số lượng</th>
-                            <th style="width:170px; text-align:right;">Tạm tính</th>
+                            <th style="width:150px; text-align:center;">Tạm tính</th>
                             <th style="width:90px; text-align:center;">Xóa</th>
                         </tr>
-                    </thead>
+                        </thead>
 
-                    <tbody>
-                    @foreach($cart as $item)
-                        @php
-                            $maxQty = max(1, (int)$item['max_qty']);
-                            $qty = max(1, min((int)$item['quantity'], $maxQty));
-                        @endphp
+                        <tbody>
+                        @foreach($cart as $item)
+                            @php
+                                // chuẩn hoá dữ liệu
+                                $id = (int) ($item['id'] ?? 0);
+                                $name = $item['name'] ?? 'Sản phẩm';
+                                $image = $item['image'] ?? asset('frontend/images/noimage.jpg');
 
-                        <tr>
-                            {{-- IMAGE --}}
-                            <td style="text-align:center;">
-                                <img src="{{ $item['image'] }}" class="od-thumb" alt="product">
-                            </td>
+                                $basePrice  = (float) ($item['base_price'] ?? 0);
+                                $finalPrice = (float) ($item['final_price'] ?? $basePrice);
 
-                            {{-- PRODUCT --}}
-                            <td class="col-name text-wrap" style="font-weight:800;">
-                                {{ $item['name'] }}
-                            </td>
+                                // chỉ coi là giảm khi final < base
+                                $hasDiscount = ($finalPrice > 0) && ($finalPrice < $basePrice);
 
-                            {{-- PRICE --}}
-                            <td style="text-align:center;">
-                                <div class="od-price">
-                                    <span class="od-price-sale">
-                                        {{ number_format($item['final_price'],0,',','.') }} đ
-                                    </span>
-                                    @if($item['has_sale'])
-                                        <div class="od-price-old">
-                                            {{ number_format($item['base_price'],0,',','.') }} đ
-                                        </div>
-                                    @endif
-                                </div>
-                            </td>
+                                $maxQty = max(1, (int)($item['max_qty'] ?? 1));
+                                $qty = max(1, min((int)($item['quantity'] ?? 1), $maxQty));
 
-                            {{-- QTY --}}
-                            <td style="text-align:center;">
-                                <div class="qty-control" data-max="{{ $maxQty }}">
-                                    <button type="button" class="qty-btn qty-minus">−</button>
-                                    <input type="text"
-                                           readonly
-                                           name="quantities[{{ $item['id'] }}]"
-                                           value="{{ $qty }}"
-                                           class="cart-qty-input">
-                                    <button type="button" class="qty-btn qty-plus">+</button>
-                                </div>
-                                <div class="cart-stock-note">Tồn: {{ $maxQty }}</div>
-                            </td>
+                                // line_total ưu tiên controller tính sẵn, nhưng vẫn fallback tính lại cho chắc
+                                $lineTotal = isset($item['line_total'])
+                                    ? (float)$item['line_total']
+                                    : ($finalPrice * $qty);
+                            @endphp
 
-                            {{-- LINE TOTAL --}}
-                            <td style="text-align:right;" class="text-red">
-                                {{ number_format($item['line_total'],0,',','.') }} đ
-                            </td>
+                            <tr>
+                                {{-- IMAGE --}}
+                                <td style="text-align:center;">
+                                    <img src="{{ $image }}" class="od-thumb" alt="product">
+                                </td>
 
-                            {{-- REMOVE --}}
-                            <td style="text-align:center;">
-                                <button type="submit"
-                                        class="btn-remove"
-                                        formaction="{{ route('cart.remove') }}"
-                                        name="product_id"
-                                        value="{{ $item['id'] }}">
-                                    Xóa
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                {{-- PRODUCT --}}
+                                <td class="col-name text-wrap" style="font-weight:800;">
+                                    {{ $name }}
+                                </td>
 
-            {{-- SUMMARY --}}
-            <div class="summary-box" style="margin-top:12px;">
-                <div class="sum-row">
-                    <span>Tạm tính:</span>
-                    <strong>{{ number_format($subtotal,0,',','.') }} đ</strong>
+                                {{-- PRICE --}}
+                                <td style="text-align:center;">
+                                    <div class="od-price">
+                                        <span class="od-price-sale">
+                                            {{ number_format($finalPrice, 0, ',', '.') }} đ
+                                        </span>
+
+                                        @if($hasDiscount)
+                                            <div class="od-price-old">
+                                                {{ number_format($basePrice, 0, ',', '.') }} đ
+                                            </div>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                {{-- QTY --}}
+                                <td style="text-align:center;">
+                                    <div class="qty-control" data-max="{{ $maxQty }}">
+                                        <button type="button" class="qty-btn qty-minus">−</button>
+
+                                        <input type="text"
+                                               readonly
+                                               name="quantities[{{ $id }}]"
+                                               value="{{ $qty }}"
+                                               class="cart-qty-input">
+
+                                        <button type="button" class="qty-btn qty-plus">+</button>
+                                    </div>
+
+                                    <div class="cart-stock-note">Tồn: {{ $maxQty }}</div>
+                                </td>
+
+                                {{-- LINE TOTAL --}}
+                                <td style="text-align:center;" class="text-red">
+                                    {{ number_format($lineTotal, 0, ',', '.') }} đ
+                                </td>
+
+                                {{-- REMOVE --}}
+                                <td style="text-align:center;">
+                                    <button type="submit"
+                                            class="btn-remove"
+                                            formaction="{{ route('cart.remove') }}"
+                                            name="product_id"
+                                            value="{{ $id }}">
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="sum-row discount">
-                    <span>
-                        @if($billDiscount)
-                            Ưu Đãi Hóa Đơn ({{ $billDiscount->name }} - {{ $billDiscount->rate }}%)
-                        @else
-                            Ưu Đãi Hóa Đơn
-                        @endif
-                    </span>
-                    <strong>-{{ number_format($billDiscountAmount,0,',','.') }} đ</strong>
+                {{-- SUMMARY --}}
+                <div class="summary-box" style="margin-top:12px;">
+                    <div class="sum-row">
+                        <span>Tạm tính:</span>
+                        <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+                    </div>
+
+                    {{-- ORDER PROMO + CODE (new system) --}}
+                    <div class="sum-row discount">
+                        <span>
+                            Ưu đãi hóa đơn
+                            @if(!empty($promoCode))
+                                <span style="color:#555; font-weight:800;">(Code: {{ $promoCode }})</span>
+                            @endif
+
+                            @if(!empty($orderPromoName))
+                                <span style="color:#555; font-weight:800;">- {{ $orderPromoName }}</span>
+                            @endif
+                        </span>
+
+                        <strong>
+                            @if($billDiscountAmount > 0)
+                                -{{ number_format($billDiscountAmount, 0, ',', '.') }} đ
+                            @else
+                                0 đ
+                            @endif
+                        </strong>
+                    </div>
+
+                    <div class="sum-row total">
+                        <span>Tổng thanh toán:</span>
+                        <strong class="text-red">{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+                    </div>
+
+                    {{-- Debug (nếu cần) --}}
+                    {{--
+                    @if(!empty($quote))
+                        <div style="margin-top:6px; font-size:12px; color:#777;">
+                            Quote: subtotal={{ $quote['subtotal'] ?? '' }},
+                            discount={{ $quote['discount_amount'] ?? '' }},
+                            total={{ $quote['total'] ?? '' }}
+                        </div>
+                    @endif
+                    --}}
                 </div>
 
-                <div class="sum-row total">
-                    <span>Tổng thanh toán:</span>
-                    <strong class="text-red">{{ number_format($grandTotal,0,',','.') }} đ</strong>
+                {{-- ACTIONS --}}
+                <div class="cart-actions">
+                    <a href="{{ url('/trang-chu') }}" class="btn btn-default btn-back">Tiếp tục mua sắm</a>
+
+                    <button type="submit" class="btn btn-warning btn-update">
+                        Cập nhật
+                    </button>
+
+                    @if(Session::get('id'))
+                        <a href="{{ url('/payment') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
+                    @else
+                        <a href="{{ url('/login-checkout') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
+                    @endif
                 </div>
+
             </div>
-
-            {{-- ACTIONS --}}
-            <div class="cart-actions">
-                <a href="{{ url('/trang-chu') }}" class="btn btn-default btn-back">Tiếp tục mua sắm</a>
-
-                <button type="submit" class="btn btn-warning btn-update">
-                    Cập nhật
-                </button>
-
-                @if(Session::get('id'))
-                    <a href="{{ url('/payment') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
-                @else
-                    <a href="{{ url('/login-checkout') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
-                @endif
-            </div>
-        </div>
-    </form>
+        </form>
     @endif
 </div>
 
-{{-- JS --}}
+{{-- JS QTY --}}
 <script>
 document.querySelectorAll('.qty-control').forEach(c => {
     const input = c.querySelector('input');
-    const max = parseInt(c.dataset.max);
+    const max = parseInt(c.dataset.max || '1', 10);
+
+    const getVal = () => {
+        const v = parseInt(input.value || '1', 10);
+        return isNaN(v) ? 1 : v;
+    };
 
     c.querySelector('.qty-minus').onclick = () => {
-        input.value = Math.max(1, input.value - 1);
+        const v = getVal();
+        input.value = Math.max(1, v - 1);
     };
+
     c.querySelector('.qty-plus').onclick = () => {
-        input.value = Math.min(max, parseInt(input.value) + 1);
+        const v = getVal();
+        input.value = Math.min(max, v + 1);
     };
 });
 </script>
@@ -242,7 +306,7 @@ document.querySelectorAll('.qty-control').forEach(c => {
     background:#fff;
 }
 
-/* Đơn giá (giá sale + giá gốc) */
+/* Đơn giá */
 .od-price{ line-height: 1.1; }
 .od-price-sale{
     color:#e60012;
@@ -296,7 +360,7 @@ document.querySelectorAll('.qty-control').forEach(c => {
     margin-top: 4px;
 }
 
-/* Summary giống show */
+/* Summary */
 .summary-box{ border-top:1px dashed #ddd; margin-top:12px; padding-top:12px; }
 .sum-row{
     display:flex;
@@ -322,12 +386,10 @@ document.querySelectorAll('.qty-control').forEach(c => {
     font-weight:800;
     border-radius:6px;
 }
-
 .btn-update{
     font-weight:800;
     border-radius:6px;
 }
-
 .btn-checkout{
     background:#e60012 !important;
     border-color:#e60012 !important;
