@@ -1,27 +1,31 @@
 <?php
+
 namespace App\Http\Controllers;
 
+use App\Services\SaleService;
+use App\Services\PromotionService;
+use Illuminate\Http\Request;
 use App\Models\Product;
-use Carbon\Carbon;
+use App\Services\ProductPromotionApplier;
 
 class SaleController extends Controller
 {
-    public function index()
-    {
-        $today = Carbon::today();
-
-        $saleProducts = Product::where('status', 1)
-            ->whereHas('discounts', function ($q) use ($today) {
-                $q->where('discount_products.status', 1)
-                  ->where('discount_product_details.status', 1)
-                  ->where(function ($q2) use ($today) {
-                      $q2->whereNull('discount_product_details.expiration_date')
-                         ->orWhere('discount_product_details.expiration_date', '>=', $today);
-                  });
-            })
-            ->with(['productImage', 'discounts'])
-            ->paginate(9);
-
+    public function index(
+        SaleService $saleService,
+        ProductPromotionApplier $applier
+    ) {
+        // LẤY ĐÚNG SẢN PHẨM ĐANG CÓ PROMOTION
+        $query = $saleService->saleProductQuery()
+            ->where('stock_status', 'selling');
+    
+        $saleProducts = $query->paginate(9);
+    
+        // ÁP DỤNG PROMOTION
+        $saleProducts->setCollection(
+            $applier->apply($saleProducts->getCollection())
+        );
+    
         return view('pages.sales', compact('saleProducts'));
     }
+    
 }

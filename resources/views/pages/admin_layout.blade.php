@@ -309,6 +309,7 @@ body {
         
                     </ul>
                 </li>
+                @endif
 
                 <li class="sub-menu">
                     <a href="javascript:;">	
@@ -337,6 +338,7 @@ body {
 
 
                 @if (in_array($role, [1,3,4]))
+
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class=" fa fa-comments"></i>

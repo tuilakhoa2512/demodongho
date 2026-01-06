@@ -3,20 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
     protected $table = 'products';
 
-    // ✅ giữ nguyên appends ảnh
+    /**
+     * ✅ appends cho URL ảnh (giữ nguyên cho view/front-end)
+     */
     protected $appends = ['main_image_url', 'hover_image_url'];
 
     /**
-     * Các cột được phép gán mass-assignment
-     * NOTE:
-     * - discounted_price vẫn giữ vì DB đang có cột này / form có thể còn dùng tạm
-     * - Nhưng logic ưu đãi chuẩn marketplace sẽ tính runtime bằng PromotionService
+     * Mass assignment
+     * - discounted_price: legacy (tạm giữ nếu DB/form còn), KHÔNG dùng làm logic ưu đãi mới
      */
     protected $fillable = [
         'name',
@@ -28,7 +27,7 @@ class Product extends Model
         'brand_id',
         'storage_detail_id',
         'price',
-        'discounted_price', // ⚠️ legacy field (không dùng làm logic chính nữa)
+        'discounted_price', // legacy
         'quantity',
         'stock_status', // selling / sold_out / stopped
         'status',       // 1 = active, 0 = inactive
@@ -37,10 +36,12 @@ class Product extends Model
     protected $casts = [
         'dial_size' => 'float',
         'price'     => 'float',
+        'discounted_price' => 'float',
         'quantity'  => 'integer',
+        'status'    => 'integer',
     ];
 
-    /* ================== QUAN HỆ ================== */
+    /* ================== RELATIONSHIPS ================== */
 
     public function brand()
     {
@@ -64,53 +65,56 @@ class Product extends Model
         return $this->hasOne(ProductImage::class, 'product_id', 'id');
     }
 
-    // ✅ giữ nguyên accessor lấy image_1, image_2 (nếu bạn đang dùng nơi khác)
+    /* ================== IMAGE ACCESSORS ================== */
+
+    // Nếu nơi khác đang gọi $product->image_1 / image_2 thì giữ lại
     public function getImage1Attribute()
     {
-        return optional($this->productImage)->image_1;
+        return $this->productImage?->image_1;
     }
 
     public function getImage2Attribute()
     {
-        return optional($this->productImage)->image_2;
+        return $this->productImage?->image_2;
     }
 
-    /* ================== ACCESSOR ẢNH ================== */
-
     /**
-     * Ảnh chính hiển thị ngoài trang chủ / chi tiết
-     * Ưu tiên image_1 trong bảng product_images
+     * Ảnh chính: ưu tiên image_1, fallback ảnh default
      */
-    public function getMainImageUrlAttribute()
+    public function getMainImageUrlAttribute(): string
     {
-        if ($this->productImage && $this->productImage->image_1) {
-            return asset('storage/' . $this->productImage->image_1);
+        $img = $this->productImage?->image_1;
+        if (!empty($img)) {
+            return asset('storage/' . $img);
         }
-
         return asset('frontend/images/rolex1.jpg');
     }
 
-    public function getHoverImageUrlAttribute()
+    /**
+     * Ảnh hover: ưu tiên image_2, fallback image_1, cuối cùng fallback main_image_url
+     */
+    public function getHoverImageUrlAttribute(): string
     {
-        if ($this->productImage) {
-            if ($this->productImage->image_2) {
-                return asset('storage/' . $this->productImage->image_2);
-            }
+        $img2 = $this->productImage?->image_2;
+        if (!empty($img2)) {
+            return asset('storage/' . $img2);
+        }
 
-            if ($this->productImage->image_1) {
-                return asset('storage/' . $this->productImage->image_1);
-            }
+        $img1 = $this->productImage?->image_1;
+        if (!empty($img1)) {
+            return asset('storage/' . $img1);
         }
 
         return $this->main_image_url;
     }
 
-    /* ================== ƯU ĐÃI (HỆ MỚI) ==================
-     * ✅ Không đặt logic promotion trong Model để tránh query ngầm + khó kiểm soát
-     * ✅ Giá sale / promo lấy bằng PromotionService (runtime):
-     *    app( \App\Services\PromotionService::class )->calcProductFinalPrice($product)
+    /* ================== PROMOTION (NEW SYSTEM) ==================
      *
-     * ❌ Đã loại bỏ toàn bộ quan hệ & accessor của hệ cũ:
-     *    discountProducts(), activeDiscountProduct(), active_discount, discount_label, getDiscountedPriceAttribute(), discounts()
+     * ✅ KHÔNG đặt logic promotion trong Model để tránh query ngầm khó debug.
+     * ✅ Khi cần giá sau ưu đãi:
+     *    $pack = app(\App\Services\PromotionService::class)->calcProductFinalPrice($product);
+     *    $finalPrice = $pack['final_price'];
+     *
+     * ❌ Không còn quan hệ / accessor của hệ cũ.
      */
 }

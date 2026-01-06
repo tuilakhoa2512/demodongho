@@ -11,14 +11,17 @@ use App\Models\Category;
 use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
-// ✅ NEW (promotion system)
+// ✅ NEW promotion system
 use App\Services\PromotionService;
 
 class ProductController extends Controller
 {
-    // ✅ CHỈ SỬA: index() (bỏ join discount cũ, dùng PromotionService)
+    /**
+     * ADMIN - danh sách sản phẩm
+     * ✅ Không join ưu đãi cũ
+     * ✅ Giá final runtime từ PromotionService
+     */
     public function index(PromotionService $promoService)
     {
         $products = Product::query()
@@ -31,34 +34,39 @@ class ProductController extends Controller
             ->orderByDesc('id')
             ->paginate(20);
 
-        // ✅ Gắn field runtime để view dùng (không query thêm trong view)
         foreach ($products as $p) {
-            $pack     = $promoService->calcProductFinalPrice($p);
+            $pack = $promoService->calcProductFinalPrice($p);
+
+            $final = (float)($pack['final_price'] ?? $p->price);
+            $base  = (float)($p->price ?? 0);
+
+            // runtime fields cho view
+            $p->final_price = (int)$final;
+
+            // chỉ coi là "sale" khi final < base
+            $p->promo_has_sale = ($final > 0 && $base > 0 && $final < $base) ? 1 : 0;
+
+            // meta promo (nếu có)
             $campaign = $pack['campaign'] ?? null;
             $rule     = $pack['rule'] ?? null;
 
-            $p->final_price           = (int)($pack['final_price'] ?? (int)$p->price);
-            $p->promo_has_sale        = $rule ? 1 : 0;
+            $p->promo_name            = $campaign?->name;
+            $p->promo_discount_type   = $rule?->discount_type;     // percent|fixed|null
+            $p->promo_discount_value  = $rule ? (int)$rule->discount_value : null;
+            $p->promo_label           = $pack['promo_label'] ?? null;
 
-            if ($rule) {
-                $p->promo_name            = $campaign?->name;          // tên campaign
-                $p->promo_discount_type   = $rule->discount_type;      // percent|fixed
-                $p->promo_discount_value  = (int)$rule->discount_value;
-                $p->promo_label           = $pack['promo_label'] ?? null;
-                $p->promo_discount_amount = (int)($pack['discount_amount'] ?? max(0, (int)$p->price - (int)$p->final_price));
-            } else {
-                $p->promo_name            = null;
-                $p->promo_discount_type   = null;
-                $p->promo_discount_value  = null;
-                $p->promo_label           = null;
-                $p->promo_discount_amount = 0;
-            }
+            // discount amount: ưu tiên pack, fallback base-final
+            $p->promo_discount_amount = (int)($pack['discount_amount'] ?? max(0, (int)$base - (int)$final));
         }
 
         return view('admin.products.index', compact('products'));
     }
 
-
+    /**
+     * ADMIN - xem chi tiết sản phẩm
+     * ✅ Không join ưu đãi cũ
+     * ✅ Giá final runtime từ PromotionService
+     */
     public function show($id, PromotionService $promoService)
     {
         $product = Product::with([
@@ -68,30 +76,31 @@ class ProductController extends Controller
             'storageDetail.storage',
         ])->findOrFail($id);
 
-        // ✅ promo pack theo hệ mới
-        $pack     = $promoService->calcProductFinalPrice($product);
+        $pack = $promoService->calcProductFinalPrice($product);
+
+        $final = (float)($pack['final_price'] ?? $product->price);
+        $base  = (float)($product->price ?? 0);
+
+        $product->final_price = (int)$final;
+        $product->promo_has_sale = ($final > 0 && $base > 0 && $final < $base) ? 1 : 0;
+
         $campaign = $pack['campaign'] ?? null;
         $rule     = $pack['rule'] ?? null;
 
-        // ✅ gắn field runtime để view dùng giống index
-        $product->promo_has_sale        = $rule ? 1 : 0;
-        $product->promo_name            = $campaign?->name;                 // tên chiến dịch
-        $product->promo_discount_type   = $rule?->discount_type;            // percent|fixed
-        $product->promo_discount_value  = $rule?->discount_value;           // int
+        $product->promo_name            = $campaign?->name;
+        $product->promo_discount_type   = $rule?->discount_type;
+        $product->promo_discount_value  = $rule ? (int)$rule->discount_value : null;
         $product->promo_label           = $pack['promo_label'] ?? null;
+        $product->promo_discount_amount = (int)($pack['discount_amount'] ?? max(0, (int)$base - (int)$final));
 
-        $product->final_price           = (int)($pack['final_price'] ?? (int)$product->price);
-        $product->promo_discount_amount = (int)($pack['discount_amount'] ?? 0);
-
-        // Lấy review của sản phẩm
+        // Reviews
         $reviews = Review::where('product_id', $id)
             ->where('status', 1)
             ->orderByDesc('created_at')
             ->get();
 
-        // Tính điểm trung bình
         $averageRating = round(
-            Review::where('product_id', $id)
+            (float) Review::where('product_id', $id)
                 ->where('status', 1)
                 ->avg('rating'),
             1
@@ -100,10 +109,8 @@ class ProductController extends Controller
         return view('admin.products.show', compact('product', 'reviews', 'averageRating'));
     }
 
-
-
     // =========================
-    // CÁC PHẦN DƯỚI GIỮ NGUYÊN
+    // CRUD - giữ nguyên (không liên quan ưu đãi)
     // =========================
 
     public function create()
@@ -115,19 +122,10 @@ class ProductController extends Controller
             ->orderByDesc('id')
             ->get();
 
-        $categories = Category::where('status', 1)
-            ->orderBy('name')
-            ->get();
+        $categories = Category::where('status', 1)->orderBy('name')->get();
+        $brands     = Brand::where('status', 1)->orderBy('name')->get();
 
-        $brands = Brand::where('status', 1)
-            ->orderBy('name')
-            ->get();
-
-        return view('admin.products.create', compact(
-            'storageDetails',
-            'categories',
-            'brands'
-        ));
+        return view('admin.products.create', compact('storageDetails', 'categories', 'brands'));
     }
 
     public function store(Request $request)
@@ -155,43 +153,27 @@ class ProductController extends Controller
             'image_1.required'           => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
         ]);
 
-        // 2) Lấy dòng kho
         $detail = StorageDetail::with('storage', 'product')->findOrFail($request->storage_detail_id);
 
-        // Chặn: kho đang ẩn
         if ((int)$detail->status !== 1) {
-            return back()
-                ->withErrors(['storage_detail_id' => 'Dòng kho này đang bị ẩn, không thể đăng bán.'])
-                ->withInput();
+            return back()->withErrors(['storage_detail_id' => 'Dòng kho này đang bị ẩn, không thể đăng bán.'])->withInput();
         }
 
-        //Chặn: đã có product rồi
         if ($detail->product) {
-            return back()
-                ->withErrors(['storage_detail_id' => 'Dòng kho này đã được đăng bán (đã có sản phẩm).'])
-                ->withInput();
+            return back()->withErrors(['storage_detail_id' => 'Dòng kho này đã được đăng bán (đã có sản phẩm).'])->withInput();
         }
 
-        // Chỉ cho đăng từ pending
         if ($detail->stock_status !== 'pending') {
-            return back()
-                ->withErrors(['storage_detail_id' => 'Dòng kho này không còn trạng thái Chờ bán (pending).'])
-                ->withInput();
+            return back()->withErrors(['storage_detail_id' => 'Dòng kho này không còn trạng thái Chờ bán (pending).'])->withInput();
         }
 
-        //Lấy số lượng từ kho
         $quantityFromStorage = (int)$detail->import_quantity;
-
         if ($quantityFromStorage <= 0) {
-            return back()
-                ->withErrors(['storage_detail_id' => 'Dòng kho này không còn số lượng khả dụng.'])
-                ->withInput();
+            return back()->withErrors(['storage_detail_id' => 'Dòng kho này không còn số lượng khả dụng.'])->withInput();
         }
 
-        // Nếu không nhập tên -> dùng tên trong kho
         $name = $request->name ?: $detail->product_name;
 
-        // Tạo Product
         $product = Product::create([
             'storage_detail_id' => $detail->id,
             'category_id'       => $request->category_id,
@@ -204,22 +186,14 @@ class ProductController extends Controller
             'gender'            => $request->gender,
 
             'price'             => $request->price,
-
-            //quantity = import_quantity
             'quantity'          => $quantityFromStorage,
-
-            // mới đăng => đang bán
             'stock_status'      => 'selling',
-
-            //mặc định hiển thị
             'status'            => $request->status ?? 1,
         ]);
 
-        // Đồng bộ kho sang selling
         $detail->stock_status = 'selling';
         $detail->save();
 
-        //Lưu ảnh
         $folder = "products/{$product->id}";
         $imagesData = ['product_id' => $product->id];
 
@@ -233,24 +207,16 @@ class ProductController extends Controller
 
         ProductImage::create($imagesData);
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Đăng sản phẩm mới thành công.');
+        return redirect()->route('admin.products.index')->with('success', 'Đăng sản phẩm mới thành công.');
     }
 
     public function edit($id)
     {
-        $product = Product::with(['productImage', 'storageDetail.storage', 'brand', 'category'])
-            ->findOrFail($id);
-
+        $product = Product::with(['productImage', 'storageDetail.storage', 'brand', 'category'])->findOrFail($id);
         $categories = Category::orderBy('name')->get();
         $brands     = Brand::orderBy('name')->get();
 
-        return view('admin.products.edit', compact(
-            'product',
-            'categories',
-            'brands'
-        ));
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     public function update(Request $request, $id)
@@ -268,10 +234,7 @@ class ProductController extends Controller
             'gender'          => 'nullable|in:male,female,unisex',
 
             'price'           => 'required|numeric|min:0',
-
-            // Cho phép đổi trạng thái bán
             'stock_status'    => 'nullable|in:selling,sold_out,stopped',
-
             'status'          => 'nullable|in:0,1',
 
             'image_1'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -296,13 +259,11 @@ class ProductController extends Controller
             'status'         => $request->status ?? $product->status,
         ]);
 
-        // Đồng bộ stock_status sang kho
         if ($product->storageDetail) {
             $product->storageDetail->stock_status = $product->stock_status;
             $product->storageDetail->save();
         }
 
-        // Cập nhật ảnh
         $folder = "products/{$product->id}";
         $images = $product->productImage;
 
@@ -324,9 +285,7 @@ class ProductController extends Controller
 
         $images->save();
 
-        return redirect()
-            ->route('admin.products.index')
-            ->with('success', 'Cập nhật sản phẩm thành công.');
+        return redirect()->route('admin.products.index')->with('success', 'Cập nhật sản phẩm thành công.');
     }
 
     public function toggleStatus($id)
@@ -334,9 +293,7 @@ class ProductController extends Controller
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
-        // 1) ĐANG HIỂN THỊ -> ẨN
-        if ($product->status == 1) {
-
+        if ((int)$product->status === 1) {
             $product->status = 0;
             $product->stock_status = 'stopped';
             $product->save();
@@ -346,39 +303,22 @@ class ProductController extends Controller
                 $detail->save();
             }
 
-            return redirect()
-                ->back()
-                ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
+            return redirect()->back()->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-        //ĐANG ẨN -> HIỆN
-
-        // Kho đang ẩn -> KHÔNG cho hiện
-        if ($detail && $detail->status == 0) {
-            return redirect()
-                ->back()
-                ->with('error', 'Sản phẩm trong kho đang bị ẩn, không thể hiển thị sản phẩm.');
+        if ($detail && (int)$detail->status === 0) {
+            return redirect()->back()->with('error', 'Sản phẩm trong kho đang bị ẩn, không thể hiển thị sản phẩm.');
         }
 
         $product->status = 1;
-
-        // cập nhật trạng thái bán theo tồn kho
-        if ($product->quantity > 0) {
-            $product->stock_status = 'selling';
-        } else {
-            $product->stock_status = 'sold_out';
-        }
-
+        $product->stock_status = ((int)$product->quantity > 0) ? 'selling' : 'sold_out';
         $product->save();
 
-        // đồng bộ kho
         if ($detail) {
             $detail->stock_status = $product->stock_status;
             $detail->save();
         }
 
-        return redirect()
-            ->back()
-            ->with('success', 'Đã hiển thị sản phẩm.');
+        return redirect()->back()->with('success', 'Đã hiển thị sản phẩm.');
     }
 }

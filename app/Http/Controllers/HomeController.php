@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Services\PromotionService;
+use App\Services\ProductPromotionApplier;
 
 class HomeController extends Controller
 {
@@ -114,6 +115,7 @@ class HomeController extends Controller
         $cate_pro  = DB::table('categories')->where('status', 1)->get();
         $brand_pro = DB::table('brands')->where('status', 1)->get();
 
+        $applier = app(ProductPromotionApplier::class);
         // ✅ NOTE: đang lọc theo price gốc (nhanh). Nếu muốn lọc theo final_price mình sẽ nâng cấp sau.
         $all_product = Product::with(['productImage','category','brand'])
             ->where('status', 1)
