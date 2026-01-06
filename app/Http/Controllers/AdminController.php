@@ -18,23 +18,48 @@ use Carbon\Carbon;
 use App\Models\User;
 class AdminController extends Controller
 {
-    public function AuthLogin(){
-        $id = Session::get('id');
-            if($id){
-                return Redirect::to('dashboard');
-            }else{
-                return Redirect::to('admin')->send();
-            }
-        }    
-
+    // =========================
+    // FORM LOGIN ADMIN
+    // =========================
     public function index()
     {
-        return view('pages.admin_login'); 
+        return view('pages.admin_login');
     }
 
+    // =========================
+    // XỬ LÝ LOGIN ADMIN
+    // =========================
+    public function dashboard(Request $request)
+    {
+        $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
+
+        //  CHỈ KIỂM TRA BẢNG NHÂN SỰ
+        $nhansu = DB::table('nhansu')
+            ->where('email', $request->email)
+            ->where('status', 1)
+            ->first();
+
+        if (!$nhansu || !Hash::check($request->password, $nhansu->password)) {
+            return Redirect::to('/admin')
+                ->with('message', 'Email hoặc mật khẩu admin không đúng!');
+        }
+
+        //  LOGIN OK
+        Session::put('admin_id', $nhansu->id);
+        Session::put('admin_name', $nhansu->fullname);
+        Session::put('admin_role_id', (int)$nhansu->role_id);
+
+        return Redirect::to('/dashboard');
+    }
+
+    // =========================
+    // DASHBOARD
+    // =========================
     public function show_dashboard()
     {
-        // Nếu chưa đăng nhập admin, chuyển về trang login
         if (!Session::has('admin_id')) {
             return Redirect::to('/admin');
         }
@@ -42,40 +67,12 @@ class AdminController extends Controller
         return view('pages.admin_layout');
     }
 
-    public function dashboard(Request $request)
-    {
-        // Validate
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
-
-        // Tìm user theo email
-        $user = User::where('email', $request->email)->first();
-
-        // Nếu không có user, hoặc sai mật khẩu, hoặc không phải admin
-        if (
-            !$user ||
-            !Hash::check($request->password, $user->password) ||
-            $user->role_id != 1 // admin là role_id = 1
-        ) {        
-            Session::flash('message', 'Tài khoản hoặc mật khẩu sai!');
-            return Redirect::to('/admin')->withInput($request->only('email'));
-        }
-
-        Session::put('admin_id', $user->id);
-        Session::put('admin_name', $user->fullname);
-
-        return Redirect::to('/dashboard');
-    }
-    //Đăng xuất admin
+    // =========================
+    // LOGOUT
+    // =========================
     public function logout()
     {
-        $this->AuthLogin();
-        Session::forget('admin_id');
-        Session::forget('admin_name');
-        Session::flush(); 
-
+        Session::flush();
         return Redirect::to('/admin');
     }
 

@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\PromotionRedemptionController;
 use App\Http\Controllers\Admin\PromotionTargetController;
 use App\Http\Controllers\Admin\PromotionCodeController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\VNPayController;
@@ -224,10 +225,17 @@ Route::get(
 Route::get('/all-reviews-user', [AdminUserController::class, 'all_reviews_user'])->name('admin.reviewuser.index');
 //Quản lý user khách hàng
   Route::get('/all-admin-user', [AdminUserController::class, 'all_admin_user'])->name('admin.users.index');
+  // NHÂN SỰ
+  Route::get('/all-staff-user', [AdminStaffController::class, 'all_staff_user'])->name('admin.staff.index');
+  Route::get('/staff/unactive/{id}', [AdminStaffController::class, 'unactive_staff'])->name('admin.staff.unactive');
+  Route::get('/staff/active/{id}', [AdminStaffController::class, 'active_staff'])->name('admin.staff.active');
+
   Route::get('/add-admin-user', [AdminUserController::class, 'add_admin_user'])->name('admin.users.create');
   Route::post('/store-admin-user', [AdminUserController::class, 'store_admin_user'])->name('admin.users.store');
   Route::get('/unactive-admin-user/{id}', [AdminUserController::class, 'unactive_admin_user'])->name('admin.users.unactive');
   Route::get('/active-admin-user/{id}', [AdminUserController::class, 'active_admin_user'])->name('admin.users.active');
+  Route::post('/admin/staff/update-role/{id}',[AdminStaffController::class, 'update_staff_role'])->name('admin.staff.updateRole');
+
 
   //Sale
   Route::get('/sales', [SaleController::class, 'index'])->name('sales.product');

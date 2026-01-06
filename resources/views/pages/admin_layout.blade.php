@@ -45,6 +45,10 @@ body {
 </style>
 </head>
 <body>
+@php
+    $role = (int) Session::get('admin_role_id');
+@endphp
+
 <section id="container">
 <!--header start-->
 <header class="header fixed-top clearfix">
@@ -107,7 +111,9 @@ body {
                         <span>Dashboard</span>
                     </a>
                 </li>
+
                 
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-user"></i>
@@ -116,17 +122,27 @@ body {
                     <ul class="sub">
                         <li style="display: flex; justify-content: center;">
                             <a href="{{ route('admin.users.index') }}" style="width: 160px; text-align: left;">
-                                Danh Sách người dùng
+                                Tài Khoản Khách Hàng
                             </a>
                         </li> 
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.staff.index') }}" style="width: 160px; text-align: left;">
+                                Tài Khoản Nhân Sự
+                            </a>
+                        </li>
+                        @if ($role === 1)
                         <li style="display: flex; justify-content: center;">
                             <a href="{{ route('admin.users.create') }}" style="width: 160px; text-align: left;">
                                 Thêm người dùng
                             </a>
-                        </li>                                            
+                        </li> 
+                        @endif                                           
                     </ul>                  
                 </li>
-                
+                @endif
+
+
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-th"></i>
@@ -146,8 +162,10 @@ body {
                                                           
                     </ul>
                 </li>
+                @endif
 
 
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-tasks"></i>
@@ -166,7 +184,10 @@ body {
                         </li>                                                                   
                     </ul>
                 </li>
+                @endif
 
+
+                @if (in_array($role, [1,3,5]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-database"></i>
@@ -185,7 +206,10 @@ body {
                         </li>                                             
                     </ul>
                 </li>
+                @endif
 
+
+                @if (in_array($role, [1,3,5]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-archive"></i>
@@ -220,7 +244,10 @@ body {
                                            
                     </ul>
                 </li>
+                @endif
 
+
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class="fa fa-cubes"></i>
@@ -239,8 +266,10 @@ body {
                         </li> 
                     </ul>
                 </li>
+                @endif
 
 
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class=" fa fa-shopping-cart"></i>
@@ -280,42 +309,7 @@ body {
         
                     </ul>
                 </li>
-                {{-- <li class="sub-menu">
-                    <a href="javascript:;">	
-                        <i class=" fa fa-ticket"></i>
-                        <span>Ưu Đãi Sản Phẩm</span>
-                    </a>
-                      <ul class="sub">
-                      <li style="display: flex; justify-content: center;">
-                            <a href="{{  route('admin.discount-products.index')  }}" style="width: 160px; text-align: left;">
-                                Danh Sách Ưu Đãi Sản Phẩm
-                            </a>
-                        </li>
-                        <li style="display: flex; justify-content: center;">
-                            <a href="{{ route('admin.discount-products.create') }}" style="width: 160px; text-align: left;">
-                                Thêm Ưu Đãi Sản Phẩm
-                            </a>
-                        </li> 
-                    </ul>
-                </li> --}}
-                {{-- <li class="sub-menu">
-                    <a href="javascript:;">	
-                        <i class=" fa fa-ticket"></i>
-                        <span>Ưu Đãi Bill</span>
-                    </a>
-                      <ul class="sub">
-                      <li style="display: flex; justify-content: center;">
-                            <a href="{{  route('admin.discount-bills.index')  }}" style="width: 160px; text-align: left;">
-                                Danh Sách Ưu Đãi Bill
-                            </a>
-                        </li>
-                        <li style="display: flex; justify-content: center;">
-                            <a href="{{ route('admin.discount-bills.create') }}" style="width: 160px; text-align: left;">
-                                Thêm Ưu Đãi Bill
-                            </a>
-                        </li>                        
-                    </ul>
-                </li> --}}
+
                 <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class="fa fa-ticket"></i>
@@ -340,6 +334,9 @@ body {
                     </ul>
                 </li>
 
+
+
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class=" fa fa-comments"></i>
@@ -353,12 +350,15 @@ body {
                     </li>         
                     </ul>
                 </li>
+                @endif
+
                 
                 
             </ul>            </div>
         <!-- sidebar menu end-->
     </div>
 </aside>
+
 <!--sidebar end-->
 <!--main content start-->
 <div id="main-content">

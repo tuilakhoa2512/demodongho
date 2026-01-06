@@ -237,7 +237,7 @@
                 {{-- ================== REVIEW ================== --}}
                 <h4 class="product-section-title" style="margin-top:20px;">Đánh giá sản phẩm</h4>
 
-                <div class="well" style="padding:12px 15px;">
+                <div class="well" style="">
                     <p><strong>Điểm trung bình:</strong> {{ $averageRating }}/5</p>
 
                     @if($reviews->isEmpty())
@@ -253,6 +253,65 @@
                         @endforeach
                     @endif
                 </div>
+
+
+                {{-- ================== FORM ĐÁNH GIÁ HOẶC THÔNG BÁO ================== --}}
+                @php
+                    $canReview = false;
+                    $notPurchased = false;
+
+                    if(session()->has('id')) {
+                        $userId = session('id');
+
+                        $lastOrderDetail = \App\Models\OrderDetail::where('product_id', $product->id)
+                            ->whereHas('order', fn($q) => $q->where('user_id', $userId)->where('status','success'))
+                            ->orderByDesc('id')->first();
+
+                        if(!$lastOrderDetail) {
+                            $notPurchased = true;
+                        } else {
+                            $completedAt = $lastOrderDetail->order->updated_at;
+                            if($completedAt && $completedAt->diffInMinutes(now()) >= 2) {
+                                $canReview = true;
+                            }
+                        }
+                    } else {
+                        $notPurchased = true;
+                    }
+                @endphp
+
+                @if($canReview)
+                    <div class="well mt-3">
+                        <h5>Viết đánh giá</h5>
+                        <form action="{{ route('reviews.store', $product->id) }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label>Số sao:</label>
+                                <select name="rating" class="form-control" required>
+                                    @for($i=1;$i<=5;$i++)
+                                        <option value="{{ $i }}">{{ $i }} ★</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Nhận xét:</label>
+                                <textarea name="comment" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success">Gửi đánh giá</button>
+                        </form>
+                    </div>
+                @elseif($notPurchased)
+                    <div class="alert alert-info mt-3">
+                        Bạn cần mua sản phẩm và đơn phải hoàn thành mới có thể đánh giá.
+                    </div>
+                @else
+                    <div class="alert alert-warning mt-3">
+                        Bạn cần đợi 2 phút sau khi đơn hoàn thành để có thể đánh giá.
+                    </div>
+                @endif
+
+
+
 
                 {{-- ================== NÚT ================== --}}
                 <div style="margin-top:15px;">

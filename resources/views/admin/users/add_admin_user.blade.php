@@ -34,7 +34,7 @@
                 <input type="password" name="password" class="form-control" required>
             </div>
 
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label>Số điện thoại</label>
                 <input type="text" name="phone" class="form-control">
             </div>
@@ -42,6 +42,18 @@
             <div class="form-group">
                 <label>Địa chỉ</label>
                 <input type="text" name="address" class="form-control">
+            </div> -->
+
+            <div class="form-group">
+                <label>Phân quyền</label>
+                <select name="role_id" class="form-control" required>
+                    <option value="">-- Chọn quyền --</option>
+                    <option value="2">Khách hàng</option>
+                    <option value="1">Admin Coder</option>
+                    <option value="3">Giám đốc</option>
+                    <option value="4">Nhân viên bán hàng</option>
+                    <option value="5">Nhân viên kho</option>
+                </select>
             </div>
 
             <button type="submit" class="btn btn-info">

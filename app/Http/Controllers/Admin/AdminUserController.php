@@ -2,132 +2,181 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Admin\BaseAdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use App\Models\Review;
 
-class AdminUserController extends Controller
+class AdminUserController extends BaseAdminController
 {
-    public function all_admin_user(Request $request)
+    protected function checkAdminCoder()
 {
-    // lọc trạng thái 1 / 0
-    $filterStatus = $request->get('status');
-
-    $query = DB::table('users')
-        ->where('role_id', 2);
-
-    // nếu có lọc
-    if ($filterStatus === "1") {
-        $query->where('status', 1);
-    } elseif ($filterStatus === "0") {
-        $query->where('status', 0);
+    //  Chưa đăng nhập admin
+    if (!Session::has('admin_id')) {
+        abort(403, 'Bạn chưa đăng nhập admin');
     }
 
-    $users = $query->orderBy('id', 'asc')->get();
-
-    return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
+    //  Không phải Admin Coder
+    if ((int) Session::get('admin_role_id') !== 1) {
+        abort(403, 'Bạn không có quyền thực hiện chức năng này');
+    }
 }
 
-    // Trang thêm khach hang
+    /**
+     * =========================
+     * DANH SÁCH KHÁCH HÀNG
+     * Role: 1,3,4
+     * =========================
+     */
+    public function all_admin_user(Request $request)
+    {
+        $this->allowRoles([1,3,4]);
+
+        $filterStatus = $request->get('status');
+
+        $query = DB::table('users')
+            ->where('role_id', 2); // chỉ khách hàng
+
+        if ($filterStatus === '1') {
+            $query->where('status', 1);
+        } elseif ($filterStatus === '0') {
+            $query->where('status', 0);
+        }
+
+        $users = $query->orderBy('id')->get();
+
+        return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
+    }
+
+    /**
+     * =========================
+     * FORM THÊM USER
+     * CHỈ ADMIN CODER
+     * =========================
+     */
     public function add_admin_user()
     {
+        $this->checkAdminCoder();
+
         return view('admin.users.add_admin_user');
     }
 
-    // Lưu khach hang
+    /**
+     * =========================
+     * LƯU USER
+     * - role_id = 2 → users
+     * - role_id = 1,3,4,5 → nhansu
+     * =========================
+     */
     public function store_admin_user(Request $request)
-{
-    $request->validate(
-        [
-            'fullname' => ['required','string','max:30','regex:/^[\pL\s]+$/u',],
+    {
+        $this->checkAdminCoder();
 
-            'email' => ['required','email','max:255','unique:users,email','regex:/^[A-Za-z0-9._%+-]+@gmail\.com$/',],
+        $request->validate([
+            'fullname' => 'required|string|max:150',
+            'email'    => 'required|email|max:255|unique:users,email|unique:nhansu,email',
+            'password' => 'required|min:6',
+            'role_id'  => 'required|integer|in:1,2,3,4,5',
+        ]);
 
-            'password' => ['required','string','max:30','min:6',],
+        DB::beginTransaction();
 
-            'phone' => ['nullable','regex:/^[0-9]+$/',],
+        try {
 
-            'address' => ['nullable','string','max:255',],
-        ],
-        [
-            // ===== tiếng việt =====
-            'fullname.required' => 'Vui lòng nhập họ tên.',
-            'fullname.max' => 'Họ tên không được vượt quá 30 ký tự.',
-            'fullname.regex' => 'Họ tên không được chứa số hoặc ký tự đặc biệt.',
+            // ===== KHÁCH HÀNG =====
+            if ((int)$request->role_id === 2) {
 
-            'email.required' => 'Vui lòng nhập email.',
-            'email.email' => 'Email không đúng định dạng.',
-            'email.unique' => 'Email này đã tồn tại.',
-            'email.regex' => 'Email phải có định dạng @gmail.com.',
+                DB::table('users')->insert([
+                    'fullname'   => $request->fullname,
+                    'email'      => $request->email,
+                    'password'   => Hash::make($request->password),
+                    'role_id'    => 2,
+                    'status'     => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            
+            } elseif (in_array((int)$request->role_id, [1,3,4,5])) {
+            
+                DB::table('nhansu')->insert([
+                    'fullname'   => $request->fullname,
+                    'email'      => $request->email,
+                    'password'   => Hash::make($request->password),
+                    'role_id'    => (int)$request->role_id,
+                    'status'     => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
-            'password.required' => 'Vui lòng nhập mật khẩu.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-            'password.max' => 'Mật khẩu không được vượt quá 30 ký tự.',
+            DB::commit();
 
-            'phone.regex' => 'Số điện thoại chỉ được chứa chữ số.',
-            'address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
-        ]
-    );
+            return redirect()
+                ->route('admin.users.index')
+                ->with('message', 'Thêm tài khoản thành công');
 
-    DB::table('users')->insert([
-        'fullname'   => $request->fullname,
-        'email'      => $request->email,
-        'password'   => Hash::make($request->password), // mã hoá
-        'phone'      => $request->phone,
-        'address'    => $request->address,
-        'role_id'    => 2, // KHÁCH HÀNG
-        'status'     => 1,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-    return redirect()
-        ->route('admin.users.index')
-        ->with('message', 'Thêm khách hàng thành công');
-}
+            return back()->withErrors('Lỗi: '.$e->getMessage());
+        }
+    }
 
-
-    // ẩn khách hàng
+    /**
+     * =========================
+     * KHOÁ / MỞ KHÁCH HÀNG
+     * =========================
+     */
     public function unactive_admin_user($id)
     {
+        $this->allowRoles([1,3,4]);
+
         DB::table('users')
             ->where('id', $id)
             ->where('role_id', 2)
             ->update(['status' => 0]);
 
-        return redirect()->back()
-            ->with('message', 'Đã ẩn tài khoản khách hàng');
+        return back()->with('message', 'Đã khoá khách hàng');
     }
 
-    //KÍCH HOẠT KHÁCH HÀNG
     public function active_admin_user($id)
     {
+        $this->allowRoles([1,3,4]);
+
         DB::table('users')
             ->where('id', $id)
             ->where('role_id', 2)
             ->update(['status' => 1]);
 
-        return redirect()->back()
-            ->with('message', 'Đã kích hoạt tài khoản khách hàng');
+        return back()->with('message', 'Đã mở khoá khách hàng');
     }
+
+    /**
+     * =========================
+     * QUẢN LÝ REVIEW
+     * =========================
+     */
     public function all_reviews_user()
-{
-    $reviews = Review::with(['user', 'product'])
-        ->orderByDesc('created_at')
-        ->paginate(10);
+    {
+        $this->allowRoles([1,3,4]);
 
-    return view('admin.reviews_user.index', compact('reviews'));
-}
-public function toggle_review_status($id)
-{
-    $review = Review::findOrFail($id);
+        $reviews = Review::with(['user', 'product'])
+            ->orderByDesc('created_at')
+            ->paginate(10);
 
-    // Đảo trạng thái
-    $review->status = $review->status == 1 ? 0 : 1;
-    $review->save();
+        return view('admin.reviews_user.index', compact('reviews'));
+    }
 
-    return redirect()->back()->with('success', 'Cập nhật trạng thái đánh giá thành công');
-}
+    public function toggle_review_status($id)
+    {
+        $this->allowRoles([1,3,4]);
+
+        $review = Review::findOrFail($id);
+        $review->status = $review->status ? 0 : 1;
+        $review->save();
+
+        return back()->with('success', 'Cập nhật đánh giá thành công');
+    }
 }

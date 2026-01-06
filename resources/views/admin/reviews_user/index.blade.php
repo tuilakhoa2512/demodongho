@@ -54,7 +54,7 @@ reviews_user/index.blade.php
         <table class="table table-striped table-bordered">
             <thead style="background:#f5f5f5;">
                 <tr>
-                    <th>#</th>
+                    <th>ID</th>
                     <th>Người đánh giá</th>
                     <th>Sản phẩm</th>
                     <th>Số sao</th>

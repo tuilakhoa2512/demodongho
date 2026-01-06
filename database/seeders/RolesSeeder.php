@@ -20,5 +20,20 @@ class RolesSeeder extends Seeder
             ['name' => 'Customer'],
             []
         );
+
+        DB::table('roles')->updateOrInsert(
+            ['name' => 'Owner'],
+            []
+        );
+
+        DB::table('roles')->updateOrInsert(
+            ['name' => 'Store Staff'],
+            []
+        );
+
+        DB::table('roles')->updateOrInsert(
+            ['name' => 'Storage Staff'],
+            []
+        );
     }
 }
