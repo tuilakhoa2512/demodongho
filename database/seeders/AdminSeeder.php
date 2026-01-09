@@ -2,44 +2,74 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\NhanSu;
 
 class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        // Lấy id của role Admin
-        $adminRoleId = DB::table('roles')
-            ->where('name', 'Admin')
-            ->value('id');
+        // Lấy id role theo tên
+        $roles = DB::table('roles')
+            ->whereIn('name', [
+                'Admin',
+                'Owner',
+                'Store Staff',
+                'Storage Staff',
+            ])
+            ->pluck('id', 'name'); // ['Admin' => 1, ...]
 
-        // Nếu chưa có role Admin thì dừng, tránh lỗi FK
-        if (!$adminRoleId) {
+        if ($roles->isEmpty()) {
             return;
         }
 
-        // Tạo hoặc cập nhật tài khoản admin theo email
-        User::updateOrCreate(
-            ['email' => 'admin@gmail.com'], // điều kiện tìm
-
-            // dữ liệu cập nhật / tạo mới
+        // Danh sách tài khoản nhân sự mặc định
+        $nhanSus = [
             [
-                'role_id'   => $adminRoleId,
-                'fullname'  => 'Administrator',
-                'password'  => Hash::make('admin123'),
-                'status'    => 1,
+                'role'     => 'Admin',
+                'fullname' => 'System Administrator',
+                'email'    => 'admin@gmail.com',
+                'password' => '123456',
+            ],
+            [
+                'role'     => 'Owner',
+                'fullname' => 'Store Owner',
+                'email'    => 'owner@gmail.com',
+                'password' => '123456',
+            ],
+            [
+                'role'     => 'Store Staff',
+                'fullname' => 'Store Staff',
+                'email'    => 'staff@gmail.com',
+                'password' => '123456',
+            ],
+            [
+                'role'     => 'Storage Staff',
+                'fullname' => 'Storage Staff',
+                'email'    => 'storage@gmail.com',
+                'password' => '123456',
+            ],
+        ];
 
-                // Các cột mới trong bảng users (nếu nullable thì để null được)
-                'phone'        => null,
-                'address'      => null,
-                'province_id'  => null,
-                'district_id'  => null,
-                'ward_id'      => null,
-                'image'        => null,
-            ]
-        );
+        foreach ($nhanSus as $ns) {
+
+            if (!isset($roles[$ns['role']])) {
+                continue;
+            }
+
+            NhanSu::updateOrCreate(
+                ['email' => $ns['email']], // điều kiện tìm
+                [
+                    'role_id'    => $roles[$ns['role']],
+                    'fullname'   => $ns['fullname'],
+                    'password'   => Hash::make($ns['password']),
+                    'phone'      => null,
+                    'status'     => 1,
+                    'created_by' => null,
+                ]
+            );
+        }
     }
 }
