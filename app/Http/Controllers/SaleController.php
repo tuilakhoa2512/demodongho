@@ -18,7 +18,7 @@ class SaleController extends Controller
         $query = $saleService->saleProductQuery()
             ->where('stock_status', 'selling');
     
-        $saleProducts = $query->paginate(9);
+        $saleProducts = $query->paginate(6);
     
         // ÁP DỤNG PROMOTION
         $saleProducts->setCollection(
