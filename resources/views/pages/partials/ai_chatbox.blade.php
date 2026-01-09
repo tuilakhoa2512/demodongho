@@ -35,7 +35,7 @@
             <button onclick="sendAIMessage()">➤</button>
         </div>
 
-        <!-- 🔥 POPUP XÁC NHẬN XOÁ CHAT -->
+        <!-- POPUP XÁC NHẬN XOÁ CHAT -->
         <div id="ai-chat-confirm" class="ai-confirm hidden">
             <div class="ai-confirm-content">
                 <div class="ai-confirm-text">

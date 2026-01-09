@@ -61,8 +61,8 @@ Route::get('/register', [CheckoutController::class, 'register'])->name('user.reg
 Route::get('/payment', [CheckoutController::class, 'payment'])->name('user.payment'); 
 
 //Login user google
-Route::get('/login-user-google', [AdminController::class, 'login_user_google']);
-Route::get('/user/google/callback', [AdminController::class, 'callback_user_google']);
+Route::get('/login-user-google', [CheckoutController::class, 'login_user_google']);
+Route::get('/user/google/callback', [CheckoutController::class, 'callback_user_google']);
 
 //Trang chu
 Route::get('/', [HomeController::class, 'index']);

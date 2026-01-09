@@ -2988,3 +2988,23 @@ ul.nav.nav-pills.nav-justified i {
 .star-rating .star.active {
     color: #e60012;
 }
+.pagination {
+    gap: 5px;
+}
+
+.pagination .page-link {
+    border: none;
+    padding: 6px 12px;
+    color: #696763;
+    background: #f1f1f1;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #d0021b; /* đỏ */
+    color: #fff;
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #aaa;
+    background: #f5f5f5;
+}

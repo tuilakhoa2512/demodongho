@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Social;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Facades\Auth;
 
 session_start();
 
@@ -92,14 +96,6 @@ class CheckoutController extends Controller
         return Redirect::to('/trang-chu');
     }
 
-    public function checkout(){
-        $cate_pro = DB::table('categories')->where('status', 1)->orderby('id','asc')->get();
-        $brand_pro = DB::table('brands')->where('status', 1)->orderby('id','asc')->get();
-        return view('pages.checkout.show_checkout')
-            ->with('category', $cate_pro)
-            ->with('brand', $brand_pro);
-    }
-
     public function logout_checkout(){
         Session::flush();
         return Redirect::to('/login-checkout');
@@ -113,13 +109,19 @@ class CheckoutController extends Controller
         ]);
 
         $user = DB::table('users')->where('email', $request->email)->first();
+        // CHẶN NHÂN SỰ / ADMIN
+        $nhansu = DB::table('nhansu')
+        ->where('email', $request->email)
+        ->whereIn('role_id', [1, 3, 4, 5])
+        ->first();
+
+        if ($nhansu) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản này không được phép đăng nhập vào hệ thống người dùng.');
+        }
 
         if (!$user) {
             return redirect('/login-checkout')->with('error', 'Email hoặc mật khẩu không chính xác.');
-        }
-
-        if ($user->role_id == 1) {
-            return redirect('/login-checkout')->with('error', 'Tài khản này không được phép đăng nhập.');
         }
 
         if ($user->status == 0) {
@@ -246,4 +248,128 @@ class CheckoutController extends Controller
         //sau khi gộp xong thì xoá cart guest để tránh nhân đôi
         Session::forget('cart');
     }
+
+//ĐĂNG NHẬP GOOGLE
+public function login_google()
+{
+    return Socialite::driver('google')->redirect();
+}
+
+public function callback_google()
+{
+    try {
+        $googleUser = Socialite::driver('google')->user();
+
+        // Tìm user theo email
+        $user = User::where('email', $googleUser->email)->first();
+
+        if (!$user) {
+            // Tạo user mới
+            $user = User::create([
+                'fullname' => $googleUser->name,
+                'email' => $googleUser->email,
+                'google_id' => $googleUser->id,
+                'password' => bcrypt('google_default'), //pass ko dùng chỉ để tránh null
+                'role_id' => 2,
+            ]);
+        }
+
+        // Không cho admin login client
+            if ($user->role_id != 2) {
+                return redirect('/login-checkout')
+                    ->with('error', 'Tài khoản của bạn không được phép đăng nhập ở đây!');
+            }
+
+            // chặn ko cho user đăng nhập khi bị khoá
+            if ($user->status == 0) {
+                return redirect('/login-checkout')
+                    ->with('error', 'Tài khoản của bạn đã bị đình chỉ!');
+            }
+
+            Auth::login($user);
+
+            return redirect('/')->with('message', 'Đăng nhập Google thành công!');
+
+    } catch (\Exception $e) {
+        return redirect('/login-checkout')->with('error', 'Đăng nhập Google thất bại!');
+    }
+}
+
+public function login_user_google()
+{
+    return Socialite::driver('google')->redirect();
+}
+
+public function callback_user_google()
+{
+    /** @var \Laravel\Socialite\Two\AbstractProvider $provider */
+    $provider = Socialite::driver('google');
+    $googleUser = $provider->stateless()->user();
+    // Tìm hoặc tạo tài khoản social
+    $socialAccount = $this->findOrCreateUser($googleUser, 'google');
+
+    // Lấy user liên kết
+    $user = $socialAccount->user;
+
+    // Không cho admin login client
+    if ($user->role_id != 2) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản của bạn không được phép đăng nhập!');
+    }
+
+    // Không cho user bị đình chỉ
+    if ($user->status == 0) {
+        return redirect('/login-checkout')
+            ->with('error', 'Tài khoản của bạn đã bị đình chỉ!');
+    }
+
+    // OK thì mới lưu session
+    Session::put('id', $user->id);
+    Session::put('image', $user->image);
+    Session::put('fullname', $user->fullname);
+
+    // MERGE CART GUEST (Session cart) → DB carts
+    $this->mergeGuestCartToDb((int)$user->id);
+
+    return redirect('/trang-chu')
+        ->with('message', 'Đăng nhập Google <span style="color:red">'.$user->email.'</span> thành công!');
+}
+
+
+
+public function findOrCreateUser($googleUser, $provider)
+{
+    //Tìm trong bảng social trước
+    $social = Social::where('provider_user_id', $googleUser->id)
+                    ->where('provider', strtoupper($provider))
+                    ->first();
+
+    if ($social) {
+        return $social;
+    }
+
+    //Nếu không có thì tìm user theo email
+    $user = User::where('email', $googleUser->email)->first();
+
+    //Nếu user chưa tồn tại thì tạo mới
+    if (!$user) {
+        $user = User::create([
+            'fullname' => $googleUser->name,
+            'email' => $googleUser->email,
+            'role_id' => 2,
+            'status'   => 1,
+            'password' => '',
+        ]);
+    }
+
+    // Tạo tài khoản social mới và liên kết với user
+    $social = Social::create([
+        'provider_user_id'   => $googleUser->id,
+        'provider_user_email'=> $googleUser->email,
+        'provider'           => strtoupper($provider),
+        'user_id'            => $user->id,
+    ]);
+
+    return $social;
+}
 }

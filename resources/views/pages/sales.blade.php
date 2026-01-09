@@ -24,7 +24,7 @@
 </div>
 
 <div class="text-center">
-    {{ $saleProducts->links() }}
+    {{ $saleProducts->links('vendor.pagination.number-only') }}
 </div>
 
 @endsection
