@@ -47,6 +47,7 @@
                     <th>Trạng thái</th>
                     <th>Thao tác</th>
                     <th>Ngày</th>
+                    <th>Gộp</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,7 +70,7 @@
                     <td style="max-width:300px;">
                         {{ $review->comment }}
                     </td>
-{{-- status --}}
+                    {{-- status --}}
                     <td>
                         @if($review->status == 1)
                             <span class="label label-success">Hiển thị</span>
@@ -96,6 +97,9 @@
                     {{-- DATE --}}
                     <td>
                         {{ $review->created_at->format('d/m/Y H:i') }}
+                    </td>
+                    <td>{{ $review->rating }} ★,
+                    {{ $review->created_at->format('d/m/Y H:i') }}
                     </td>
                 </tr>
                 @empty
