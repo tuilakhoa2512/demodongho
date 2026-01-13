@@ -3,6 +3,7 @@
 @section('content')
 
 @php
+
     $method = strtoupper((string)($order->payment_method ?? 'COD'));
     $status = (string)($order->status ?? 'pending');
 
