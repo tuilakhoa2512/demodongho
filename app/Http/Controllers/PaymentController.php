@@ -12,7 +12,6 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderDetail;
 
-// ✅ NEW promotion system
 use App\Services\PromotionService;
 use App\Services\OrderPricingService;
 use App\Models\PromotionRedemption;
@@ -312,21 +311,43 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // COD: trừ kho + clear cart
+            // COD: trừ kho + auto update trạng thái + clear cart
             if ($request->payment_method === 'COD') {
-                foreach ($items as $it) {
-                    $updated = Product::where('id', $it['product_id'])
-                        ->where('quantity', '>=', $it['quantity'])
-                        ->decrement('quantity', $it['quantity']);
 
-                    if (!$updated) {
+                foreach ($items as $it) {
+
+                    /** @var Product $product */
+                    $product = Product::lockForUpdate()->find($it['product_id']);
+                    if (!$product) {
+                        throw new \Exception('Không tìm thấy sản phẩm.');
+                    }
+
+                    if ($product->quantity < $it['quantity']) {
                         throw new \Exception('Sản phẩm đã hết hàng hoặc không đủ tồn kho.');
                     }
+
+                    // Trừ kho
+                    $product->quantity -= $it['quantity'];
+
+                    // ✅ HẾT HÀNG → sold_out + ẩn
+                    if ($product->quantity <= 0) {
+                        $product->quantity = 0;
+                        $product->stock_status = 'sold_out';
+                        $product->status = 0; // ẨN
+
+                        if ($product->storageDetail) {
+                            $product->storageDetail->stock_status = 'sold_out';
+                            $product->storageDetail->save();
+                        }
+                    }
+
+                    $product->save();
                 }
 
                 $this->clearCart();
                 Session::forget('promo_code');
             }
+
 
             DB::commit();
 

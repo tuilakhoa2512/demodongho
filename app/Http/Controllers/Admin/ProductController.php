@@ -353,7 +353,20 @@ class ProductController extends Controller
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
+        /**
+         * ❌ KHÔNG CHO HIỆN LẠI KHI ĐÃ HẾT HÀNG
+         */
+        if ((int)$product->quantity <= 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Sản phẩm đã hết hàng, không thể hiển thị lại.');
+        }
+
+        /**
+         * ĐANG HIỆN => ẨN
+         */
         if ((int)$product->status === 1) {
+
             $product->status = 0;
             $product->stock_status = 'stopped';
             $product->save();
@@ -363,22 +376,26 @@ class ProductController extends Controller
                 $detail->save();
             }
 
-            return redirect()->back()->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
+            return redirect()
+                ->back()
+                ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-        if ($detail && (int)$detail->status === 0) {
-            return redirect()->back()->with('error', 'Sản phẩm trong kho đang bị ẩn, không thể hiển thị sản phẩm.');
-        }
-
+        /**
+         * ĐANG ẨN =>  HIỆN (CHỈ KHI CÒN HÀNG)
+         */
         $product->status = 1;
-        $product->stock_status = ((int)$product->quantity > 0) ? 'selling' : 'sold_out';
+        $product->stock_status = 'selling';
         $product->save();
 
         if ($detail) {
-            $detail->stock_status = $product->stock_status;
+            $detail->stock_status = 'selling';
             $detail->save();
         }
 
-        return redirect()->back()->with('success', 'Đã hiển thị sản phẩm.');
+        return redirect()
+            ->back()
+            ->with('success', 'Đã hiển thị sản phẩm.');
     }
+
 }

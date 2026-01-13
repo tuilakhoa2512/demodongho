@@ -211,6 +211,7 @@ class OrderController extends Controller
             }
 
             if ($newStatus === 'canceled') {
+
                 $details = DB::table('order_details')
                     ->where('order_id', $order->id)
                     ->get(['product_id', 'quantity']);
@@ -219,14 +220,41 @@ class OrderController extends Controller
                     $qty = (int)($d->quantity ?? 0);
                     if ($qty <= 0) continue;
 
+                    // 1️⃣ Hoàn lại tồn kho
                     DB::table('products')
                         ->where('id', (int)$d->product_id)
                         ->increment('quantity', $qty);
+
+                    // 2️⃣ Lấy lại product sau khi hoàn kho
+                    $product = DB::table('products')
+                        ->where('id', (int)$d->product_id)
+                        ->first();
+
+                    if ($product && (int)$product->quantity > 0) {
+
+                        // 3️⃣ Mở lại sản phẩm
+                        DB::table('products')
+                            ->where('id', (int)$product->id)
+                            ->update([
+                                'stock_status' => 'selling',
+                                'status'       => 1,
+                            ]);
+
+                        // 4️⃣ Đồng bộ lại kho (KHÔNG đụng status kho)
+                        if (!empty($product->storage_detail_id)) {
+                            DB::table('storage_details')
+                                ->where('id', (int)$product->storage_detail_id)
+                                ->update([
+                                    'stock_status' => 'selling',
+                                ]);
+                        }
+                    }
                 }
 
-                // (optional): hủy redemption nếu bạn muốn
+                // (optional) hủy redemption nếu muốn
                 // DB::table('promotion_redemptions')->where('order_id', $order->id)->update(['status' => 'canceled']);
             }
+
 
             DB::table('orders')
                 ->where('id', $order->id)

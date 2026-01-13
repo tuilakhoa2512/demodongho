@@ -216,9 +216,25 @@ class StorageDetailController extends Controller
         $detail  = StorageDetail::with('product')->findOrFail($id);
         $product = $detail->product;
 
+        /**
+         * ❌ NẾU SẢN PHẨM ĐÃ SOLD OUT → KHÔNG CHO TOGGLE
+         * (vì sold_out là trạng thái khóa)
+         */
+        if ($product && (int)$product->quantity <= 0) {
+            return redirect()
+                ->back()
+                ->with('error', 'Sản phẩm đã bán hết, không thể thay đổi trạng thái kho.');
+        }
+
+        // toggle Ẩn / Hiện kho
         $detail->status = $detail->status ? 0 : 1;
 
+        /**
+         * KHO BỊ ẨN
+         * → Ẩn sản phẩm
+         */
         if ($detail->status == 0) {
+
             $detail->stock_status = 'stopped';
 
             if ($product) {
@@ -226,9 +242,24 @@ class StorageDetailController extends Controller
                 $product->stock_status = 'stopped';
                 $product->save();
             }
-        } else {
+
+        }
+        /**
+         * KHO ĐƯỢC HIỆN
+         * → chỉ hiện nếu còn hàng
+         */
+        else {
+
             if ($product) {
-                $detail->stock_status = $product->stock_status;
+                if ((int)$product->quantity > 0) {
+                    $detail->stock_status = 'selling';
+                    $product->status = 1;
+                    $product->stock_status = 'selling';
+                    $product->save();
+                } else {
+                    // phòng thủ (trường hợp hiếm)
+                    $detail->stock_status = 'sold_out';
+                }
             } else {
                 $detail->stock_status = 'pending';
             }
@@ -238,8 +269,9 @@ class StorageDetailController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Cập nhật trạng thái kho (và sản phẩm liên quan) thành công.');
+            ->with('success', 'Cập nhật trạng thái kho thành công.');
     }
+
 
     //LIST THEO STOCK_STATUS (dùng chung query builder để có selling_qty/sold_qty)
 

@@ -8,44 +8,44 @@
     <div class="row">
 
         <div class="col-md-3">
-            <div class="panel panel-primary text-center" style="padding:40px;background-color:#ffeb85">
+            <div class="panel panel-primary text-center" style="padding:35px;background-color:#ffeb85">
                 <div class="panel-body">
-                    <h3 style="font-size:48px; font-weight:700;">{{ $totalCustomers }}</h3>
-                    <p style="font-size:25px; font-weight:700;">Khách Hàng</p>
+                    <h3 style="font-size:30px; font-weight:700;">{{ $totalCustomers }}</h3>
+                    <p style="font-size:20px; font-weight:600;">Khách Hàng</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-        <div class="panel panel-primary text-center" style="padding:40px;background-color:#ffa385">
+        <div class="panel panel-primary text-center" style="padding:35px;background-color:#ffa385">
                 <div class="panel-body">
-                    <h3 style="font-size:48px; font-weight:700;">{{ $totalOrders }}</h3>
-                    <p style="font-size:25px; font-weight:700;">Đơn Hàng</p>
+                    <h3 style="font-size:30px; font-weight:700;">{{ $totalOrders }}</h3>
+                    <p style="font-size:20px; font-weight:600;">Đơn Hàng</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-        <div class="panel panel-primary text-center" style="padding:40px;background-color:#bcff85">
+        <div class="panel panel-primary text-center" style="padding:35px;background-color:#bcff85">
                 <div class="panel-body">
-                    <h3 style="font-size:48px; font-weight:700;">{{ $totalProducts }}</h3>
-                    <p style="font-size:25px; font-weight:700;">Sản Phẩm Đang Bán</p>
+                    <h3 style="font-size:30px; font-weight:700;">{{ $totalProducts }}</h3>
+                    <p style="font-size:20px; font-weight:600;">Sản Phẩm Đang Bán</p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-        <div class="panel panel-primary text-center" style="padding:40px;background-color:#eec7fc">
+        <div class="panel panel-primary text-center" style="padding:35px;background-color:#eec7fc">
                 <div class="panel-body">
-                    <h3 style="font-size:48px; font-weight:700;">{{ $totalReviews }}</h3>
-                    <p style="font-size:25px; font-weight:700;">Đánh Giá</p>
+                    <h3 style="font-size:30px; font-weight:700;">{{ $totalReviews }}</h3>
+                    <p style="font-size:20px; font-weight:600;">Đánh Giá</p>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <br><br>
+   
     {{-- ===== BIỂU ĐỒ ===== --}}
     <div class="row">
     <!-- Doanh thu -->
@@ -67,7 +67,7 @@
 <style>
 .dashboard-card {
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 20px;
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
     margin-bottom: 25px;
