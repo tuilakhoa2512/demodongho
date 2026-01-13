@@ -1,16 +1,17 @@
 @extends('pages.layout')
 @section('content')
 
-
 <div class="container" style="margin-top:50px;">
-    <div class="row justify-content-center">
+    <div class="row">
 
-        <div class="col-sm-9 d-flex justify-content-center" style="padding-right: 15px;">
-            <div class="login-form p-4"
-                 style="border: 1px solid #ddd; border-radius: 10px; background-color:#fff; width:100%;">
+        <!-- CONTENT SAU SIDEBAR -->
+        <div class="col-sm-12 col-md-9 col-lg-9">
 
-                <h2 class="title text-center mb-4">Đăng ký</h2>
+            <div class="register-form">
 
+                <h2 class="title text-center mb-4">ĐĂNG KÝ</h2>
+
+                <div class="register-inner">
                 @if ($errors->any())
                     <div class="alert alert-danger text-center">
                         @foreach ($errors->all() as $err)
@@ -18,91 +19,78 @@
                         @endforeach
                     </div>
                 @endif
+                
+                    <form action="{{ URL::to('/add-user') }}" method="POST">
+                        @csrf
 
-                <form action="{{ URL::to('/add-user') }}" method="POST">
-                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" name="fullname"
+                                   class="form-control"
+                                   placeholder="Nguyễn Văn A"
+                                   required>
+                        </div>
 
-                        <label>Họ và tên:</label>
-                        <input type="text" name="fullname" placeholder="Nguyễn Văn A"
-                            class="form-control mb-3" style="width:130%;"maxlength="30" required>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" name="email"
+                                   class="form-control"
+                                   placeholder="xxx@gmail.com"
+                                   required>
+                        </div>
 
-                        <label>Email:</label>
-                        <input type="email" name="email"
-                            placeholder="xxx@gmail.com"
-                            class="form-control mb-3" style="width:130%;"
-                            maxlength="30"
-                            pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
-                            title="Email phải kết thúc bằng @gmail.com và không vượt quá 30 ký tự"
-                            required>
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" name="password"
+                                   id="password"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-                        <label>Mật khẩu:</label>
-                        <input type="password" name="password"
-                            id="password"
-                            placeholder="********"
-                            class="form-control mb-3" style="width:130%;"
-                            maxlength="30"
-                            title="Mật khẩu không quá 30 ký tự"
-                            required>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu</label>
+                            <input type="password"
+                                   name="password_confirmation"
+                                   id="password_confirmation"
+                                   class="form-control"
+                                   required>
+                            <small id="password-match-message"></small>
+                        </div>
 
-                        <label>Xác nhận mật khẩu:</label>
-                        <input type="password"
-                            name="password_confirmation"
-                            id="password_confirmation"
-                            placeholder="********"
-                            class="form-control mb-1"
-                            style="width:130%;"
-                            maxlength="30"
-                            required>
-                        <small id="password-match-message"></small><br>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="text" name="phone"
+                                   class="form-control"
+                                   required>
+                        </div>
 
-                        <label>Số điện thoại:</label>
-                        <input type="text" name="phone"
-                            placeholder="0123456789"
-                            class="form-control mb-3" style="width:130%;"
-                            pattern="^[0-9]{10,15}$"
-                            title="Số điện thoại phải từ 10 đến 15 số và không chứa chữ"
-                            required>
-
-                        <button type="submit" class="btn btn-danger btn-block" style="width:130%;">Đăng ký</button>
+                        <button type="submit" class="register-btn">
+                            Đăng ký
+                        </button>
                     </form>
 
+                    <div class="mt-4 text-center">
+                        Đã có tài khoản?
+                        <a href="{{ url('/login-checkout') }}" style="color:blue;font-weight:bold;">
+                            Đăng nhập
+                        </a>
+                    </div>
 
-<style type="text/css">
-    ul.list-login {
-        margin: 10px;
-        padding: 0;
-        text-align: center;
-         
-    }
-    .list-login {
-        margin: 10px 0;
-        text-align: center; 
-    }
-    ul.list-login li {
-        display: inline-block;
-        margin: 5px;
-    }
-    
-</style>
-                <div class="mt-4 text-center">
-                    <p>Đã có tài khoản?
-                        <a href="{{ URL::to('/login-checkout') }}" style="color:blue; font-weight:bold;">Đăng nhập</a>
-                    </p>
                 </div>
-
             </div>
         </div>
-
     </div>
 </div>
 
+
+<!-- JS KIỂM TRA KHỚP MẬT KHẨU -->
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const password = document.getElementById('password');
     const confirm  = document.getElementById('password_confirmation');
     const message  = document.getElementById('password-match-message');
 
-    function checkPasswordMatch() {
+    function checkMatch() {
         if (!confirm.value) {
             message.textContent = '';
             return;
@@ -117,9 +105,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    password.addEventListener('keyup', checkPasswordMatch);
-    confirm.addEventListener('keyup', checkPasswordMatch);
+    password.addEventListener('keyup', checkMatch);
+    confirm.addEventListener('keyup', checkMatch);
 });
 </script>
+
 
 @endsection

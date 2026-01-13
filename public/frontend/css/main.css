@@ -888,7 +888,7 @@ h2.title:before {
 h2.title {
     color: #d70018;
     font-family: "Roboto", sans-serif;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     margin: 0 15px;
     text-transform: uppercase;
@@ -3007,4 +3007,94 @@ ul.nav.nav-pills.nav-justified i {
 .pagination .page-item.disabled .page-link {
     color: #aaa;
     background: #f5f5f5;
+}
+.register-form {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+
+    padding: 35px;
+    margin-bottom: 60px;      /* ✅ TẠO KHOẢNG CÁCH ĐÁY */
+    
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* ✅ nhìn rõ khung */
+}
+
+
+.register-inner {
+    max-width: 700px;      /* FORM TRÀN ĐỀU 2 BÊN */
+    margin: 0 auto;        /* CĂN GIỮA */
+}
+
+/* Căn giữa từng dòng form */
+.register-inner .form-group {
+    max-width: 520px;     /* 👈 độ rộng chuẩn */
+    margin: 0 auto 18px;  /* 👈 căn giữa + khoảng cách dưới */
+}
+
+/* Input full width theo form-group */
+.register-inner .form-control {
+    width: 100%;
+    height: 42px;
+    border-radius: 4px;
+}
+
+/* Label căn trái, nhưng trong khối giữa */
+.register-inner label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+
+.register-inner .btn {
+    width: 100%;
+    height: 44px;
+    font-size: 16px;
+}
+.register-btn {
+    display: block;
+
+    max-width: 520px;        /*BẰNG input */
+    width: 100%;
+    margin: 22px auto 0;     /* căn giữa + cách form */
+
+    height: 46px;            /* cao hơn input chút */
+    line-height: 46px;
+
+    background-color: #D70018 !important;
+    color: #fff !important;
+
+    border: none;
+    border-radius: 8px;      /* bo đẹp hơn */
+
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+
+    cursor: pointer;
+    text-align: center;
+
+    transition: background-color 0.25s ease,
+                transform 0.15s ease,
+                box-shadow 0.15s ease;
+}
+
+/* Hover */
+.register-btn:hover {
+    background-color: #b80015 !important;
+    color: #fff !important;
+    transform: translateY(-1px);
+}
+
+/* Active (click) */
+.register-btn:active {
+    background-color: #a00012 !important;
+    transform: scale(0.98);
+}
+
+/* Focus (khi tab) */
+.register-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(215, 0, 24, 0.25);
 }
