@@ -45,6 +45,8 @@ class CheckoutController extends Controller
                     'string',
                     'min:6',
                     'max:30',
+                    'regex:/^(?=.*[A-Z]).+$/',
+                    'confirmed'
                 ],
                 'phone' => [
                     'required',
@@ -69,6 +71,8 @@ class CheckoutController extends Controller
                 'password.required' => 'Vui lòng nhập mật khẩu.',
                 'password.min'      => 'Mật khẩu phải có ít nhất 6 ký tự.',
                 'password.max'      => 'Mật khẩu không được vượt quá 30 ký tự.',
+                'password.regex'    => 'Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa và bao gồm số.',
+                'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
     
                 // phone
                 'phone.required' => 'Vui lòng nhập số điện thoại.',

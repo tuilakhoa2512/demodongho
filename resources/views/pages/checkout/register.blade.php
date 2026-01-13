@@ -37,11 +37,23 @@
 
                         <label>Mật khẩu:</label>
                         <input type="password" name="password"
+                            id="password"
                             placeholder="********"
                             class="form-control mb-3" style="width:130%;"
                             maxlength="30"
                             title="Mật khẩu không quá 30 ký tự"
                             required>
+
+                        <label>Xác nhận mật khẩu:</label>
+                        <input type="password"
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            placeholder="********"
+                            class="form-control mb-1"
+                            style="width:130%;"
+                            maxlength="30"
+                            required>
+                        <small id="password-match-message"></small><br>
 
                         <label>Số điện thoại:</label>
                         <input type="text" name="phone"
@@ -83,5 +95,31 @@
 
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const password = document.getElementById('password');
+    const confirm  = document.getElementById('password_confirmation');
+    const message  = document.getElementById('password-match-message');
+
+    function checkPasswordMatch() {
+        if (!confirm.value) {
+            message.textContent = '';
+            return;
+        }
+
+        if (password.value === confirm.value) {
+            message.textContent = '✔ Mật khẩu khớp';
+            message.style.color = 'green';
+        } else {
+            message.textContent = '✖ Mật khẩu không khớp';
+            message.style.color = 'red';
+        }
+    }
+
+    password.addEventListener('keyup', checkPasswordMatch);
+    confirm.addEventListener('keyup', checkPasswordMatch);
+});
+</script>
 
 @endsection

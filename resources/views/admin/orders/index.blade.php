@@ -82,6 +82,8 @@
             <th style="width:120px;">Trạng thái</th>
             <th style="width:140px;">Đổi trạng thái</th>
             <th style="width:60px;">Xem</th>
+            <th>gộp</th>
+            <th>gộp 2</th>
           </tr>
         </thead>
 
@@ -165,6 +167,66 @@
                   <i class="fa fa-eye text-info" style="font-size:18px;"></i>
                 </a>
               </td>
+
+<td>
+    <form method="POST"
+          action="{{ URL::to('/admin/orders/'.$o->order_code.'/status') }}"
+          data-order="{{ $o->order_code }}"
+          data-current="{{ $st }}"
+          style="margin:0;">
+        @csrf
+
+        <div style="display:flex; align-items:center; gap:8px;">
+            <select name="status"
+                    class="form-control input-sm order-status-select js-status-select"
+                    >
+                @foreach($statuses as $key => $label)
+                    <option value="{{ $key }}" {{ $st === $key ? 'selected' : '' }}>
+                        {{ $label }}
+                    </option>
+                @endforeach
+            </select>
+
+            <a href="{{ URL::to('/admin/orders/'.$o->order_code) }}"
+               title="Chi tiết"
+               style="display:flex; align-items:center;">
+                <i class="fa fa-eye text-info" style="font-size:18px;"></i>
+            </a>
+        </div>
+    </form>
+</td>
+
+<td>
+<form method="POST"
+                      action="{{ URL::to('/admin/orders/'.$o->order_code.'/status') }}"
+                      data-order="{{ $o->order_code }}"
+                      data-current="{{ $st }}"
+                      style="margin:0;">
+                  @csrf
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                  <select name="status"
+                          class="form-control input-sm order-status-select js-status-select">
+                    @foreach($statuses as $key => $label)
+                      <option value="{{ $key }}" {{ $st === $key ? 'selected' : '' }}>
+                        {{ $label }}
+                      </option>
+                    @endforeach
+                  </select>
+
+                  @if($o->created_at)
+                  <div style="line-height:1.2;">
+                    <div>{{ \Carbon\Carbon::parse($o->created_at)->format('H:i') }}</div>
+                    <div style="font-size:12px; color:#777; font-weight: bold;">
+                      {{ \Carbon\Carbon::parse($o->created_at)->format('d/m/Y') }}
+                    </div>
+                  </div>
+                @else
+                  —
+                @endif
+                </div>
+                </form>
+</td>
+
             </tr>
           @endforeach
         </tbody>
