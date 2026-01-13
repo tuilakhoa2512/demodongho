@@ -1,4 +1,3 @@
-reviews_user/index.blade.php
 @extends('pages.admin_layout')
 @section('admin_content')
 
@@ -13,20 +12,6 @@ reviews_user/index.blade.php
             <small>(Trạng thái: Ẩn)</small>
         @endif
     </div>
-
-    {{-- Popup thông báo --}}
-    @if (session('success'))
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            Swal.fire({
-                icon: 'success',
-                title: 'Thành công!',
-                text: '{{ session('success') }}',
-                confirmButtonText: 'OK'
-            });
-        });
-    </script>
-    @endif
 
     {{-- form lọc --}}
     <div class="row" style="padding: 10px 15px;">
@@ -125,9 +110,20 @@ reviews_user/index.blade.php
     </div>
 
     {{-- phân trang --}}
-    <div class="text-center">
-        {{ $reviews->links() }}
-    </div>
+    <footer class="panel-footer">
+      <div class="row">
+        <div class="col-sm-5 text-center">
+          <small class="text-muted inline m-t-sm m-b-sm">
+            Hiển thị {{ $reviews->firstItem() }} - {{ $reviews->lastItem() }}
+            / {{ $reviews->total() }} Comment
+          </small>
+        </div>
+
+        <div class="text-center">
+          {{ $reviews->links('vendor.pagination.number-only') }}
+        </div>
+      </div>
+    </footer>
 
 </div>
 

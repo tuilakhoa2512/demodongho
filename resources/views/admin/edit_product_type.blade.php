@@ -7,23 +7,6 @@
             <header class="panel-heading">
                 Cập nhật loại sản phẩm
             </header>
-            @if (session('message'))
-                            <script>
-                                $(document).ready(function() {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Thành công!',
-                                        text: 'Cập nhật loại sản phẩm thành công!',
-                                        confirmButtonText: 'OK'
-                                    });
-                                });
-                            </script>
-                        @endif
-          
-            @if (Session::has('message'))
-                <span class="text-alert">{{ Session::get('message') }}</span>
-                {{ Session::put('message', null) }}
-            @endif
 
             <div class="panel-body">
                 @foreach ($edit_product_type as $key => $edit_value)

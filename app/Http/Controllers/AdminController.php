@@ -58,15 +58,85 @@ class AdminController extends Controller
     // =========================
     // DASHBOARD
     // =========================
+    // public function show_dashboard()
+    // {
+    //     if (!Session::has('admin_id')) {
+    //         return Redirect::to('/admin');
+    //     }
+
+    //     return view('pages.admin_layout');
+    // }
     public function show_dashboard()
     {
         if (!Session::has('admin_id')) {
             return Redirect::to('/admin');
         }
-
-        return view('pages.admin_layout');
-    }
-
+    
+        /* ================== THỐNG KÊ TRÊN ================== */
+    
+        // Khách hàng (không tính nhân sự)
+        $totalCustomers = DB::table('users')->count();
+    
+        // Tổng đơn hàng (mọi trạng thái)
+        $totalOrders = DB::table('orders')->count();
+    
+        // Tổng sản phẩm đang bán (không tính số lượng)
+        $totalProducts = DB::table('products')
+            ->where('status', 1)
+            ->count();
+    
+        // Tổng đánh giá
+        $totalReviews = DB::table('reviews')->count();
+    
+        /* ================== BIỂU ĐỒ ================== */
+    
+        // Doanh thu theo tháng (chỉ đơn hoàn tất)
+        $revenueRaw = DB::table('orders')
+            ->selectRaw('MONTH(created_at) as month, SUM(total_price) as total')
+            ->where('status', 'success')
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get();
+    
+            $revenueData = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $found = $revenueRaw->firstWhere('month', $i);
+                $revenueData[] = [
+                    'month' => 'Tháng ' . $i,
+                    'total' => $found ? (int)$found->total : 0
+                ];
+            }
+        
+            // ===============================
+            // BIỂU ĐỒ SỐ ĐƠN HÀNG THEO THÁNG
+            // ===============================
+            $orderRaw = DB::table('orders')
+                ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
+                ->whereYear('created_at', date('Y'))
+                ->groupBy('month')
+                ->orderBy('month')
+                ->get();
+        
+            $orderData = [];
+            for ($i = 1; $i <= 12; $i++) {
+                $found = $orderRaw->firstWhere('month', $i);
+                $orderData[] = [
+                    'month' => 'Tháng ' . $i,
+                    'total' => $found ? (int)$found->total : 0
+                ];
+            }
+        
+            return view('pages.dashboard', compact(
+                'totalCustomers',
+                'totalOrders',
+                'totalProducts',
+                'totalReviews',
+                'revenueData',
+                'orderData'
+            ));
+        }
+    
     // =========================
     // LOGOUT
     // =========================

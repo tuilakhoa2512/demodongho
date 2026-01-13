@@ -186,8 +186,15 @@
 
     <footer class="panel-footer">
       <div class="row">
-        <div class="col-sm-12 text-right text-center-xs">
-          {{ $details->links('pagination::bootstrap-4') }}
+        <div class="col-sm-5 text-center">
+          <small class="text-muted inline m-t-sm m-b-sm">
+            Hiển thị {{ $details->firstItem() }} - {{ $details->lastItem() }}
+            / {{ $details->total() }} lô hàng
+          </small>
+        </div>
+
+        <div class="text-center">
+          {{ $details->links('vendor.pagination.number-only') }}
         </div>
       </div>
     </footer>

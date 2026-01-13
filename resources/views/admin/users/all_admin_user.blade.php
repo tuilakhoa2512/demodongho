@@ -90,7 +90,21 @@
             </tbody>
         </table>
     </div>
+{{-- PHÂN TRANG --}}
 
-</div>
+<footer class="panel-footer">
+      <div class="row">
+        <div class="col-sm-5 text-center">
+          <small class="text-muted inline m-t-sm m-b-sm">
+            Hiển thị {{ $users->firstItem() }} - {{ $users->lastItem() }}
+            / {{ $users->total() }} Tài Khoản
+          </small>
+        </div>
+
+        <div class="col-sm-7 text-right text-center-xs">
+          {{ $users->links('vendor.pagination.number-only') }}
+        </div>
+      </div>
+    </footer>
 
 @endsection

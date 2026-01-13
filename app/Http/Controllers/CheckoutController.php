@@ -104,9 +104,20 @@ class CheckoutController extends Controller
     public function login_user(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+            'email' => [
+                'required',
+                'email',
+                'max:30',
+                'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'
+            ],
+            'password' => [
+                'required',
+                'string',
+                'max:30'
+            ]
+        ], [
+            'email.regex' => 'Email phải kết thúc bằng @gmail.com',
+        ]);        
 
         $user = DB::table('users')->where('email', $request->email)->first();
         // CHẶN NHÂN SỰ / ADMIN

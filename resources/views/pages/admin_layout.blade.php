@@ -125,11 +125,13 @@ body {
                                 Tài Khoản Khách Hàng
                             </a>
                         </li> 
+                        @if (in_array($role, [1,3]))
                         <li style="display: flex; justify-content: center;">
                             <a href="{{ route('admin.staff.index') }}" style="width: 160px; text-align: left;">
                                 Tài Khoản Nhân Sự
                             </a>
                         </li>
+                        @endif
                         @if ($role === 1)
                         <li style="display: flex; justify-content: center;">
                             <a href="{{ route('admin.users.create') }}" style="width: 160px; text-align: left;">
@@ -282,27 +284,27 @@ body {
                             </a>
                         </li>
                         <li style="display: flex; justify-content: center;">
-                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                            <a href="{{ URL::to('/admin/orders?status=pending') }}" style="width: 160px; text-align: left;">
                                 Đang Chờ Xử Lý
                             </a>
                         </li> 
                         <li style="display: flex; justify-content: center;">
-                            <a href="{{  URL::to('#')  }}" style="width: 160px; text-align: left;">
+                            <a href="{{  URL::to('/admin/orders?status=confirmed')  }}" style="width: 160px; text-align: left;">
                                 Đang Đóng Gói
                             </a>
                         </li>
                         <li style="display: flex; justify-content: center;">
-                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                            <a href="{{ URL::to('/admin/orders?status=shipping') }}" style="width: 160px; text-align: left;">
                                 Đang Vận Chuyển
                             </a>
                         </li> 
                         <li style="display: flex; justify-content: center;">
-                            <a href="{{  URL::to('#')  }}" style="width: 160px; text-align: left;">
+                            <a href="{{  URL::to('/admin/orders?status=success')  }}" style="width: 160px; text-align: left;">
                                 Đơn Hàng Thành Công
                             </a>
                         </li>
                         <li style="display: flex; justify-content: center;">
-                            <a href="{{ URL::to('#') }}" style="width: 160px; text-align: left;">
+                            <a href="{{ URL::to('/admin/orders?status=canceled') }}" style="width: 160px; text-align: left;">
                                 Đơn Bị Huỷ
                             </a>
                         </li> 
@@ -365,6 +367,7 @@ body {
 <!--main content start-->
 <div id="main-content">
     <section class="wrapper">
+        @include('pages.partials.alert')
         @yield('admin_content')
     </section>
 

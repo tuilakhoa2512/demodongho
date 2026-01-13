@@ -112,5 +112,7 @@
     </div>
 </div>
 @endif
-
+<div class="col-sm-7 text-right text-center-xs">
+    {{ $brand_by_id->links('vendor.pagination.number-only') }}
+</div>
 @endsection

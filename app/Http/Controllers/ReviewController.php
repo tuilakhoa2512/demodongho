@@ -89,7 +89,7 @@ class ReviewController extends Controller
             ->where('product_id', $product_id)
             ->where('status', 1)
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate(5);
 
         $averageRating = round(
             Review::where('product_id', $product_id)

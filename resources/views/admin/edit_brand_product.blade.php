@@ -7,11 +7,6 @@
             <header class="panel-heading">
                 Cập nhật thương hiệu sản phẩm
             </header>
-          
-            @if (Session::has('message'))
-                <span class="text-alert">{{ Session::get('message') }}</span>
-                {{ Session::put('message', null) }}
-            @endif
 
             <div class="panel-body">
                 @foreach ($edit_brand_product as $key => $edit_value)

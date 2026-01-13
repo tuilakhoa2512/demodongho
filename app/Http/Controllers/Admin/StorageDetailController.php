@@ -65,7 +65,7 @@ class StorageDetailController extends Controller
     {
         [$query, $selectedStorageId] = $this->buildIndexQuery($request);
 
-        $details = $query->paginate(20)->appends($request->query());
+        $details = $query->paginate(5)->appends($request->query());
 
         $storages = Storage::orderByDesc('id')->get(['id', 'batch_code']);
 
@@ -87,7 +87,7 @@ class StorageDetailController extends Controller
         [$query] = $this->buildIndexQuery($request);
 
         $details = $query
-            ->paginate(20)
+            ->paginate(10)
             ->appends($request->query());
 
         return view('admin.storage_details.index', compact('storage', 'details'));
@@ -105,10 +105,26 @@ class StorageDetailController extends Controller
         $storage = Storage::findOrFail($storageId);
 
         $request->validate([
-            'product_name'    => 'required|string|max:255',
-            'import_quantity' => 'required|integer|min:1',
-            'note'            => 'nullable|string',
-        ]);
+            'product_name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}0-9\s\-]+$/u'
+            ],
+            'import_quantity' => [
+                'required',
+                'integer',
+                'min:1'
+            ],
+            'note' => [
+                'nullable',
+                'string',
+                'max:300'
+            ],
+        ], [
+            'product_name.regex' =>
+                'Tên sản phẩm chỉ được chứa chữ cái, số, dấu gạch ngang và khoảng trắng',
+        ]);        
 
         StorageDetail::create([
             'storage_id'      => $storage->id,
@@ -153,19 +169,32 @@ class StorageDetailController extends Controller
         $maxImport = 10000;
 
         $rules = [
-            'product_name'    => 'required|string|max:255',
+            'product_name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}0-9\s\-]+$/u'
+            ],
             'import_quantity' => [
                 'required',
                 'integer',
                 'min:' . $minImport,
                 'max:' . $maxImport,
             ],
-            'note' => 'nullable|string',
+            'note' => [
+                'nullable',
+                'string',
+                'max:300'
+            ],
         ];
-
+        
         $messages = [
-            'import_quantity.min' => 'Số lượng nhập phải ≥ ' . $minImport,
-            'import_quantity.max' => 'Số lượng nhập không được vượt quá ' . number_format($maxImport),
+            'product_name.regex' =>
+                'Tên sản phẩm chỉ được chứa chữ cái, số và dấu gạch ngang',
+            'import_quantity.min' =>
+                'Số lượng nhập phải ≥ ' . $minImport,
+            'import_quantity.max' =>
+                'Số lượng nhập không được vượt quá ' . number_format($maxImport),
         ];
 
         $request->validate($rules, $messages);
@@ -217,7 +246,7 @@ class StorageDetailController extends Controller
     public function listPending(Request $request)
     {
         [$query] = $this->buildIndexQuery($request, 'pending');
-        $details = $query->paginate(20)->appends($request->query());
+        $details = $query->paginate(10)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
@@ -230,7 +259,7 @@ class StorageDetailController extends Controller
     public function listSelling(Request $request)
     {
         [$query] = $this->buildIndexQuery($request, 'selling');
-        $details = $query->paginate(20)->appends($request->query());
+        $details = $query->paginate(10)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
@@ -243,7 +272,7 @@ class StorageDetailController extends Controller
     public function listSoldOut(Request $request)
     {
         [$query] = $this->buildIndexQuery($request, 'sold_out');
-        $details = $query->paginate(20)->appends($request->query());
+        $details = $query->paginate(10)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,
@@ -256,7 +285,7 @@ class StorageDetailController extends Controller
     public function listStopped(Request $request)
     {
         [$query] = $this->buildIndexQuery($request, 'stopped');
-        $details = $query->paginate(20)->appends($request->query());
+        $details = $query->paginate(10)->appends($request->query());
 
         return view('admin.storage_details.index_all', [
             'details' => $details,

@@ -22,6 +22,20 @@
                         });
                     </script>
                 @endif
+
+                @if ($errors->any())
+                    <script>
+                        $(document).ready(function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi!',
+                                html: `{!! implode('<br>', $errors->all()) !!}`,
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    </script>
+                @endif
+
                 <div class="position-center">
                     <form role="form" action="{{ URL::to('/save-product-type') }}" method="post">
                         {{ csrf_field() }}

@@ -6,7 +6,7 @@
     $storage       = optional($storageDetail->storage);
     $images        = $product->productImage;
 
-    // ✅ NEW: ƯU ĐÃI (PromotionService gắn runtime từ controller)
+    //  NEW: ƯU ĐÃI (PromotionService gắn runtime từ controller)
     $hasPromo   = !empty($product->promo_has_sale);
     $promoName  = $product->promo_name ?? null;
     $promoLabel = $product->promo_label ?? null;
@@ -18,34 +18,7 @@
     $showFinalPrice = $hasPromo && ($finalPrice < (float)$product->price);
 @endphp
 
-<style>
-    .product-section-title {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
-    .product-image-large {
-        width: 100%;
-        height: 260px;
-        object-fit: cover;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-    }
-    .info-row {
-        display: flex;
-        border-bottom: 1px solid #eee;
-        padding: 6px 0;
-    }
-    .info-label {
-        font-weight: 600;
-        width: 180px;
-    }
-    .badge-status {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
-</style>
+
 
 <div class="row">
     <div class="col-lg-12">
@@ -108,7 +81,7 @@
                                 <div>{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             </div>
 
-                            {{-- ✅ NEW: Ưu đãi (promotion) --}}
+                            {{-- NEW: Ưu đãi (promotion) --}}
                             <div class="info-row">
                                 <div class="info-label">Ưu đãi</div>
                                 <div>
@@ -125,7 +98,7 @@
                                 </div>
                             </div>
 
-                            {{-- ✅ NEW: Giá sau ưu đãi (đồng bộ với index) --}}
+                            {{-- NEW: Giá sau ưu đãi (đồng bộ với index) --}}
                             <div class="info-row">
                                 <div class="info-label">Giá sau ưu đãi</div>
                                 <div>
@@ -250,5 +223,34 @@
         </section>
     </div>
 </div>
+
+<style>
+    .product-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    .product-image-large {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+    .info-row {
+        display: flex;
+        border-bottom: 1px solid #eee;
+        padding: 6px 0;
+    }
+    .info-label {
+        font-weight: 600;
+        width: 180px;
+    }
+    .badge-status {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+    }
+</style>
 
 @endsection

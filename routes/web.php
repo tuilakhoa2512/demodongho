@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\PromotionRedemptionController;
 use App\Http\Controllers\Admin\PromotionTargetController;
 use App\Http\Controllers\Admin\PromotionCodeController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AdminStaffController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\SaleController;
@@ -97,6 +98,7 @@ Route::prefix('location')->group(function () {
 });
 
 
+
 // Danh mục sản phẩm trang chủ
 // Route::get('/danh-muc-san-pham/{id}', [ProductsaveTypeController::class, 'show_category_home']);
 // Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
@@ -144,6 +146,7 @@ Route::post('/admin-dashboard', [AdminController::class, 'dashboard'])->name('ad
 
 // Dashboard sau khi đăng nhập
 Route::get('/dashboard', [AdminController::class, 'show_dashboard'])->name('admin.dashboard');
+
 
 // Đăng xuất
 Route::get('/logout', [AdminController::class, 'logout'])->name('admin.logout');

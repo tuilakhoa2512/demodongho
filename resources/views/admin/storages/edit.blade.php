@@ -10,18 +10,6 @@
 
             <div class="panel-body">
                 <div class="position-center">
-
-                    {{-- Hiển thị lỗi validate --}}
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul style="margin-bottom: 0;">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <form role="form"
                           method="POST"
                           action="{{ route('admin.storages.update', $storage->id) }}">

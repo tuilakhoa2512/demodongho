@@ -7,21 +7,8 @@
       <header class="panel-heading" style="color:#000; font-weight:600;">
         Đăng sản phẩm mới từ kho
       </header>
-
       <div class="panel-body">
         <div class="position-center">
-
-          {{-- Hiển thị lỗi validate --}}
-          @if ($errors->any())
-            <div class="alert alert-danger">
-              <ul style="margin-bottom:0;">
-                @foreach ($errors->all() as $error)
-                  <li>{{ $error }}</li>
-                @endforeach
-              </ul>
-            </div>
-          @endif
-
           <form method="POST"
                 action="{{ route('admin.products.store') }}"
                 enctype="multipart/form-data">

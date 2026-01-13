@@ -45,7 +45,10 @@ class AdminUserController extends BaseAdminController
             $query->where('status', 0);
         }
 
-        $users = $query->orderBy('id')->get();
+        $users = $query
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->appends($request->query());
 
         return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
     }
@@ -71,58 +74,128 @@ class AdminUserController extends BaseAdminController
      * =========================
      */
     public function store_admin_user(Request $request)
-    {
-        $this->checkAdminCoder();
-
-        $request->validate([
-            'fullname' => 'required|string|max:150',
-            'email'    => 'required|email|max:255|unique:users,email|unique:nhansu,email',
-            'password' => 'required|min:6',
-            'role_id'  => 'required|integer|in:1,2,3,4,5',
-        ]);
-
-        DB::beginTransaction();
-
-        try {
-
-            // ===== KHÁCH HÀNG =====
-            if ((int)$request->role_id === 2) {
-
-                DB::table('users')->insert([
-                    'fullname'   => $request->fullname,
-                    'email'      => $request->email,
-                    'password'   => Hash::make($request->password),
-                    'role_id'    => 2,
-                    'status'     => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            
-            } elseif (in_array((int)$request->role_id, [1,3,4,5])) {
-            
-                DB::table('nhansu')->insert([
-                    'fullname'   => $request->fullname,
-                    'email'      => $request->email,
-                    'password'   => Hash::make($request->password),
-                    'role_id'    => (int)$request->role_id,
-                    'status'     => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            DB::commit();
-
-            return redirect()
-                ->route('admin.users.index')
-                ->with('message', 'Thêm tài khoản thành công');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return back()->withErrors('Lỗi: '.$e->getMessage());
-        }
+{
+    //  BẮT BUỘC đăng nhập
+    if (!Session::has('admin_id')) {
+        abort(403, 'Bạn chưa đăng nhập admin');
     }
+
+    $creatorRole = (int) Session::get('admin_role_id'); // role người tạo
+    $targetRole  = (int) $request->role_id;             // role sắp tạo
+
+    /**
+     * =========================
+     * VALIDATE DỮ LIỆU
+     * =========================
+     */
+    $request->validate(
+        [
+            'fullname' => [
+                'required',
+                'string',
+                'min:3',
+                'max:25',
+                'regex:/^[\pL\s]+$/u',
+            ],
+            'email' => [
+                'required',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+                'unique:nhansu,email',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
+            'role_id' => [
+                'required',
+                'integer',
+                'in:1,2,3,4,5',
+            ],
+        ],
+        [
+            'fullname.regex' => 'Họ tên chỉ được chứa chữ cái.',
+            'password.regex' => 'Mật khẩu phải có chữ hoa, chữ thường, số và ký tự đặc biệt.',
+        ]
+    );
+
+    /**
+     * =========================
+     * RÀNG BUỘC PHÂN QUYỀN
+     * =========================
+     */
+
+    //  KHÁCH HÀNG KHÔNG ĐƯỢC TẠO BẤT KỲ AI
+    if ($creatorRole === 2) {
+        abort(403, 'Bạn không có quyền tạo tài khoản.');
+    }
+
+    //  role 4,5 KHÔNG ĐƯỢC TẠO NHÂN SỰ
+    if (in_array($creatorRole, [4,5]) && $targetRole !== 2) {
+        abort(403, 'Bạn chỉ được tạo tài khoản khách hàng.');
+    }
+
+    //  chỉ role 1,3 mới được tạo NHÂN SỰ
+    if (in_array($targetRole, [1,3,4,5]) && !in_array($creatorRole, [1,3])) {
+        abort(403, 'Chỉ Admin Coder hoặc Giám đốc mới được tạo tài khoản nhân sự.');
+    }
+
+    DB::beginTransaction();
+
+    try {
+
+        /**
+         * =========================
+         * TẠO KHÁCH HÀNG
+         * =========================
+         */
+        if ($targetRole === 2) {
+            DB::table('users')->insert([
+                'fullname'   => $request->fullname,
+                'email'      => $request->email,
+                'password'   => Hash::make($request->password),
+                'role_id'    => 2,
+                'status'     => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        /**
+         * =========================
+         * TẠO NHÂN SỰ
+         * =========================
+         */
+        if (in_array($targetRole, [1,3,4,5])) {
+            DB::table('nhansu')->insert([
+                'fullname'   => $request->fullname,
+                'email'      => $request->email,
+                'password'   => Hash::make($request->password),
+                'role_id'    => $targetRole,
+                'status'     => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        DB::commit();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('message', 'Thêm tài khoản thành công');
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->withErrors('Lỗi hệ thống: '.$e->getMessage());
+    }
+}
+
 
     /**
      * =========================
@@ -164,7 +237,7 @@ class AdminUserController extends BaseAdminController
 
         $reviews = Review::with(['user', 'product'])
             ->orderByDesc('created_at')
-            ->paginate(10);
+            ->paginate(5);
 
         return view('admin.reviews_user.index', compact('reviews'));
     }

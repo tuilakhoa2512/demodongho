@@ -12,15 +12,15 @@ use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-// ✅ NEW promotion system
+//  NEW promotion system
 use App\Services\PromotionService;
 
 class ProductController extends Controller
 {
     /**
      * ADMIN - danh sách sản phẩm
-     * ✅ Không join ưu đãi cũ
-     * ✅ Giá final runtime từ PromotionService
+     *  Không join ưu đãi cũ
+     *  Giá final runtime từ PromotionService
      */
     public function index(PromotionService $promoService)
     {
@@ -32,7 +32,8 @@ class ProductController extends Controller
                 'productImage',
             ])
             ->orderByDesc('id')
-            ->paginate(20);
+            ->paginate(5);
+            
 
         foreach ($products as $p) {
             $pack = $promoService->calcProductFinalPrice($p);
@@ -64,8 +65,8 @@ class ProductController extends Controller
 
     /**
      * ADMIN - xem chi tiết sản phẩm
-     * ✅ Không join ưu đãi cũ
-     * ✅ Giá final runtime từ PromotionService
+     *  Không join ưu đãi cũ
+     *  Giá final runtime từ PromotionService
      */
     public function show($id, PromotionService $promoService)
     {
@@ -131,28 +132,42 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'storage_detail_id' => 'required|exists:storage_details,id',
-            'category_id'       => 'required|exists:categories,id',
-            'brand_id'          => 'required|exists:brands,id',
+            'storage_detail_id' => ['required', 'exists:storage_details,id'],
+            'category_id'       => ['required', 'exists:categories,id'],
+            'brand_id'          => ['required', 'exists:brands,id'],
 
-            'name'              => 'nullable|string|max:255',
-            'description'       => 'nullable|string',
-            'strap_material'    => 'nullable|string|max:100',
-            'dial_size'         => 'nullable|numeric|min:0|max:99.99',
-            'gender'            => 'nullable|in:male,female,unisex',
+            'name' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}0-9\s\-]+$/u'
+            ],
 
-            'price'             => 'required|numeric|min:0',
-            'status'            => 'nullable|in:0,1',
+            'description' => ['nullable', 'string', 'max:2000'],
 
-            'image_1'           => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'image_2'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'image_3'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'image_4'           => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'strap_material' => [
+                'nullable',
+                'string',
+                'max:100',
+                'regex:/^[\p{L}\s\-]+$/u'
+            ],
+
+            'dial_size' => ['nullable', 'numeric', 'min:0', 'max:99.99'],
+            'gender'    => ['nullable', 'in:male,female,unisex'],
+
+            'price'  => ['required', 'numeric', 'min:0'],
+            'status' => ['nullable', 'in:0,1'],
+
+            'image_1' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'image_2' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image_3' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image_4' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ], [
-            'storage_detail_id.required' => 'Vui lòng chọn sản phẩm trong kho.',
-            'image_1.required'           => 'Cần ít nhất 1 ảnh chính cho sản phẩm.',
+            'name.regex'           => 'Tên sản phẩm chỉ được chứa chữ cái, số và dấu gạch ngang',
+            'strap_material.regex' => 'Chất liệu dây chỉ được chứa chữ cái và khoảng trắng',
+            'image_1.required'     => 'Cần ít nhất 1 ảnh chính cho sản phẩm',
         ]);
-
+        
         $detail = StorageDetail::with('storage', 'product')->findOrFail($request->storage_detail_id);
 
         if ((int)$detail->status !== 1) {
@@ -224,24 +239,69 @@ class ProductController extends Controller
         $product = Product::with('productImage', 'storageDetail')->findOrFail($id);
 
         $request->validate([
-            'category_id'     => 'required|exists:categories,id',
-            'brand_id'        => 'required|exists:brands,id',
-
-            'name'            => 'required|string|max:255',
-            'description'     => 'nullable|string',
-            'strap_material'  => 'nullable|string|max:100',
-            'dial_size'       => 'nullable|numeric|min:0|max:99.99',
-            'gender'          => 'nullable|in:male,female,unisex',
-
-            'price'           => 'required|numeric|min:0',
-            'stock_status'    => 'nullable|in:selling,sold_out,stopped',
-            'status'          => 'nullable|in:0,1',
-
-            'image_1'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'image_2'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'image_3'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'image_4'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'category_id' => [
+                'required',
+                'exists:categories,id'
+            ],
+            'brand_id' => [
+                'required',
+                'exists:brands,id'
+            ],
+        
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[\p{L}0-9\s\-]+$/u'
+            ],
+        
+            'description' => [
+                'nullable',
+                'string',
+                'max:2000'
+            ],
+        
+            'strap_material' => [
+                'nullable',
+                'string',
+                'max:100',
+                'regex:/^[\p{L}\s\-]+$/u'
+            ],
+        
+            'dial_size' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'max:99.99'
+            ],
+        
+            'gender' => [
+                'nullable',
+                'in:male,female,unisex'
+            ],
+        
+            'price' => [
+                'required',
+                'numeric',
+                'min:0'
+            ],
+        
+            'stock_status' => [
+                'nullable',
+                'in:selling,sold_out,stopped'
+            ],
+        
+            'status' => [
+                'nullable',
+                'in:0,1'
+            ],
+        
+            'image_1' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image_2' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image_3' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image_4' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+        
 
         $product->update([
             'name'           => $request->name,

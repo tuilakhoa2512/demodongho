@@ -31,7 +31,11 @@ class ProductTypeController extends Controller
             $query->where('status', 0);
         }
         // Lấy kết quả
-        $all_product_type = $query->get();
+        $all_product_type = $query
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->appends($request->query());
+
 
     return view('admin.all_product_type', [
         'all_product_type' => $all_product_type,
@@ -39,26 +43,46 @@ class ProductTypeController extends Controller
     ]);
         
     }
-    public function save_product_type(Request $request){
-        
-        $request->validate([
-            'product_type_name' => 'required|max:255',
-            'product_type_slug'   => 'nullable|string|max:255',
-            'product_type_desc'   => 'nullable|string',
-            'product_type_status' => 'required'
-        ]);
-        $data = array();
-        $data['name'] = $request->product_type_name;
-        $data['description'] = $request->product_type_desc;
-        $data['status'] = $request->product_type_status;
-        $data['category_slug'] = $this->createSlug($request->product_type_name);
+        public function save_product_type(Request $request){
+            
+            $request->validate([
+                'product_type_name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'unique:categories,name',
+                    'regex:/^[\p{L}\s]+$/u'
+                ],
+            
+                'product_type_desc' => [
+                    'nullable',
+                    'string',
+                    'max:1000'
+                ],
+            
+                'product_type_status' => [
+                    'required',
+                    'integer',
+                    'in:0,1'
+                ]
+            ], [
+                'product_type_name.required' => 'Tên loại sản phẩm không được để trống',
+                'product_type_name.unique'   => 'Tên loại sản phẩm đã tồn tại',
+                'product_type_status.in'     => 'Trạng thái không hợp lệ',
+                'product_type_name.regex'    => 'Tên danh mục chỉ được chứa chữ cái và khoảng trắng, 
+                không được chứa số hoặc ký tự đặc biệt',
+            ]);
+            
+            $data = [];
+            $data['name'] = trim($request->product_type_name);
+            $data['description'] = trim($request->product_type_desc);
+            $data['status'] = $request->product_type_status;
+            $data['category_slug'] = $this->createSlug($request->product_type_name);
 
-        
-
-       DB::table('categories')->insert($data);
-       session()->flash('message', 'Thêm loại sản phẩm thành công');
-       return Redirect::to('all-product-type');
-    }
+        DB::table('categories')->insert($data);
+        session()->flash('message', 'Thêm loại sản phẩm thành công');
+        return Redirect::to('all-product-type');
+        }
 
     private function createSlug($str)
     {
@@ -151,7 +175,8 @@ public function show_category_home($category_slug)
     $category_by_id = Product::with('productImage')
         ->where('category_id', $category->id)
         ->where('status', 1)
-        ->get();
+        ->orderByDesc('id')
+        ->paginate(6);
 
     return view('pages.category.show_category')
         ->with('category', $cate_pro)

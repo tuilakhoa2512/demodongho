@@ -7,37 +7,8 @@
       <header class="panel-heading" style="color:#000; font-weight:600;">
         Thêm sản phẩm vào lô: {{ $storage->batch_code }}
       </header>
-
       <div class="panel-body">
-
-        
-        @if (session('message'))
-          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-          <script>
-              document.addEventListener("DOMContentLoaded", function() {
-                  Swal.fire({
-                      icon: 'success',
-                      title: 'Thành công!',
-                      text: '{{ session("message") }}',
-                      confirmButtonText: 'OK'
-                  });
-              });
-          </script>
-        @endif
-
         <div class="position-center">
-
-          {{-- Hiển thị lỗi --}}
-          @if ($errors->any())
-            <div class="alert alert-danger">
-              <ul style="margin-bottom:0;">
-                @foreach ($errors->all() as $error)
-                  <li>{{ $error }}</li>
-                @endforeach
-              </ul>
-            </div>
-          @endif
-
           {{-- THÔNG TIN LÔ HIỆN TẠI --}}
           <div class="alert alert-info">
             <strong>Thông Tin Lô Hàng:</strong><br>

@@ -73,11 +73,50 @@ public function profileUpdate(Request $request)
     $user = DB::table('users')->where('id', $id)->first();
 
     $request->validate([
-        'fullname' => 'required|string|max:150',
-        'phone'    => 'nullable|string|max:20',
-        'address'  => 'nullable|string|max:255',
-        'image'    => 'nullable|image|max:2048',
+        'fullname' => [
+            'required',
+            'string',
+            'max:150',
+            'regex:/^[\p{L}\s]+$/u'
+        ],
+    
+        'phone' => [
+            'nullable',
+            'regex:/^[0-9]{10,15}$/'
+        ],
+    
+        'address' => [
+            'nullable',
+            'string',
+            'max:255'
+        ],
+    
+        'province_id' => [
+            'nullable',
+            'exists:provinces,id'
+        ],
+    
+        'district_id' => [
+            'nullable',
+            'exists:districts,id'
+        ],
+    
+        'ward_id' => [
+            'nullable',
+            'exists:wards,id'
+        ],
+    
+        'image' => [
+            'nullable',
+            'image',
+            'mimes:jpg,jpeg,png,webp',
+            'max:2048'
+        ],
+    ], [
+        'fullname.regex' => 'Họ tên chỉ được chứa chữ cái và khoảng trắng',
+        'phone.regex'    => 'Số điện thoại phải từ 10 đến 15 chữ số',
     ]);
+    
 
     // Dữ liệu text
     $data = [

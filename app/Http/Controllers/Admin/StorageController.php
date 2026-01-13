@@ -37,18 +37,33 @@ class StorageController extends Controller
    public function store(Request $request)
     {
         $request->validate([
-            'supplier_name'  => 'nullable|string|max:50',
-
-            'supplier_email' => ['nullable','email','max:30', function ($attribute, $value, $fail) {
-                if (!str_ends_with($value, '@gmail.com')) {
-                    $fail('Email phải có đuôi @gmail.com');
-                }
-            }],
-
-            'import_date' => 'nullable|date',
-
-            'note'       => 'nullable|string|max:200',
-        ]);
+            'supplier_name' => [
+                'nullable',
+                'string',
+                'max:50',
+                'regex:/^[\p{L}\s]+$/u'
+            ],
+            'supplier_email' => [
+                'nullable',
+                'email',
+                'max:30',
+                'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'
+            ],
+            'import_date' => [
+                'nullable',
+                'date'
+            ],
+            'note' => [
+                'nullable',
+                'string',
+                'max:200'
+            ],
+        ], [
+            'supplier_name.regex' =>
+                'Tên nhà cung cấp chỉ được chứa chữ cái và khoảng trắng',
+            'supplier_email.regex' =>
+                'Email phải có đuôi @gmail.com',
+        ]);        
 
         $year = Carbon::now()->year;
         $sequence = (Storage::max('id') ?? 0) + 1;

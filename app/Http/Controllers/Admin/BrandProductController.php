@@ -37,7 +37,10 @@ class BrandProductController extends Controller
             $query->where('status', 0);
         }
         // Lấy kết quả
-        $all_brand_product = $query->get();
+        $all_brand_product = $query
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->appends($request->query());
         
         $manager_brand_product = view('admin.all_brand_product')
             ->with('all_brand_product', $all_brand_product);
@@ -51,43 +54,66 @@ class BrandProductController extends Controller
     public function save_brand_product(Request $request)
     {
         $request->validate([
-            'brand_product_name'   => 'required|string|max:150',
-            'brand_product_slug'   => 'nullable|string|max:255',
-            'brand_product_image'  => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'brand_product_desc'   => 'nullable|string',
-            'brand_product_status' => 'required'
+            'brand_product_name' => [
+                'required',
+                'string',
+                'max:150',
+                'unique:brands,name',
+                'regex:/^[\p{L}\s]+$/u'
+            ],
+            'brand_product_desc' => [
+                'nullable',
+                'string',
+                'max:1000'
+            ],
+            'brand_product_image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,gif,webp',
+                'max:2048'
+            ],
+            'brand_product_status' => [
+                'required',
+                'integer',
+                'in:0,1'
+            ]
+        ], [
+            'brand_product_name.required' => 'Tên thương hiệu không được để trống',
+            'brand_product_name.unique'   => 'Thương hiệu này đã tồn tại',
+            'brand_product_status.in'     => 'Trạng thái không hợp lệ',
+            'brand_product_name.regex'    =>'Tên thương hiệu chỉ được chứa chữ cái và khoảng trắng, 
+            không được chứa số hoặc ký tự đặc biệt',
+
         ]);
-
+    
         $data = [];
-        $data['name']        = $request->brand_product_name;
-        $data['description'] = $request->brand_product_desc;
-        $data['status'] = $request->brand_product_status;
-
-        //  Tạo slug từ tên brand
-    $data['brand_slug'] = Str::slug($request->brand_product_name);
-
-    // Nếu slug bị trùng thì thêm số vào sau
-    $count = DB::table('brands')->where('brand_slug', $data['brand_slug'])->count();
-    if ($count > 0) {
-        $data['brand_slug'] = $data['brand_slug'] . '-' . ($count + 1);
-    }
-
-        if ($request->hasFile('brand_product_image')) {
-            $file = $request->file('brand_product_image');
-
-            // lưu vào storage/app/public/brands
-            $path = $file->store('brands', 'public');
-            $data['image'] = $path;
-        } else {
-            $data['image'] = null;
+        $data['name']        = trim($request->brand_product_name);
+        $data['description'] = trim($request->brand_product_desc);
+        $data['status']      = $request->brand_product_status;
+    
+        // Tạo slug từ tên
+        $data['brand_slug'] = Str::slug($request->brand_product_name);
+    
+        // Phòng trường hợp trùng slug hiếm
+        $count = DB::table('brands')
+            ->where('brand_slug', $data['brand_slug'])
+            ->count();
+        if ($count > 0) {
+            $data['brand_slug'] .= '-' . ($count + 1);
         }
-
+    
+        // Upload ảnh
+        if ($request->hasFile('brand_product_image')) {
+            $data['image'] = $request->file('brand_product_image')
+                                     ->store('brands', 'public');
+        }
+    
         DB::table('brands')->insert($data);
-
-        return redirect()->route('admin.allbrandproduct')
-        ->with('message', 'Thêm thương hiệu sản phẩm thành công');
-
-    }
+    
+        return redirect()
+            ->route('admin.allbrandproduct')
+            ->with('success', 'Thêm thương hiệu sản phẩm thành công');
+    }    
 
     public function unactive_brand_product($id){
         DB::table('brands')->where('id',$id)->update(['status'=> 0]);
@@ -187,7 +213,8 @@ class BrandProductController extends Controller
     $brand_by_id = Product::with('productImage')
         ->where('brand_id', $brand->id)
         ->where('status', 1)
-        ->get();
+        ->orderByDesc('id')
+        ->paginate(6);
 
     return view('pages.brand.show_brand', [
         'category'      => $cate_pro,

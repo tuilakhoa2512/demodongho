@@ -170,8 +170,8 @@
           </small>
         </div>
 
-        <div class="col-sm-7 text-right text-center-xs">
-          {{ $storages->links('pagination::bootstrap-4') }}
+        <div class="text-center">
+          {{ $storages->links('vendor.pagination.number-only') }}
         </div>
       </div>
     </footer>

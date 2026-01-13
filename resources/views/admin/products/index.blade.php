@@ -240,7 +240,7 @@
         </div>
 
         <div class="col-sm-7 text-right text-center-xs">
-          {{ $products->links('pagination::bootstrap-4') }}
+          {{ $products->links('vendor.pagination.number-only') }}
         </div>
 
       </div>
