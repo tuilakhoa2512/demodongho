@@ -101,7 +101,7 @@
 											</a>
 
 											<ul class="dropdown-menu user-dropdown">
-												<li><a href="{{ URL::to('/profile') }}"><i class="fa fa-info-circle"></i> Thông tin cá nhân</a></li>
+												<li><a href="{{ URL::to('/profile') }}"><i class="fa fa-info-circle"></i> Quản lý tài khoản</a></li>
 												<li><a href="{{ URL::to('/my-orders') }}"><i class="fa fa-list-alt"></i> Đơn hàng</a></li>
 												<li><a href="{{ URL::to('/logout-checkout') }}"><i class="fa fa-sign-out"></i> Đăng xuất</a></li>
 											</ul>

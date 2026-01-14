@@ -8,7 +8,7 @@
     function showAlertOnce(options) {
         Swal.fire(options);
 
-        // 🔑 FIX BACK BUTTON (BFCache)
+        // FIX BACK BUTTON (BFCache)
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
         }

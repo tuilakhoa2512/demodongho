@@ -155,7 +155,6 @@ public function profileUpdate(Request $request)
     return redirect()->back()->with('success', 'Cập nhật thông tin thành công!');
 }
 
-
 public function getDistricts($province_id)
     {
         return DB::table('districts')
@@ -171,4 +170,100 @@ public function getDistricts($province_id)
             ->orderBy('name')
             ->get();
     }
+//Thay đổi mật khẩu khách
+public function showChangePassword()
+{
+    $id = Session::get('id');
+
+    if (!$id) {
+        return redirect('/login-checkout');
+    }
+
+    $user = DB::table('users')->where('id', $id)->first();
+
+    if (!$user) {
+        return redirect('/login-checkout');
+    }
+
+    $email = $user->email;
+
+    // Che email: ví dụ lam***@gmail.com
+    $maskedEmail = preg_replace(
+        '/^(.{3}).*(@gmail\.com)$/',
+        '$1***$2',
+        $email
+    );
+
+    return view('pages.profile.change_password', compact(
+        'email',
+        'maskedEmail'
+    ));
+}
+
+/**
+ * Xử lý đổi mật khẩu
+ */
+public function changePassword(Request $request)
+{
+    $request->validate([
+        'email' => [
+            'required',
+            'email',
+            'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'
+        ],
+        'current_password' => [
+            'required'
+        ],
+        'new_password' => [
+            'required',
+            'min:8',
+            'regex:/[A-Z]/',   // ít nhất 1 chữ hoa
+            'regex:/[0-9]/',   // ít nhất 1 số
+            'confirmed'
+        ],
+    ], [
+        'email.required'            => 'Email không được để trống',
+        'email.email'               => 'Email không hợp lệ',
+        'email.regex'               => 'Email phải là @gmail.com',
+
+        'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại',
+
+        'new_password.required'     => 'Vui lòng nhập mật khẩu mới',
+        'new_password.min'          => 'Mật khẩu phải có ít nhất 8 ký tự',
+        'new_password.regex'        => 'Mật khẩu phải có ít nhất 1 chữ hoa và 1 số',
+        'new_password.confirmed'    => 'Xác nhận mật khẩu không khớp',
+    ]);
+
+    $user = DB::table('users')
+        ->where('email', $request->email)
+        ->first();
+
+    // Mật khẩu hiện tại sai
+    if (!$user || !Hash::check($request->current_password, $user->password)) {
+        return back()
+            ->with('success', 'Mật khẩu hiện tại không đúng')
+            ->withInput()
+            ->with('active_tab', 'password');
+    }
+
+    // Không cho trùng mật khẩu cũ
+    if (Hash::check($request->new_password, $user->password)) {
+        return back()
+            ->with('success', 'Mật khẩu mới không được trùng mật khẩu hiện tại')
+            ->withInput()
+            ->with('active_tab', 'password');
+    }
+
+    // Update mật khẩu
+    DB::table('users')
+        ->where('email', $request->email)
+        ->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+    return back()
+        ->with('success', 'Đổi mật khẩu thành công')
+        ->with('active_tab', 'password');
+}
+
 }

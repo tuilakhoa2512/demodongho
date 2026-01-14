@@ -38,11 +38,17 @@
                             maxlength="30"
                             required>
 
-                    <div class="d-flex justify-content-between mb-3">
-                        <label><input type="checkbox" class="checkbox" style="width:15px"> Ghi nhớ đăng nhập</label>
-                        <a href="{{ url('/quen-mat-khau') }}">Quên mật khẩu?</a>
-                    </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label>
+                                <input type="checkbox" class="checkbox" style="width:15px">
+                                Ghi nhớ đăng nhập
+                            </label>
 
+                            <a href="{{ route('password.forgot') }}"
+                            class="forgot-password-link">
+                                Quên mật khẩu?
+                            </a>
+                        </div>
                     
                     <button type="submit" class="btn btn-danger btn-block mb-3" style="width: 130%;">Đăng nhập</button><br>
                     <div class="mt-3">
@@ -91,6 +97,20 @@
         width: 20px; 
         margin-right: 10px;
     }
+    /* FIX QUÊN MẬT KHẨU */
+.forgot-password-link {
+    color: #0d6efd !important;   /* xanh bootstrap */
+    font-size: 14px;
+    text-decoration: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.forgot-password-link:hover {
+    color: #D70018 !important;
+    text-decoration: underline;
+}
+
 </style>
                 
 <br>
