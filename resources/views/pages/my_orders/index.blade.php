@@ -122,6 +122,8 @@
 
         <div class="note-box">
             * Trạng thái đơn hàng sẽ được cập nhật bởi quản trị viên.
+        <br>
+            * Nếu có thắc mắc hoặc vấn đề về đơn hàng, vui lòng liên hệ qua Hotline: 0983 567 891
         </div>
     @endif
 </div> <br> <br> <br>
@@ -135,8 +137,8 @@ body > section > .container > .row > .col-sm-3{
 }
 body > section > .container > .row > .col-sm-9.padding-right{
     width: 90% !important;
-    float: none !important;         /* bỏ float của bootstrap */
-    margin: 0 auto !important;      /* căn giữa */
+    float: none !important;        
+    margin: 0 auto !important;      
     display: block !important;
     
 }

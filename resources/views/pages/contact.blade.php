@@ -70,8 +70,8 @@
     <h2 class="contact-title">Liên hệ với chúng tôi</h2>
 
     <div class="contact-info">
-        <p><strong>Địa chỉ:</strong> 8 Cao Lỗ</p>
-        <p><strong>Số điện thoại:</strong> 0123 456 789</p>
+        <p><strong>Địa chỉ:</strong> 123 Dương Bá Trạc - Phường 4 - Quận 8 - TP. Hồ Chí Minh</p>
+        <p><strong>Số điện thoại:</strong> 0983 567 891</p>
         <p><strong>Email:</strong> unkstore@gmail.com</p>
     </div>
 

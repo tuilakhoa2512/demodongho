@@ -250,10 +250,34 @@ class PaymentController extends Controller
         $discountAmount = (int)($quote['discount_amount'] ?? 0);
         $grandTotal     = (int)($quote['total'] ?? max(0, $subtotal - $discountAmount));
 
-        $orderCode = 'DH-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
+        // $orderCode = 'DH-' . now()->format('Ymd') . '-' . strtoupper(Str::random(6));
 
         DB::beginTransaction();
         try {
+
+        // ===== TẠO MÃ ĐƠN: UnK-YYYYMM-DD0001 =====
+
+        $ym = now()->format('Ym'); // YYYYMM
+        $d  = now()->format('d');  // DD
+
+        $prefix = "UnK-{$ym}-{$d}";
+
+        // tìm đơn cuối cùng trong ngày
+        $lastOrderToday = Order::where('order_code', 'like', $prefix . '%')
+            ->orderByDesc('id')
+            ->lockForUpdate()
+            ->first();
+
+        if ($lastOrderToday) {
+            // lấy 4 số cuối
+            $lastNumber = (int) substr($lastOrderToday->order_code, -4);
+            $nextNumber = $lastNumber + 1;
+        } else {
+            $nextNumber = 1;
+        }
+
+        $orderCode = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
             // 1) Create Order (KHÔNG thêm cột)
             $order = Order::create([
                 'order_code' => $orderCode,

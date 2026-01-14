@@ -393,7 +393,7 @@
 						<div class="single-widget">
 							<h2>CẬP NHẬT THÔNG TIN</h2>
 							<form action="#" class="searchform">
-								<input type="text" placeholder="Your email address" />
+								<input type="text" placeholder="Nhập địa chỉ Email của bạn" />
 								<button type="submit" class="btn btn-default"><i class="fa fa-arrow-circle-o-right"></i></button>
 								<p>Nhận những cập nhật mới nhất từ trang của chúng tôi và luôn bắt kịp xu hướng!</p>
 							</form>

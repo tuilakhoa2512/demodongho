@@ -216,6 +216,11 @@
             <strong class="text-red">{{ number_format($grandShow, 0, ',', '.') }} đ</strong>
         </div>
     </div>
+    <div class="note-box">
+            * Nhân viên sẽ liên hệ với quý khách để xác nhận đơn hàng.
+    <br>
+            * Không thể hủy khi đơn hàng đang ở trạng thái 'Đang Giao Hàng'
+    </div>
 </div>
 
 <br><br>
@@ -341,6 +346,14 @@ section > .container > .row > .col-sm-9.padding-right{
     section > .container > .row > .col-sm-9.padding-right{
         width: 100% !important;
     }
+}
+
+.note-box{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed #ddd;
+    color:#777;
+    font-size:13px;
 }
 </style>
 
