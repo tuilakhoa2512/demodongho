@@ -29,6 +29,7 @@ use App\Http\Controllers\Admin\PromotionCodeController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AdminStaffController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\MyOrderController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\VNPayController;
@@ -56,6 +57,13 @@ Route::post('/save-checkout-user', [CheckoutController::class, 'save-checkout-us
 Route::get('/profile', [UserController::class, 'profile'])->name('profile');
 
 Route::post('/profile-update', [UserController::class, 'profileUpdate'])->name('profile.update');
+// form đổi mật khẩu
+Route::get('/doi-mat-khau', [UserController::class, 'showChangePassword'])
+    ->name('profile.changePassword.form');
+
+// xử lý đổi mật khẩu
+Route::post('/doi-mat-khau', [UserController::class, 'changePassword'])
+    ->name('profile.changePassword');
 
 Route::get('/register', [CheckoutController::class, 'register'])->name('user.register');
 
@@ -64,6 +72,22 @@ Route::get('/payment', [CheckoutController::class, 'payment'])->name('user.payme
 //Login user google
 Route::get('/login-user-google', [CheckoutController::class, 'login_user_google']);
 Route::get('/user/google/callback', [CheckoutController::class, 'callback_user_google']);
+
+// Form nhập email
+Route::get('/quen-mat-khau', [ForgotPasswordController::class, 'showForgotForm'])
+    ->name('password.forgot');
+
+// Gửi OTP
+Route::post('/quen-mat-khau', [ForgotPasswordController::class, 'sendOtp'])
+    ->name('password.sendOtp');
+
+// Form nhập OTP + mật khẩu mới
+Route::get('/dat-lai-mat-khau', [ForgotPasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+
+// Xử lý đổi mật khẩu
+Route::post('/dat-lai-mat-khau', [ForgotPasswordController::class, 'resetPassword'])
+    ->name('password.update');
 
 //Trang chu
 Route::get('/', [HomeController::class, 'index']);
