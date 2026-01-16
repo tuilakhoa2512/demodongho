@@ -117,13 +117,13 @@ class AdminStaffController extends BaseAdminController
                 ->with('error', 'Nhân sự không tồn tại');
         }
 
-        // ❌ không được tự đình chỉ chính mình
+        //  không được tự đình chỉ chính mình
         if ($currentAdminId === (int) $targetStaff->id) {
             return redirect()->back()
                 ->with('error', 'Bạn không thể đình chỉ chính mình');
         }
 
-        // ❌ không ai được đình chỉ Admin Coder
+        //  không ai được đình chỉ Admin Coder
         if ((int)$targetStaff->role_id === 1) {
             return redirect()->back()
                 ->with('error', 'Không thể đình chỉ Admin Coder');

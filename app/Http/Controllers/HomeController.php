@@ -23,7 +23,7 @@ class HomeController extends Controller
         foreach ($products as $p) {
             $pack = $promoService->calcProductFinalPrice($p);
 
-            // ✅ dùng float để không mất phần thập phân
+            // dùng float để không mất phần thập phân
             $p->final_price    = (float) ($pack['final_price'] ?? $p->price);
             $p->promo_has_sale = !empty($pack['promotion']) ? 1 : 0;
 
@@ -95,7 +95,7 @@ class HomeController extends Controller
 
         $search_product = $this->attachProductPromos($search_product, $promoService);
 
-        // ✅ FE search: trả về pages.home (tạm dùng chung layout)
+        // FE search: trả về pages.home (tạm dùng chung layout)
         return view('pages.home', [
             'category'             => $cate_pro,
             'brand'                => $brand_pro,
@@ -116,7 +116,7 @@ class HomeController extends Controller
         $brand_pro = DB::table('brands')->where('status', 1)->get();
 
         $applier = app(ProductPromotionApplier::class);
-        // ✅ NOTE: đang lọc theo price gốc (nhanh). Nếu muốn lọc theo final_price mình sẽ nâng cấp sau.
+        // NOTE: đang lọc theo price gốc (nhanh). Nếu muốn lọc theo final_price mình sẽ nâng cấp sau.
         $all_product = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')

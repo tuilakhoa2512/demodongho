@@ -241,17 +241,17 @@ public function changePassword(Request $request)
     // Mật khẩu hiện tại sai
     if (!$user || !Hash::check($request->current_password, $user->password)) {
         return back()
-            ->with('success', 'Mật khẩu hiện tại không đúng')
-            ->withInput()
-            ->with('active_tab', 'password');
+            ->with('password_error', 'Mật khẩu hiện tại không đúng')
+            ->with('active_tab', 'password')
+            ->withInput();
     }
 
     // Không cho trùng mật khẩu cũ
     if (Hash::check($request->new_password, $user->password)) {
         return back()
-            ->with('success', 'Mật khẩu mới không được trùng mật khẩu hiện tại')
-            ->withInput()
-            ->with('active_tab', 'password');
+            ->with('password_error', 'Mật khẩu mới không được trùng mật khẩu hiện tại')
+            ->with('active_tab', 'password')
+            ->withInput();
     }
 
     // Update mật khẩu
@@ -262,7 +262,7 @@ public function changePassword(Request $request)
         ]);
 
     return back()
-        ->with('success', 'Đổi mật khẩu thành công')
+        ->with('password_success', 'Đổi mật khẩu thành công')
         ->with('active_tab', 'password');
 }
 

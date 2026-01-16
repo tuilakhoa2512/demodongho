@@ -62,3 +62,88 @@
     </div>
 </div>
 @endsection
+
+<style>
+/* ===============================
+   RESET PASSWORD FORM
+================================ */
+
+.reset-form {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 36px 40px;
+    width: 160%;
+}
+
+/* Title */
+.reset-form .title {
+    color: #D70018;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 20px;
+}
+
+/* Alert */
+.reset-form .alert {
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Label nhỏ giống form mật khẩu */
+.reset-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Input đồng bộ */
+.reset-form .form-control {
+    height: 46px;
+    border-radius: 6px;
+    border: 1px solid #dcdcdc;
+    font-size: 14px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Focus */
+.reset-form .form-control:focus {
+    border-color: #D70018;
+    box-shadow: 0 0 0 2px rgba(215, 0, 24, 0.12);
+}
+
+/* Button */
+.reset-btn {
+    display: block;
+    width: 260px;              /*  nút ngắn */
+    margin: 24px auto 0;       /*  căn giữa */
+    height: 46px;
+
+    background-color: #D70018;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+/* Hover */
+.reset-btn:hover {
+    background-color: #b80015;
+    transform: translateY(-1px);
+}
+
+/* Active */
+.reset-btn:active {
+    transform: scale(0.97);
+}
+</style>
+

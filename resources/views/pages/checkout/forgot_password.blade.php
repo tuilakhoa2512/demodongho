@@ -62,10 +62,10 @@
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 10px;
-    padding: 35px 40px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    padding: 170px 80px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    width: 165%;
 }
-
 /* ===== TITLE ===== */
 .title-forgot {
     color: #D70018;
@@ -122,6 +122,13 @@
 
 .back-login:hover {
     text-decoration: underline;
+}
+body > section > .container > .row > .col-sm-9.padding-left{
+    width: 90% !important;
+    float: none !important;         /* bỏ float của bootstrap */
+    margin: 0 auto !important;      /* căn giữa */
+    display: block !important;
+    
 }
 </style>
 

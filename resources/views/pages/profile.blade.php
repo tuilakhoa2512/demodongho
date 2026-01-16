@@ -151,8 +151,8 @@
             <div class="alert alert-danger">{{ session('password_error') }}</div>
         @endif
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+        @if(session('password_success'))
+            <div class="alert alert-success">{{ session('password_success') }}</div>
         @endif
 
         <form action="{{ route('profile.changePassword') }}" method="POST">
@@ -215,7 +215,7 @@
     display: none !important;
 }
 
-/* ===== MENU TÀI KHOẢN (GIỐNG DANH MỤC) ===== */
+/* ===== MENU TÀI KHOẢN ===== */
 .profile-menu {
     border: 1px solid #eee;
     padding: 20px;
@@ -312,7 +312,7 @@
 
 body > section > .container > .row > .col-sm-9.padding-right{
     width: 90% !important;
-    float: none !important;         /* bỏ float của bootstrap */
+    float: none !important;        
     margin: 0 auto !important;      /* căn giữa */
     display: block !important;
     
@@ -449,9 +449,9 @@ body > section > .container > .row > .col-sm-9.padding-right{
 
 /* Nút trong tab đổi mật khẩu */
 #tab-password .btn-save {
-    width: 260px;          /* 👈 độ dài nút */
+    width: 260px;          /* độ dài nút */
     max-width: 100%;
-    margin: 24px auto 0;   /* 👈 căn giữa */
+    margin: 24px auto 0;   /* căn giữa */
     display: block;
 
     height: 46px;
@@ -467,7 +467,7 @@ body > section > .container > .row > .col-sm-9.padding-right{
 
 /* Nút trong tab thông tin cá nhân */
 #tab-info .btn-save {
-    width: 260px;          /* 👈 cùng kích thước */
+    width: 260px;          /* cùng kích thước */
     max-width: 100%;
     margin: 24px auto 0;
     display: block;
@@ -494,7 +494,6 @@ body > section > .container > .row > .col-sm-9.padding-right{
 #tab-info .btn-save:active {
     transform: scale(0.97);
 }
-
 
 </style>
 
@@ -565,6 +564,81 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         showTab('info', document.querySelector('.btn-profile:nth-child(1)'));
     }
+
+});
+document.addEventListener('DOMContentLoaded', function () {
+
+    const passwordForm = document.querySelector('#tab-password form');
+
+    if (!passwordForm) return;
+
+    passwordForm.addEventListener('submit', function (e) {
+        e.preventDefault(); // chặn submit mặc định
+
+        const currentPassword = passwordForm.querySelector('[name="current_password"]').value.trim();
+        const newPassword     = passwordForm.querySelector('[name="new_password"]').value.trim();
+        const confirmPassword = passwordForm.querySelector('[name="new_password_confirmation"]').value.trim();
+
+        // 1 Mật khẩu hiện tại
+        if (!currentPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Vui lòng nhập mật khẩu hiện tại'
+            });
+            return;
+        }
+
+        // 2️ Mật khẩu mới
+        if (!newPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Vui lòng nhập mật khẩu mới'
+            });
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Mật khẩu phải có ít nhất 8 ký tự'
+            });
+            return;
+        }
+
+        if (!/[A-Z]/.test(newPassword)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Mật khẩu phải có ít nhất 1 chữ hoa'
+            });
+            return;
+        }
+
+        if (!/[0-9]/.test(newPassword)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Mật khẩu phải có ít nhất 1 chữ số'
+            });
+            return;
+        }
+
+        // 3️ Xác nhận mật khẩu
+        if (newPassword !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Xác nhận mật khẩu không khớp'
+            });
+            return;
+        }
+
+        //  Nếu qua hết → submit form
+        passwordForm.submit();
+    });
 
 });
 </script>

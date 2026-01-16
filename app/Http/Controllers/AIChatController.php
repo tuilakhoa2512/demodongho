@@ -331,7 +331,7 @@ foreach ($words as $word) {
     $word = trim($word);
 
     if (mb_strlen($word) < 3) continue;
-    if (in_array($word, $ignoreKeywords)) continue; // 🔥 BỎ QUA KEYWORD PHỤ
+    if (in_array($word, $ignoreKeywords)) continue; // BỎ QUA KEYWORD PHỤ
 
     if (
         (str_contains($userMessage, 'đồng hồ') || str_contains($userMessage, 'hiệu'))

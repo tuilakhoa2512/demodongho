@@ -84,6 +84,4 @@ public function clear()
     return back()->with('success', 'Đã xoá tất cả sản phẩm khỏi so sánh!');
 }
 
-
-
 }

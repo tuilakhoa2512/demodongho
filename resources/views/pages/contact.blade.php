@@ -1,6 +1,56 @@
 @extends('pages.layout')
 @section('content')
+<div class="contact-wrapper">
+    <h2 class="contact-title">Liên hệ với chúng tôi</h2>
+    <div class="contact-info">
+        <p><strong>Địa chỉ:</strong> 123 Dương Bá Trạc - Phường 4 - Quận 8 - TP. Hồ Chí Minh</p>
+        <p><strong>Số điện thoại:</strong> 0983 567 891</p>
+        <p><strong>Email:</strong> unkstore@gmail.com</p>
+    </div>
+    <hr>
+    <div class="contact-form">
+        <div class="contact-form">
 
+            {{-- Thông báo gửi thành công --}}
+            @if(session('success'))
+                <p style="color: green; margin-bottom: 15px;">
+                    {{ session('success') }}
+                </p>
+            @endif
+
+            {{-- Hiển thị lỗi validate --}}
+            @if($errors->any())
+                <ul style="color:red; margin-bottom:15px;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <form action="{{ route('contact.send') }}" method="POST">
+                @csrf
+
+                <label><strong>Tên của bạn</strong></label>
+                <input type="text"
+                    name="name"
+                    placeholder="Nhập tên của bạn"
+                    required>
+
+                <label><strong>Email</strong></label>
+                <input type="email"
+                    name="email"
+                    placeholder="Nhập email"
+                    required>
+
+                <label><strong>Nội dung cần liên hệ</strong></label>
+                <textarea name="message"
+                        placeholder="Bạn muốn gửi gì đến UnK STORE?"
+                        required></textarea>
+                <button type="submit" class="btn-send">Gửi</button>
+            </form>
+        </div>
+    </div>
+</div>
 <style>
     /* Ẩn sidebar chỉ ở trang Contact */
     .left-sidebar {
@@ -64,66 +114,4 @@
         font-weight: 600;
     }
 </style>
-
-<div class="contact-wrapper">
-
-    <h2 class="contact-title">Liên hệ với chúng tôi</h2>
-
-    <div class="contact-info">
-        <p><strong>Địa chỉ:</strong> 123 Dương Bá Trạc - Phường 4 - Quận 8 - TP. Hồ Chí Minh</p>
-        <p><strong>Số điện thoại:</strong> 0983 567 891</p>
-        <p><strong>Email:</strong> unkstore@gmail.com</p>
-    </div>
-
-    <hr>
-
-    <div class="contact-form">
-    <div class="contact-form">
-
-{{-- Thông báo gửi thành công --}}
-@if(session('success'))
-    <p style="color: green; margin-bottom: 15px;">
-        {{ session('success') }}
-    </p>
-@endif
-
-{{-- Hiển thị lỗi validate --}}
-@if($errors->any())
-    <ul style="color:red; margin-bottom:15px;">
-        @foreach($errors->all() as $error)
-            <li>{{ $error }}</li>
-        @endforeach
-    </ul>
-@endif
-
-<form action="{{ route('contact.send') }}" method="POST">
-    @csrf
-
-    <label><strong>Tên của bạn</strong></label>
-    <input type="text"
-           name="name"
-           placeholder="Nhập tên của bạn"
-           required>
-
-    <label><strong>Email</strong></label>
-    <input type="email"
-           name="email"
-           placeholder="Nhập email"
-           required>
-
-    <label><strong>Nội dung cần liên hệ</strong></label>
-    <textarea name="message"
-              placeholder="Bạn muốn gửi gì đến UnK STORE?"
-              required></textarea>
-
-    <button type="submit" class="btn-send">Gửi</button>
-</form>
-
-
-</div>
-
-    </div>
-
-</div>
-
 @endsection

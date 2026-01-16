@@ -1533,7 +1533,7 @@ h2.title {
     display: flex;
     flex-direction: column; /* Xếp theo cột */
     align-items: center;    /* Canh giữa theo chiều ngang */
-    padding: 30px;
+    padding: 32px 36px;
     
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -3014,9 +3014,9 @@ ul.nav.nav-pills.nav-justified i {
     background-color: #fff;
 
     padding: 35px;
-    margin-bottom: 60px;      /* ✅ TẠO KHOẢNG CÁCH ĐÁY */
+    margin-bottom: 60px;      /* TẠO KHOẢNG CÁCH ĐÁY */
     
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* ✅ nhìn rõ khung */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* nhìn rõ khung */
 }
 
 
