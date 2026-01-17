@@ -87,7 +87,21 @@
 								 }
 								?>
 								
-								<li><a href="{{ URL::to('/cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li>
+								<!-- <li><a href="{{ URL::to('/cart') }}"><i class="fa fa-shopping-cart"></i>Giỏ Hàng</a></li> -->
+								 <li>
+									<a href="{{ URL::to('/cart') }}" class="cart-link">
+										<i class="fa fa-shopping-cart"></i>
+										Giỏ Hàng
+
+										@if(($cartCount ?? 0) > 0)
+											<span id="cart-count" class="cart-badge">( {{ $cartCount }} )</span>
+										@else
+											<span id="cart-count" class="cart-badge" style="display:none;">0</span>
+										@endif
+									</a>
+								</li>
+
+
 								<?php
 									$id = Session::get('id');
 									$fullname = Session::get('fullname');

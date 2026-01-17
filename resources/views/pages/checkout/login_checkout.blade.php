@@ -6,9 +6,9 @@
     <div class="row justify-content-center">
     <div class="col-sm-9 d-flex justify-content-center" style="padding-right: 15px;">
             <div class="login-form p-4" 
-                 style="border: 1px solid #ddd; border-radius: 10px; background-color: #fff; width: 114%; padding: 93px;">
+                 style="border: 1px solid #ddd; border-radius: 10px; background-color: #fff; width: 100%; padding: 93px;">
                  
-                <h2 class="title text-center mb-4 ">Đăng nhập</h2>
+                <h2 class="title text-center mb-4">Đăng Nhập</h2>
               
 
                 @if(session('error'))

@@ -156,6 +156,7 @@
                      id="price"
                      class="form-control"
                      min="0"
+                     max="99999999"
                      step="1000"
                      value="{{ old('price') }}"
                      required>

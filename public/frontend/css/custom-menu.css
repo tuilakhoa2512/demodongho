@@ -20,11 +20,20 @@
 .navbar-nav > .active > a:hover,
 .navbar-nav > .active > a:focus {
    
-    color: #d70018 !important; /* hoặc giữ nguyên #333 */
+    color: #d70018 !important;
 }
+
+.navbar-nav > li > a {
+    display: inline-block; 
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
 .navbar-nav > li > a:hover {
-    color: #333 !important;
+    color: #ffffff !important;
+    transform: scale(1.12);
+    border: 2px;
 }
+
 .navbar-nav .dropdown-menu {
   
     border: none !important;

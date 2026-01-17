@@ -95,7 +95,7 @@ Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
 Route::get('/tim-kiem', [HomeController::class, 'search'])->name('search');
 
-Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
+//Route::get('/product/{id}', [App\Http\Controllers\ProductDetailController::class, 'show']);
 
 //Review
 // Lưu review 
@@ -266,8 +266,7 @@ Route::get('/all-reviews-user', [AdminUserController::class, 'all_reviews_user']
 
   //Sale
   Route::get('/sales', [SaleController::class, 'index'])->name('sales.product');
-  Route::get('/product/{id}', [ProductDetailController::class, 'show'])
-    ->name('product.detail');
+  Route::get('/product/{id}', [ProductDetailController::class, 'show'])->name('product.detail');
 
 // ================= TRONG PREFIX ADMIN =================
 

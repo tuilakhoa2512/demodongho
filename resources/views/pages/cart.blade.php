@@ -29,7 +29,7 @@
     @endif
 
     {{-- EMPTY --}}
-    @if(empty($cart))
+    <div id="cart-empty" style="{{ empty($cart) ? '' : 'display:none' }}">
         <div class="order-card">
             <div class="empty-box">
                 Hiện chưa có sản phẩm nào trong giỏ hàng.
@@ -38,7 +38,7 @@
                 </div>
             </div>
         </div>
-    @else
+    </div>
 
         @php
             // đảm bảo không null
@@ -55,6 +55,7 @@
             $count = is_countable($cart ?? null) ? count($cart) : 0;
         @endphp
 
+    <div id="cart-box" style="{{ empty($cart) ? 'display:none' : '' }}">
         <form action="{{ route('cart.update') }}" method="POST">
             @csrf
 
@@ -101,18 +102,27 @@
                                     : ($finalPrice * $qty);
                             @endphp
 
-                            <tr>
-                                {{-- IMAGE --}}
+                            <tr id="row-{{ $id }}">
+                                <!-- <td style="text-align:center;">
+                                    <a href="{{ url('/product/'.$id) }}" class="text-decoration-none">
+                                        <img src="{{ $image }}" class="od-thumb" alt="product">
+                                    </a>
+                                </td> -->
+
+                                
                                 <td style="text-align:center;">
                                     <img src="{{ $image }}" class="od-thumb" alt="product">
                                 </td>
 
-                                {{-- PRODUCT --}}
-                                <td class="col-name text-wrap" style="font-weight:800;">
-                                    {{ $name }}
+                            
+                               <td class="col-name text-wrap" style="font-weight:800;">
+                                        {{ $name }}
                                 </td>
 
-                                {{-- PRICE --}}
+                                <!-- <a href="{{ url('/product/'.$id) }}" style="color:#000; text-decoration:none;">
+                                    </a> -->
+
+
                                 <td style="text-align:center;">
                                     <div class="od-price">
                                         <span class="od-price-sale">
@@ -133,10 +143,12 @@
                                         <button type="button" class="qty-btn qty-minus">−</button>
 
                                         <input type="text"
-                                               readonly
-                                               name="quantities[{{ $id }}]"
-                                               value="{{ $qty }}"
-                                               class="cart-qty-input">
+                                            readonly
+                                            name="quantities[{{ $id }}]"
+                                            value="{{ $qty }}"
+                                            class="cart-qty-input"
+                                            id="qty-{{ $id }}"
+                                            data-product="{{ $id }}">
 
                                         <button type="button" class="qty-btn qty-plus">+</button>
                                     </div>
@@ -145,19 +157,18 @@
                                 </td>
 
                                 {{-- LINE TOTAL --}}
-                                <td style="text-align:center;" class="text-red">
+                                <td style="text-align:center;" class="text-red" id="line-total-{{ $id }}">
                                     {{ number_format($lineTotal, 0, ',', '.') }} đ
                                 </td>
 
                                 {{-- REMOVE --}}
                                 <td style="text-align:center;">
-                                    <button type="submit"
+                                    <button type="button"
                                             class="btn-remove"
-                                            formaction="{{ route('cart.remove') }}"
-                                            name="product_id"
-                                            value="{{ $id }}">
+                                            data-product="{{ $id }}">
                                         Xóa
                                     </button>
+
                                 </td>
                             </tr>
                         @endforeach
@@ -169,7 +180,7 @@
                 <div class="summary-box" style="margin-top:12px;">
                     <div class="sum-row">
                         <span>Tạm tính:</span>
-                        <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
+                        <strong id="sum-subtotal">{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
                     </div>
 
                     {{-- ORDER PROMO + CODE (new system) --}}
@@ -185,7 +196,7 @@
                             @endif
                         </span>
 
-                        <strong>
+                        <strong id="sum-discount">
                             @if($billDiscountAmount > 0)
                                 -{{ number_format($billDiscountAmount, 0, ',', '.') }} đ
                             @else
@@ -195,29 +206,19 @@
                     </div>
 
                     <div class="sum-row total">
-                        <span>Tổng thanh toán:</span>
-                        <strong class="text-red">{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
+                        <span>Tổng Thanh Toán:</span>
+                        <strong class="text-red" id="sum-total">{{ number_format($grandTotal, 0, ',', '.') }} đ</strong>
                     </div>
 
-                    {{-- Debug (nếu cần) --}}
-                    {{--
-                    @if(!empty($quote))
-                        <div style="margin-top:6px; font-size:12px; color:#777;">
-                            Quote: subtotal={{ $quote['subtotal'] ?? '' }},
-                            discount={{ $quote['discount_amount'] ?? '' }},
-                            total={{ $quote['total'] ?? '' }}
-                        </div>
-                    @endif
-                    --}}
                 </div>
 
                 {{-- ACTIONS --}}
                 <div class="cart-actions">
                     <a href="{{ url('/trang-chu') }}" class="btn btn-default btn-back">Tiếp tục mua sắm</a>
 
-                    <button type="submit" class="btn btn-warning btn-update">
+                    <!-- <button type="submit" class="btn btn-warning btn-update">
                         Cập nhật
-                    </button>
+                    </button> -->
 
                     @if(Session::get('id'))
                         <a href="{{ url('/payment') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
@@ -228,14 +229,107 @@
 
             </div>
         </form>
-    @endif
+    </div>
 </div>
 
-{{-- JS QTY --}}
 <script>
+const csrf = "{{ csrf_token() }}";
+
+// ===== AJAX =====
+
+function updateCartAjax(productId, qty) {
+    fetch("{{ route('cart.update') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrf,
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({
+            quantities: { [productId]: qty }
+        })
+    })
+    .then(res => res.json())
+    .then(data => renderCart(data))
+    .catch(err => console.error('Update cart error:', err));
+}
+
+function removeCartAjax(productId) {
+    fetch("{{ route('cart.remove') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrf,
+            "Accept": "application/json"
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const row = document.getElementById('row-' + productId);
+        if (row) row.remove();
+        renderCart(data);
+    })
+    .catch(err => console.error('Remove cart error:', err));
+}
+
+function renderCart(data) {
+
+    // ===== UPDATE ROWS =====
+    Object.entries(data.cart).forEach(([id, row]) => {
+        const qtyEl = document.getElementById('qty-' + id);
+        const totalEl = document.getElementById('line-total-' + id);
+
+        if (qtyEl) qtyEl.value = row.quantity;
+        if (totalEl) {
+            totalEl.innerText =
+                new Intl.NumberFormat('vi-VN').format(row.line_total) + ' đ';
+        }
+    });
+
+    // ===== CART EMPTY TOGGLE =====
+    const cartBox = document.getElementById('cart-box');
+    const cartEmpty = document.getElementById('cart-empty');
+
+    if (data.count === 0) {
+        if (cartBox) cartBox.style.display = 'none';
+        if (cartEmpty) cartEmpty.style.display = 'block';
+    } else {
+        if (cartBox) cartBox.style.display = 'block';
+        if (cartEmpty) cartEmpty.style.display = 'none';
+    }
+
+    // ===== BADGE =====
+    const badge = document.getElementById('cart-count');
+    if (badge) {
+        if (data.count > 0) {
+            badge.innerText = '(' + data.count + ')';
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    // ===== SUMMARY =====
+    document.getElementById('sum-subtotal').innerText =
+        new Intl.NumberFormat('vi-VN').format(data.subtotal) + ' đ';
+
+    document.getElementById('sum-discount').innerText =
+        data.billDiscountAmount > 0
+            ? '-' + new Intl.NumberFormat('vi-VN').format(data.billDiscountAmount) + ' đ'
+            : '0 đ';
+
+    document.getElementById('sum-total').innerText =
+        new Intl.NumberFormat('vi-VN').format(data.total) + ' đ';
+}
+
+
+// ===== QTY EVENTS =====
+
 document.querySelectorAll('.qty-control').forEach(c => {
     const input = c.querySelector('input');
     const max = parseInt(c.dataset.max || '1', 10);
+    const pid = input.dataset.product;
 
     const getVal = () => {
         const v = parseInt(input.value || '1', 10);
@@ -243,13 +337,24 @@ document.querySelectorAll('.qty-control').forEach(c => {
     };
 
     c.querySelector('.qty-minus').onclick = () => {
-        const v = getVal();
-        input.value = Math.max(1, v - 1);
+        const v = Math.max(1, getVal() - 1);
+        input.value = v;
+        updateCartAjax(pid, v);
     };
 
     c.querySelector('.qty-plus').onclick = () => {
-        const v = getVal();
-        input.value = Math.min(max, v + 1);
+        const v = Math.min(max, getVal() + 1);
+        input.value = v;
+        updateCartAjax(pid, v);
+    };
+});
+
+// ===== REMOVE EVENTS =====
+
+document.querySelectorAll('.btn-remove').forEach(btn => {
+    btn.onclick = () => {
+        const pid = btn.dataset.product;
+        removeCartAjax(pid);
     };
 });
 </script>
