@@ -150,7 +150,7 @@ class ProductTypeController extends Controller
         return redirect()->route('admin.addproducttype')
         ->with('message', 'Cập nhật sản phẩm thành công.');
     }
-public function show_category_home($category_slug)
+public function show_category_home(Request $request,$category_slug)
 {
     $cate_pro = DB::table('categories')
         ->where('status', '1')
@@ -165,18 +165,31 @@ public function show_category_home($category_slug)
     // lấy category theo slug
     $category = DB::table('categories')
         ->where('category_slug', $category_slug)
+        ->where('status',1)
         ->first();
 
     if (!$category) {
         abort(404);
     }
-
-    // CHỈ DÙNG ELOQUENT + RELATION
-    $category_by_id = Product::with('productImage')
+    // ===== QUERY GỐC (GIỮ NGUYÊN LOGIC) =====
+    $query = Product::with(['productImage','category','brand'])
         ->where('category_id', $category->id)
         ->where('status', 1)
+        ->where('stock_status', 'selling');
+
+    // ===== THÊM LỌC GIÁ (CHỈ KHI CÓ) =====
+    if ($request->filled('min_price')) {
+        $query->where('price', '>=', (float) $request->min_price);
+    }
+
+    if ($request->filled('max_price')) {
+        $query->where('price', '<=', (float) $request->max_price);
+    }
+    // CHỈ DÙNG ELOQUENT + RELATION
+    $category_by_id = $query
         ->orderByDesc('id')
-        ->paginate(6);
+        ->paginate(6)
+        ->appends($request->query());
 
     return view('pages.category.show_category')
         ->with('category', $cate_pro)

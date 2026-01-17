@@ -294,7 +294,7 @@
 						</div><!--/brand-products-->
 						
 
-					<form action="{{ url('/filter-price') }}" method="GET" id="price-filter-form">
+						<form action="{{ url()->current() }}" method="GET" id="price-filter-form">
 						<div class="price-range">
 							<h2>Tầm Giá</h2>
 							<div class="text-center">
@@ -326,6 +326,10 @@
 						</div>
 					</form>
 
+					@foreach(request()->except(['min_price','max_price','page']) as $key => $value)
+						<input type="hidden" name="{{ $key }}" value="{{ $value }}">
+					@endforeach
+					
 					</div>
 				</div>
 
@@ -422,45 +426,42 @@
 <script>
 $(document).ready(function () {
 
-    const RATE = 25000; // 1$ = 25.000 VNĐ
-
     var slider = new Slider("#sl2", {
         min: 0,
-        max: 4000,    // $4000 = 100 triệu VNĐ
-        step: 50,
+        max: 100000000,
+        step: 500000,
         range: true,
         value: [
-            {{ floor(request('min_price', 0) / 25000) }},
-            {{ floor(request('max_price', 100000000) / 25000) }}
+            {{ request('min_price', 0) }},
+            {{ request('max_price', 100000000) }}
         ],
 
-        tooltip: 'show',    //  hiện giá khi rê
-        tooltip_split: true, //  hiện 2 tooltip cho min & max
+        tooltip: 'show',        // ✅ HIỆN TOOLTIP
+        tooltip_split: true,    // ✅ HIỆN 2 GIÁ (min & max)
 
         formatter: function (value) {
-            if (Array.isArray(value)) {
-                return '$ ' + value[0] + ' - $ ' + value[1];
-            }
-            return '$ ' + value;
+            // format tooltip sang VNĐ
+            return value.toLocaleString('vi-VN') + ' ₫';
         }
     });
 
+    slider.on("slide", function (value) {
+        // cập nhật text realtime khi rê
+        $('#price-range-text').text(
+            value[0].toLocaleString('vi-VN') + ' ₫ – ' +
+            value[1].toLocaleString('vi-VN') + ' ₫'
+        );
+    });
+
     slider.on("slideStop", function (value) {
-        let minVND = value[0] * RATE;
-        let maxVND = value[1] * RATE;
-
-        $('#min_price').val(minVND);
-        $('#max_price').val(maxVND);
-
-		 $('#price-range-text').text(
-        minVND.toLocaleString('vi-VN') + ' ₫ – ' +
-        maxVND.toLocaleString('vi-VN') + ' ₫'
-    );
-
+        $('#min_price').val(value[0]);
+        $('#max_price').val(value[1]);
         $('#price-filter-form').submit();
     });
+
 });
 </script>
+
 
 
 <script src="{{ asset('frontend/js/jquery.scrollUp.min.js')}}"></script>

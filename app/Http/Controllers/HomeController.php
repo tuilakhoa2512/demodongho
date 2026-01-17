@@ -35,35 +35,52 @@ class HomeController extends Controller
         return $products;
     }
 
-    public function index(PromotionService $promoService)
+    public function index(Request $request, PromotionService $promoService)
     {
         $cate_pro  = DB::table('categories')->where('status', 1)->orderBy('id', 'asc')->get();
         $brand_pro = DB::table('brands')->where('status', 1)->orderBy('id', 'asc')->get();
-
-        $all_product = Product::with(['productImage','category','brand'])
+    
+        // ===== GIỮ NGUYÊN QUERY GỐC, CHỈ ĐỔI TÊN BIẾN =====
+        $query = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
             ->whereHas('category', fn($q) => $q->where('status', 1))
-            ->whereHas('brand', fn($q) => $q->where('status', 1))
+            ->whereHas('brand', fn($q) => $q->where('status', 1));
+    
+        // ===== CHỈ THÊM LỌC TẦM GIÁ (NẾU CÓ) =====
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', (float) $request->min_price);
+        }
+    
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', (float) $request->max_price);
+        }
+    
+        // ===== PAGINATE GIỮ QUERY STRING =====
+        $all_product = $query
             ->inRandomOrder()
-            ->paginate(6);
-
+            ->paginate(6)
+            ->appends($request->query());
+    
+        // ===== GIỮ NGUYÊN RECOMMENDED =====
         $recommended_products = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')
             ->orderByDesc('created_at')
             ->take(6)
             ->get();
-
+    
+        // ===== GIỮ NGUYÊN PROMOTION =====
         $all_product = $this->attachProductPromos($all_product, $promoService);
         $recommended_products = $this->attachProductPromos($recommended_products, $promoService);
-
+    
         return view('pages.home')
             ->with('category', $cate_pro)
             ->with('brand', $brand_pro)
             ->with('all_product', $all_product)
             ->with('recommended_products', $recommended_products);
     }
+    
 
     public function search(Request $request, PromotionService $promoService)
     {

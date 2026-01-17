@@ -124,8 +124,6 @@ Route::prefix('location')->group(function () {
 
 
 // Danh mục sản phẩm trang chủ
-// Route::get('/danh-muc-san-pham/{id}', [ProductsaveTypeController::class, 'show_category_home']);
-// Route::get('/thuong-hieu-san-pham/{id}', [BrandProductController::class, 'show_brand_home']);
 Route::get('/danh-muc-san-pham/{category_slug}', [ProductTypeController::class, 'show_category_home'])->name('category.show');
 Route::get('/thuong-hieu-san-pham/{brand_slug}', [BrandProductController::class, 'show_brand_home'])->name('brand.show');
 Route::get('/danh-muc/{slug}', [ProductTypeController::class, 'showCategory'])->name('category.show');
