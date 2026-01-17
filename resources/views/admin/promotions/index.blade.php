@@ -103,19 +103,31 @@
 
               <td>
                 <a href="{{ route('admin.promotions.edit', $c->id) }}"
-                   class="btn btn-xs btn-info" title="Sửa Campaign + quản lý Rules/Targets/Codes">
-                  <i class="fa fa-pencil"></i>
+                   class="btn btn-xs" 
+                  style="background:none; border:none;"
+                   title="Sửa Campaign + quản lý Rules/Targets/Codes">
+                  <i class="fa fa-pencil-square-o text-success text-active" style="font-size:18px;"></i>
                 </a>
 
                 <form action="{{ route('admin.promotions.toggle-status', $c->id) }}"
                       method="POST"
                       style="display:inline-block;">
-                  @csrf
-                  @method('PATCH')
-                  <button type="submit" class="btn btn-xs btn-warning" title="Đổi trạng thái">
-                    <i class="fa fa-refresh"></i>
-                  </button>
+                    @csrf
+                    @method('PATCH')
+
+                    <button type="submit"
+                            style="border:none; background:none; padding:0;"
+                            title="{{ $c->status ? 'Ẩn khuyến mãi' : 'Hiển thị khuyến mãi' }}">
+
+                        @if($c->status)
+                            <i class="fa fa-eye-slash text-warning" style="font-size:18px;"></i>
+                        @else
+                            <i class="fa fa-eye text-warning" style="font-size:18px;"></i>
+                        @endif
+
+                    </button>
                 </form>
+
               </td>
             </tr>
           @empty

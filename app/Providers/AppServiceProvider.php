@@ -4,29 +4,25 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use App\Services\ProductPromotionApplier;
 use Illuminate\Pagination\Paginator;
+use App\Models\Cart;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
+    /* Register any application services.*/
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
+    /* Bootstrap any application services.*/
     public function boot(): void
     {
         Paginator::defaultView('vendor.pagination.number-only');
-        /* ===============================
-         |  SHARE CATEGORY & BRAND (CŨ)
-         =============================== */
+        /*  SHARE CATEGORY & BRAND (CŨ)*/
 
         // Danh mục
         $categories = DB::table('categories')
@@ -40,9 +36,7 @@ class AppServiceProvider extends ServiceProvider
             ->get();
         View::share('brand', $brands);
 
-        /* ===============================
-         |  GLOBAL APPLY PROMOTION (MỚI)
-         =============================== */
+        /* GLOBAL APPLY PROMOTION (MỚI)*/
 
         View::composer('*', function ($view) {
 
@@ -55,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
 
             $applier = app(ProductPromotionApplier::class);
 
-            // 1️⃣ Áp promotion cho 1 product
+            //  Áp promotion cho 1 product
             if (isset($data['product']) && $data['product']) {
                 $view->with(
                     'product',
@@ -63,13 +57,33 @@ class AppServiceProvider extends ServiceProvider
                 );
             }
 
-            // 2️⃣ Áp promotion cho danh sách products
+            //  Áp promotion cho danh sách products
             if (isset($data['products']) && $data['products']) {
                 $view->with(
                     'products',
                     $applier->apply($data['products'])
                 );
             }
+        });
+
+         /* CART COUNT */
+        View::composer('*', function ($view) {
+
+            $count = 0;
+
+            if (Session::get('id')) {
+                // User đã login → lấy từ DB
+                $count = Cart::where('user_id', Session::get('id'))
+                            ->sum('quantity');
+            } else {
+                // Guest → lấy từ session
+                $cart = Session::get('cart', []);
+                foreach ($cart as $item) {
+                    $count += (int) ($item['quantity'] ?? 0);
+                }
+            }
+
+            $view->with('cartCount', $count);
         });
     }
 }

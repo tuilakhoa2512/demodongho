@@ -111,7 +111,7 @@ class ProductController extends Controller
     }
 
     // =========================
-    // CRUD - giữ nguyên (không liên quan ưu đãi)
+    // CRUD 
     // =========================
 
     public function create()
@@ -155,7 +155,7 @@ class ProductController extends Controller
             'dial_size' => ['nullable', 'numeric', 'min:0', 'max:99.99'],
             'gender'    => ['nullable', 'in:male,female,unisex'],
 
-            'price'  => ['required', 'numeric', 'min:0'],
+            'price'  => ['required', 'numeric', 'min:0', 'max: 99999999'],
             'status' => ['nullable', 'in:0,1'],
 
             'image_1' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],

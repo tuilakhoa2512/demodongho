@@ -216,7 +216,12 @@ class CartController extends Controller
     public function update(Request $request)
     {
         $quantities = $request->input('quantities', []);
+
         if (empty($quantities)) {
+            if ($request->ajax() || $request->expectsJson()) {
+                return response()->json($this->buildAjaxCartResponse());
+            }
+
             return redirect()->route('cart.index');
         }
 
@@ -272,6 +277,10 @@ class CartController extends Controller
             Session::put('cart', $cart);
         }
 
+       if ($request->ajax() || $request->expectsJson()) {
+            return response()->json($this->buildAjaxCartResponse());
+        }
+
         return redirect()->route('cart.index')
             ->with('success', 'Cập nhật giỏ hàng thành công!');
     }
@@ -283,13 +292,17 @@ class CartController extends Controller
      */
     public function remove(Request $request)
     {
-        $this->removeByProductId((int)$request->input('product_id'));
+       $this->removeByProductId((int)$request->input('product_id'));
+
+        if ($request->ajax() || $request->expectsJson()) {
+            return response()->json($this->buildAjaxCartResponse());
+        }
+
         return redirect()->route('cart.index')->with('success', 'Đã xóa sản phẩm khỏi giỏ!');
+
     }
 
-    // =================================================
-    // =================== HELPERS =====================
-    // =================================================
+   
 
     private function customerId(): ?int
     {
@@ -351,4 +364,95 @@ class CartController extends Controller
             Session::put('cart', $cart);
         }
     }
+
+    //AJAX
+    private function buildAjaxCartResponse(): array
+    {
+        $rawCart = $this->getRawCart();
+
+        if (empty($rawCart)) {
+            return [
+                'cart' => [],
+                'count' => 0,
+                'subtotal' => 0,
+                'billDiscountAmount' => 0,
+                'grandTotal' => 0,
+                'total' => 0,
+            ];
+        }
+
+        $products = Product::with('productImage')
+            ->whereIn('id', array_keys($rawCart))
+            ->get()
+            ->keyBy('id');
+
+        $cart = [];
+        $subtotal = 0;
+
+        foreach ($rawCart as $pid => $qty) {
+            $product = $products->get($pid);
+            if (!$product) continue;
+
+            $qty = max(1, min((int)$qty, (int)$product->quantity));
+
+            // ✅ SYNC LẠI CART
+            $this->syncQty((int)$pid, (int)$qty);
+
+            $basePrice = (float)$product->price;
+            $pricePack = $this->promotionService->calcProductFinalPrice($product);
+            $finalPrice = (float)($pricePack['final_price'] ?? $basePrice);
+
+            $lineTotal = $finalPrice * $qty;
+            $subtotal += $lineTotal;
+
+            $cart[$pid] = [
+                'id' => $pid,
+                'quantity' => $qty,
+                'final_price' => $finalPrice,
+                'line_total' => $lineTotal,
+            ];
+        }
+
+        if (empty($cart)) {
+            return [
+                'cart' => [],
+                'count' => 0,
+                'subtotal' => 0,
+                'billDiscountAmount' => 0,
+                'grandTotal' => 0,
+                'total' => 0,
+            ];
+        }
+
+
+        $pricingItems = [];
+        foreach ($cart as $row) {
+            $pricingItems[] = [
+                'product_id'       => (int)$row['id'],
+                'qty'              => (int)$row['quantity'],
+                'unit_price_final' => (float)$row['final_price'],
+            ];
+        }
+
+        $quote = $this->orderPricingService->quote(
+            $pricingItems,
+            $this->customerId() ?? 0,
+            Session::get('promo_code')
+        );
+
+        $count = 0;
+        foreach ($cart as $row) {
+            $count += (int) $row['quantity'];
+        }
+
+        return [
+            'cart' => $cart,
+            'count' => $count,
+            'subtotal' => $subtotal,
+            'billDiscountAmount' => (float)($quote['discount_amount'] ?? 0),
+            'grandTotal' => (float)($quote['total'] ?? $subtotal),
+            'total' => (float)($quote['total'] ?? $subtotal),
+        ];
+    }
+
 }

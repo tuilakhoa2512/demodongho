@@ -92,14 +92,14 @@
         {{-- TOOLBAR ngoài form (tránh nested) --}}
         <div class="promo-toolbar">
           <button type="submit" class="btn btn-primary" form="campaign-update-form">
-            <i class="fa fa-save"></i> Lưu Campaign
+             Lưu Campaign
           </button>
 
           <form action="{{ route('admin.promotions.toggle-status', $c->id) }}" method="POST">
             @csrf
             @method('PATCH')
             <button type="submit" class="btn btn-warning">
-              <i class="fa fa-refresh"></i> Đổi trạng thái (Hiện/Ẩn)
+             Đổi trạng thái (Hiện/Ẩn)
             </button>
           </form>
 
