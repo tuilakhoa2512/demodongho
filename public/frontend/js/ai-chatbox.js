@@ -21,15 +21,16 @@ function addMessage(text, type) {
 
     const div = document.createElement('div');
     div.className = (type === 'user') ? 'ai-user' : 'ai-bot';
-    div.innerText = text;
+
+    // dùng innerHTML để render HTML
+    div.innerHTML = text;
 
     wrap.appendChild(div);
     container.appendChild(wrap);
     container.scrollTop = container.scrollHeight;
 
-    return wrap; // 🔥 QUAN TRỌNG
+    return wrap;
 }
-
 
 /* Hiển thị loading */
 function addLoading() {
@@ -39,7 +40,7 @@ function addLoading() {
     const div = document.createElement('div');
     div.className = 'ai-bot ai-loading';
     div.id = 'ai-loading';
-    div.innerText = 'Đang tư vấn...';
+    div.innerHTML = 'Đang tư vấn...';
 
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
@@ -64,6 +65,20 @@ function sendAIMessage() {
 
     const message = input.value.trim();
     if (!message) return;
+
+    /* RESET CHAT */
+    if (message.toLowerCase() === 'reset') {
+        const container = document.getElementById('ai-chat-messages');
+        container.innerHTML = `
+            <div class="ai-bot">
+                Chat đã được reset<br>
+                Tôi có thể hỗ trợ bạn tiếp nhé!<br>
+                <small style="color:#999">Nhập câu hỏi mới ✨</small>
+            </div>
+        `;
+        input.value = '';
+        return;
+    }
 
     // Hiển thị user message
     addMessage(message, 'user');
@@ -92,18 +107,14 @@ function sendAIMessage() {
     .then(data => {
         removeLoading();
 
-        /* =========================
-           1️⃣ HIỂN THỊ TEXT AI
-        ========================== */
         const aiWrap = addMessage(
             data.reply || 'Xin lỗi, hiện tôi chưa thể trả lời.',
             'ai'
         );
-        
+
         if (data.products && data.products.length > 0) {
-            renderProductCards(data.products, aiWrap); // 🔥 TRUYỀN WRAP
+            renderProductCards(data.products, aiWrap);
         }
-        
     })
     .catch(err => {
         console.error('Gemini AI error:', err);
@@ -111,7 +122,6 @@ function sendAIMessage() {
         addMessage('Xin lỗi, hệ thống AI đang bận.', 'ai');
     });
 }
-
 
 /* Load lịch sử chat */
 function loadChatHistory() {
@@ -129,13 +139,15 @@ function loadChatHistory() {
             if (messages.length === 0) {
                 container.innerHTML = `
                     <div class="ai-bot">
-                        Xin chào 👋 Tôi có thể hỗ trợ bạn về sản phẩm.
+                        Xin chào 👋 Tôi có thể hỗ trợ bạn về sản phẩm.<br>
+                        <small style="color:#999">
+                            Nhập <b>reset</b> để hỏi lại
+                        </small>
                     </div>
                 `;
                 return;
             }
 
-            // CÓ LỊCH SỬ → RENDER BÌNH THƯỜNG
             messages.forEach(m => {
                 const wrap = addMessage(
                     m.message,
@@ -150,7 +162,6 @@ function loadChatHistory() {
         .catch(err => console.error('Load history error:', err));
 }
 
-
 /* Setup nút xoá lịch sử */
 function setupClearChatButton() {
     const btn = document.getElementById('clearChatBtn');
@@ -160,17 +171,14 @@ function setupClearChatButton() {
 
     if (!btn || !popup) return;
 
-    // 🗑 Click icon → mở popup
     btn.addEventListener('click', () => {
         popup.classList.remove('hidden');
     });
 
-    // ❌ Huỷ
     cancelBtn.addEventListener('click', () => {
         popup.classList.add('hidden');
     });
 
-    // ✅ Xác nhận xoá
     okBtn.addEventListener('click', () => {
         popup.classList.add('hidden');
 
@@ -190,9 +198,11 @@ function setupClearChatButton() {
             if (container) {
                 container.innerHTML = `
                     <div class="ai-bot">
-                        Lịch sử chat đã được xoá <br>
-                        Tôi có thể hỗ trợ bạn tiếp nhé!.
-                         Nhập reset để hỏi lại
+                        🗑️ Lịch sử chat đã được xoá<br>
+                        Tôi có thể hỗ trợ bạn tiếp nhé!<br>
+                        <small style="color:#999">
+                            Nhập <b>reset</b> để hỏi lại
+                        </small>
                     </div>
                 `;
             }
@@ -201,13 +211,13 @@ function setupClearChatButton() {
     });
 }
 
-
 /* DOM READY */
 document.addEventListener('DOMContentLoaded', () => {
     loadChatHistory();
     setupClearChatButton();
 });
-//View1
+
+/* Render product cards */
 function renderProductCards(products, messageWrap) {
     if (!products || products.length === 0 || !messageWrap) return;
 
