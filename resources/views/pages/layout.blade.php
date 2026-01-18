@@ -121,7 +121,7 @@
 											</ul>
 										</li>
 									@else
-										<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng Nhập</a></li>
+										<li><a href="{{ URL::to('/login-checkout') }}"><i class="fa fa-lock"></i>Đăng Nhập</a></li>
 									@endif
 
 								

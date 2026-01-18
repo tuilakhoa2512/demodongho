@@ -138,7 +138,8 @@ private function detectGender(string $message): ?string
             'gender' => null,
             'strap'  => null,
             'brand'  => null,
-            'price'  => null,
+            'price_min' => null,
+            'price_max' => null,
         ]);
 
         //lọc sản phẩm
@@ -173,7 +174,6 @@ private function detectGender(string $message): ?string
                     // ĐỔI BRAND → RESET FILTER PHỤ
                     $context['gender'] = null;
                     $context['strap']  = null;
-                    $context['price']  = null;
                 }
                 
                 $context['brand'] = $brand->id;
@@ -225,15 +225,21 @@ private function detectGender(string $message): ?string
         session()->forget('ai_filter');
         }
         
-
-    
-        //Giá (triệu)
-
-        if (preg_match('/dưới\s*(\d+)/', $userMessage, $m)) {
-            $maxPrice = ((int)$m[1]) * 1_000_000;
+        //Giá dưới (triệu)
+        if (preg_match('/(dưới|<)\s*(\d+)\s*(triệu|tr)?/u', $userMessage, $m)) {
+            $maxPrice = ((int)$m[2]) * 1_000_000;
+            $context['price_max'] = $maxPrice;
             $query->where('price', '<=', $maxPrice);
             $hasValidFilter = true;
         }
+        // Giá trên (triệu)
+        if (preg_match('/(trên|>)\s*(\d+)\s*(triệu|tr)?/u', $userMessage, $m)) {
+            $minPrice = ((int)$m[2]) * 1_000_000;
+            $context['price_min'] = $minPrice;
+            $query->where('price', '>=', $minPrice);
+            $hasValidFilter = true;
+        }
+
         $resetKeywords = [
             'reset', 'bỏ lọc',
             'làm lại', 'tìm lại'
@@ -250,9 +256,13 @@ private function detectGender(string $message): ?string
             $query->where('brand_id', $context['brand']);
         }
         
-        if ($context['price']) {
-            $query->where('price', '<=', $context['price']);
+        if ($context['price_min']) {
+            $query->where('price', '>=', $context['price_min']);
         }
+        
+        if ($context['price_max']) {
+            $query->where('price', '<=', $context['price_max']);
+        }        
         
         foreach ($resetKeywords as $kw) {
             if (str_contains($userMessage, $kw)) {
@@ -321,28 +331,26 @@ $invalidBrand = null;
 $ignoreKeywords = [
     'nam', 'nữ',
     'da',  'nhựa', 'thép', 'không', 'gỉ',
+    'sản', 'pham', 'phẩm', 'san',
     'đồng', 'hồ',
     'rẻ', 'đắt',
     'dưới', 'trên', 'tầm', 'giá',
     'triệu'
 ];
 
-foreach ($words as $word) {
-    $word = trim($word);
+if ($askForBrand) {
+    foreach ($words as $word) {
+        $word = trim($word);
 
-    if (mb_strlen($word) < 3) continue;
-    if (in_array($word, $ignoreKeywords)) continue; // BỎ QUA KEYWORD PHỤ
+        if (mb_strlen($word) < 3) continue;
+        if (in_array($word, $ignoreKeywords)) continue;
 
-    if (
-        (str_contains($userMessage, 'đồng hồ') || str_contains($userMessage, 'hiệu'))
-        && !in_array($word, $brandNames)
-    ) {
-        $invalidBrand = $word;
-        break;
+        if (!in_array($word, $brandNames)) {
+            $invalidBrand = $word;
+            break;
+        }
     }
 }
-
-
 
  // TRẢ VỀ SỚM NẾU HÃNG KHÔNG TỒN TẠI
 
@@ -368,8 +376,9 @@ if (!$hasValidFilter && session()->has('ai_filter_context')) {
 if (!$hasValidFilter) {
     $reply = '😅 Mình chưa hiểu rõ yêu cầu của bạn. Bạn có thể hỏi theo ví dụ như:
 - đồng hồ nam
-- đồng hồ nữ dây da
-- đồng hồ tissot dưới 10 triệu';
+- đồng hồ nữ
+- đồng hồ nữ/nam dây da
+- đồng hồ (hiệu)tissot dưới/trên 10 triệu';
 
     AIChatMessage::create([
         'session_id' => $sessionId,
@@ -386,7 +395,7 @@ if (!$hasValidFilter) {
 
 if (
     !$hasValidFilter &&
-    mb_strlen($userMessage) <= 3
+    !preg_match('/(nam|nữ|trên|dưới|triệu|da|nhựa|thép|hãng|hiệu)/u', $userMessage)
 ) {
     return response()->json([
         'reply'    => '😅 Mình chưa hiểu yêu cầu. Bạn có thể hỏi: đồng hồ nam, đồng hồ nữ dây da...',
@@ -430,10 +439,6 @@ if ($products->count() > 0 && !$hasStrap && $gender) {
         'products' => $productsForUI
     ]);
 }
-
-        
-
-
 
          // KHÔNG CÓ SẢN PHẨM
 
