@@ -111,6 +111,7 @@ private function detectGender(string $message): ?string
     {
         AIChatMessage::where('session_id', $this->sessionId())->delete();
         session()->forget('ai_filter_context');
+        session()->forget('ai_filter');
         return response()->json(['status' => 'ok']);
     }
 
@@ -125,7 +126,6 @@ private function detectGender(string $message): ?string
         $sessionId   = $this->sessionId();
         $userMessage = trim($request->message);
 
-        
         //Lưu user message
         AIChatMessage::create([
             'session_id' => $sessionId,
@@ -166,20 +166,14 @@ private function detectGender(string $message): ?string
         
             if (str_contains($normalizedUser, $normalizedBrand)) {
         
-                // reset brand cũ nếu đổi hãng
-                if (
-                    empty($context['brand']) ||
-                    $context['brand'] !== $brand->id
-                ) {
-                    // ĐỔI BRAND → RESET FILTER PHỤ
-                    $context['gender'] = null;
-                    $context['strap']  = null;
-                }
-                
-                $context['brand'] = $brand->id;
+                $context['brand']     = $brand->id;
+                $context['gender']    = null;
+                $context['strap']     = null;
+                $context['price_min'] = null;
+                $context['price_max'] = null;
+            
                 $hasValidFilter = true;
                 $brandDetectedThisTurn = true;
-                
                 break;
             }
         }
@@ -191,11 +185,11 @@ private function detectGender(string $message): ?string
         if ($gender) {
             // $query->where('gender', $gender);
             $context['gender'] = $gender;
-            $context['strap']  = null; // reset strap khi đổi giới tính
+            $context['strap']  = null;// reset strap khi đổi giới tính
+            $context['price_min']  = null;
+            $context['price_max']  = null; 
             $hasValidFilter = true;
         }
-
-        
         //Dây đeo
          
         $hasStrap = false;
@@ -225,25 +219,85 @@ private function detectGender(string $message): ?string
         session()->forget('ai_filter');
         }
         
-        //Giá dưới (triệu)
-        if (preg_match('/(dưới|<)\s*(\d+)\s*(triệu|tr)?/u', $userMessage, $m)) {
-            $maxPrice = ((int)$m[2]) * 1_000_000;
-            $context['price_max'] = $maxPrice;
-            $query->where('price', '<=', $maxPrice);
-            $hasValidFilter = true;
-        }
-        // Giá trên (triệu)
-        if (preg_match('/(trên|>)\s*(\d+)\s*(triệu|tr)?/u', $userMessage, $m)) {
-            $minPrice = ((int)$m[2]) * 1_000_000;
-            $context['price_min'] = $minPrice;
-            $query->where('price', '>=', $minPrice);
-            $hasValidFilter = true;
-        }
+        // =====================
+// LỌC GIÁ – CHUẨN
+// =====================
+
+// ----- GIÁ TRÊN (triệu / tr) -----
+if (preg_match('/(trên|>)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
+
+    $minPrice = ((int)$m[2]) * 1_000_000;
+
+    // RESET FILTER CŨ
+    $context['strap']  = null;
+    $context['brand']  = null;
+    $context['price_min'] = $minPrice;
+    $context['price_max'] = null;
+
+    $hasValidFilter = true;
+}
+
+// ----- GIÁ DƯỚI (triệu / tr) -----
+if (preg_match('/(dưới|<)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
+
+    $maxPrice = ((int)$m[2]) * 1_000_000;
+
+    // RESET FILTER CŨ
+    $context['strap']  = null;
+    $context['brand']  = null;
+
+    $context['price_max'] = $maxPrice;
+    $context['price_min'] = null;
+
+    $hasValidFilter = true;
+}
+
+// ----- GIÁ NHẬP TRỰC TIẾP (4000000) -----
+if (preg_match('/(trên|>)?\s*(\d{7,})/u', $userMessage, $m)) {
+
+    $price = isset($m[2]) ? (int)$m[2] : (int)$m[1];
+
+    if ($price >= 1_000_000) {
+
+        // RESET FILTER CŨ
+        $context['strap']  = null;
+        $context['brand']  = null;
+
+        $context['price_min'] = $price;
+        $context['price_max'] = null;
+
+        $hasValidFilter = true;
+    }
+}
 
         $resetKeywords = [
             'reset', 'bỏ lọc',
             'làm lại', 'tìm lại'
         ];
+        
+        foreach ($resetKeywords as $kw) {
+            if (str_contains($userMessage, $kw)) {
+
+                session()->forget('ai_filter_context');
+                session()->forget('ai_filter');
+
+                AIChatMessage::create([
+                    'session_id' => $sessionId,
+                    'user_id'    => $this->userId(),
+                    'role'       => 'ai',
+                    'message'    => '👍 Mình đã reset bộ lọc. Bạn muốn tìm đồng hồ như thế nào?'
+                ]);
+        
+                return response()->json([
+                    'reply'    => '👍 Mình đã reset bộ lọc. Bạn muốn tìm đồng hồ như thế nào?',
+                    'products' => []
+                ]);
+            }
+        }
+        
+        // LƯU NGỮ CẢNH SAU KHI PARSE USER MESSAGE
+        session()->put('ai_filter_context', $context);
+
         if ($context['gender']) {
             $query->where('gender', $context['gender']);
         }
@@ -263,27 +317,65 @@ private function detectGender(string $message): ?string
         if ($context['price_max']) {
             $query->where('price', '<=', $context['price_max']);
         }        
-        
-        foreach ($resetKeywords as $kw) {
-            if (str_contains($userMessage, $kw)) {
-                session()->forget('ai_filter_context');
-        
-                AIChatMessage::create([
-                    'session_id' => $sessionId,
-                    'user_id'    => $this->userId(),
-                    'role'       => 'ai',
-                    'message'    => '👍 Mình đã reset bộ lọc. Bạn muốn tìm đồng hồ như thế nào?'
-                ]);
-        
-                return response()->json([
-                    'reply'    => '👍 Mình đã reset bộ lọc. Bạn muốn tìm đồng hồ như thế nào?',
-                    'products' => []
-                ]);
-            }
-        }
-        
-        // LƯU NGỮ CẢNH SAU KHI PARSE USER MESSAGE
-        session()->put('ai_filter_context', $context);
+        // ===============================
+// CASE: chỉ nhập "đồng hồ nam / nữ"
+// ===============================
+if (
+    $context['gender']
+    && !$context['strap']
+    && !$context['brand']
+    && !$context['price_min']
+    && !$context['price_max']
+) {
+    $products = $query->get();
+
+    if ($products->isEmpty()) {
+        return response()->json([
+            'reply'    => 'Hiện shop chưa có sản phẩm phù hợp với yêu cầu của bạn.',
+            'products' => []
+        ]);
+    }
+
+    $productsForUI = [];
+
+    foreach ($products as $p) {
+        $image = DB::table('product_images')
+            ->where('product_id', $p->id)
+            ->value('image_1');
+
+        $productsForUI[] = [
+            'id'    => $p->id,
+            'name'  => $p->name,
+            'price' => number_format($p->price) . ' ₫',
+            'image' => $image ? asset('storage/' . $image) : asset('images/no-image.png'),
+            'link'  => url('/product/' . ($p->slug ?? $p->id))
+        ];
+    }
+
+    // Lưu gender để hỏi tiếp bước dây
+    session([
+        'ai_filter' => [
+            'gender' => $context['gender']
+        ]
+    ]);
+
+    $reply = "Shop có đồng hồ " . ($context['gender'] === 'male' ? 'nam' : 'nữ') . " 👍  
+👉 Bạn thích loại dây nào (dây da, dây nhựa, thép không gỉ)?";
+
+    AIChatMessage::create([
+        'session_id' => $sessionId,
+        'user_id'    => $this->userId(),
+        'role'       => 'ai',
+        'message'    => $reply,
+        'products'   => $productsForUI
+    ]);
+
+    return response()->json([
+        'reply'    => $reply,
+        'products' => $productsForUI
+    ]);
+}
+
 
 
  //XỬ LÝ TRẢ LỜI TIẾP THEO (dựa trên context cũ)
@@ -329,7 +421,6 @@ $invalidBrand = null;
  //Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại)
  
 $ignoreKeywords = [
-    'nam', 'nữ',
     'da',  'nhựa', 'thép', 'không', 'gỉ',
     'sản', 'pham', 'phẩm', 'san',
     'đồng', 'hồ',
@@ -369,9 +460,6 @@ if ($invalidBrand) {
         'products' => []
     ]);
 }
-if (!$hasValidFilter && session()->has('ai_filter_context')) {
-    session()->forget('ai_filter_context');
-}
 
 if (!$hasValidFilter) {
     $reply = '😅 Mình chưa hiểu rõ yêu cầu của bạn. Bạn có thể hỏi theo ví dụ như:
@@ -403,42 +491,13 @@ if (
     ]);
 }
 
-        $products = $query->limit(6)->get();
+        $products = $query->get();
 
 if (!isset($productsForUI)) {
     $productsForUI = [];
 }
 
         $followUpQuestion = null;
-
-
-
-//HIỆN SẢN PHẨM TRƯỚC VÀ HỎI NGƯỢC
-
-if ($products->count() > 0 && !$hasStrap && $gender) {
-
-    //LƯU CONTEXT VÀO SESSION
-    session([
-        'ai_filter' => [
-            'gender' => $gender
-        ]
-    ]);
-
-    $reply = "Shop có đồng hồ " . ($gender === 'male' ? 'nam' : 'nữ') . " 👍  
-👉 Bạn thích loại dây nào (dây da , dây nhựa , thép không gỉ?)";
-
-    AIChatMessage::create([
-        'session_id' => $sessionId,
-        'user_id'    => $this->userId(),
-        'role'       => 'ai',
-        'message'    => $reply
-    ]);
-
-    return response()->json([
-        'reply'    => $reply,
-        'products' => $productsForUI
-    ]);
-}
 
          // KHÔNG CÓ SẢN PHẨM
 
