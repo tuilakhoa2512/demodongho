@@ -14,7 +14,7 @@
     padding: 15px 18px;
     transition: none !important;
 }
-.navbar-nav > li > a:hover,
+
 .navbar-nav > li > a:focus,
 .navbar-nav > .active > a,
 .navbar-nav > .active > a:hover,
@@ -29,8 +29,8 @@
 }
 
 .navbar-nav > li > a:hover {
-    color: #ffffff !important;
-    transform: scale(1.12);
+    /* color: #ffffff !important; */
+    transform: scale(1.11);
     border: 2px;
 }
 

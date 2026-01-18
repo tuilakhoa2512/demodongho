@@ -54,7 +54,7 @@
                     <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        <label>Họ và tên</label>
+                        <label>Họ Và Tên</label>
                         <input type="text" name="fullname" class="form-control mb-3"
                                value="{{ $user->fullname }}"
                                maxlength="30"
