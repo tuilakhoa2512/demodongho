@@ -182,25 +182,24 @@
 						</div>
 					</div>
 					<div class="col-sm-5">
-    <form action="{{ route('search') }}" method="GET">
-        <div class="search_box pull-right" style="position: relative; width: 250px;">
+					<form action="{{ route('search') }}" method="GET">
+						<div class="search_box pull-right" style="position: relative; width: 250px;">
 
-            <input type="text"
-                   name="keywords"
-                   value="{{ request('keywords') }}"
-                   placeholder="Tìm kiếm sản phẩm"
-                   style="width: 100%; padding: 8px 35px 8px 12px; border-radius: 5px; border: 1px solid #ccc;">
+							<input type="text"
+								name="keywords"
+								value="{{ request('keywords') }}"
+								placeholder="Tìm kiếm sản phẩm"
+								style="width: 100%; padding: 8px 35px 8px 12px; border-radius: 5px; border: 1px solid #ccc;">
 
-            <button type="submit"
-                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-                           background: none; border: none; color: #555; cursor: pointer; font-size: 16px;">
-                <i class="fa fa-search"></i>
-            </button>
+							<button type="submit"
+									style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+										background: none; border: none; color: #555; cursor: pointer; font-size: 16px;">
+								<i class="fa fa-search"></i>
+							</button>
 
-        </div>
-    </form>
-</div>
-
+						</div>
+					</form>
+				</div>
 				</div>
 			</div>
 		</div><!--/header-bottom-->
@@ -450,8 +449,8 @@ $(document).ready(function () {
             {{ request('max_price', 100000000) }}
         ],
 
-        tooltip: 'show',        // ✅ HIỆN TOOLTIP
-        tooltip_split: true,    // ✅ HIỆN 2 GIÁ (min & max)
+        tooltip: 'show',        //  HIỆN TOOLTIP
+        tooltip_split: true,    //  HIỆN 2 GIÁ (min & max)
 
         formatter: function (value) {
             // format tooltip sang VNĐ

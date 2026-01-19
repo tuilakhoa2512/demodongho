@@ -11,22 +11,6 @@
       @endif
     </div>
 
-    @if (session('success'))
-      <script>
-        Swal.fire({
-          title: "Thành công!",
-          text: "{{ session('success') }}",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-      </script>
-    @endif
-
-    @if (session('error'))
-      <div class="alert alert-danger" style="margin:15px;">
-        {{ session('error') }}
-      </div>
-    @endif
 
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
@@ -51,19 +35,7 @@
       <div class="col-sm-4"></div>
 
       <div class="col-sm-3">
-        <form method="GET" action="{{ URL::to('/admin/orders') }}">
-          <div class="input-group">
-            <input type="text"
-                   name="keyword"
-                   value="{{ $keyword }}"
-                   class="input-sm form-control"
-                   placeholder="Tìm mã đơn / người nhận / SĐT...">
-            <input type="hidden" name="status" value="{{ $filterStatus }}">
-            <span class="input-group-btn">
-              <button class="btn btn-sm btn-default" type="submit">Tìm</button>
-            </span>
-          </div>
-        </form>
+        
       </div>
     </div>
 
@@ -77,6 +49,7 @@
             <th>Người nhận</th>
             <th>SĐT</th>
             <th>Thanh toán</th>
+            <th>gộp</th>
             <th>Tổng tiền</th>
             <th>Ngày đặt</th>
             <th style="width:120px;">Trạng thái</th>
@@ -117,6 +90,36 @@
               <td>{{ $receiverPhone }}</td>
 
               <td>{{ $o->payment_method ?? '—' }}</td>
+              <td><div style="text-item:center;display:flex;gap:10px;">
+                <form method="POST"
+                      action="{{ URL::to('/admin/orders/'.$o->order_code.'/status') }}"
+                      data-order="{{ $o->order_code }}"
+                      data-current="{{ $st }}"
+                      style="margin:0;">
+                  @csrf
+
+                  <select name="status"
+                          class="form-control input-sm order-status-select js-status-select">
+                    @foreach($statuses as $key => $label)
+                      <option value="{{ $key }}" {{ $st === $key ? 'selected' : '' }}>
+                        {{ $label }}
+                      </option>
+                    @endforeach
+                  </select>
+                </form>
+
+                @if($o->created_at)
+                  <div style="line-height:1.2;">
+                    <div>{{ \Carbon\Carbon::parse($o->created_at)->format('H:i') }}</div>
+                    <div style="font-size:12px; color:#777; font-weight: bold;">
+                      {{ \Carbon\Carbon::parse($o->created_at)->format('d/m/Y') }}
+                    </div>
+                  </div>
+                @else
+                  —
+                @endif
+              </td>
+              </div>
 
               <td style="color:#e60012; font-weight:800;">
                 {{ number_format((float)$o->total_price, 0, ',', '.') }} đ

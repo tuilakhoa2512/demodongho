@@ -142,60 +142,56 @@
                 </div>
             </div>
 
-            
-{{-- TAB ĐỔI MẬT KHẨU --}}
-<div id="tab-password" class="profile-tab-content" style="display:none">
-    <div class="profile-box">
+            {{-- TAB ĐỔI MẬT KHẨU --}}
+            <div id="tab-password" class="profile-tab-content" style="display:none">
+                <div class="profile-box">
 
-        @if(session('password_error'))
-            <div class="alert alert-danger">{{ session('password_error') }}</div>
-        @endif
+                    @if(session('password_error'))
+                        <div class="alert alert-danger">{{ session('password_error') }}</div>
+                    @endif
 
-        @if(session('password_success'))
-            <div class="alert alert-success">{{ session('password_success') }}</div>
-        @endif
+                    @if(session('password_success'))
+                        <div class="alert alert-success">{{ session('password_success') }}</div>
+                    @endif
 
-        <form action="{{ route('profile.changePassword') }}" method="POST">
-            @csrf
+                    <form action="{{ route('profile.changePassword') }}" method="POST">
+                        @csrf
 
-            {{-- EMAIL HIỂN THỊ (ĐÃ CHE) --}}
-            <label>Email</label>
-            <input type="text"
-                class="form-control mb-3"
-                value="{{ $maskedEmail }}"
-                disabled>
+                        {{-- EMAIL HIỂN THỊ (ĐÃ CHE) --}}
+                        <label>Email</label>
+                        <input type="text"
+                            class="form-control mb-3"
+                            value="{{ $maskedEmail }}"
+                            disabled>
 
-            {{-- EMAIL THẬT --}}
-            <input type="hidden" name="email" value="{{ $email }}"><br>
+                        {{-- EMAIL THẬT --}}
+                        <input type="hidden" name="email" value="{{ $email }}"><br>
 
-            {{-- MẬT KHẨU CŨ --}}
-            <label>Mật khẩu hiện tại</label>
-            <input type="password"
-                name="current_password"
-                class="form-control mb-3"
-                required>
+                        {{-- MẬT KHẨU CŨ --}}
+                        <label>Mật khẩu hiện tại</label>
+                        <input type="password"
+                            name="current_password"
+                            class="form-control mb-3"
+                            required>
 
-            {{-- MẬT KHẨU MỚI --}}
-            <label>Mật khẩu mới</label>
-            <input type="password"
-                name="new_password"
-                class="form-control mb-3"
-                required>
+                        {{-- MẬT KHẨU MỚI --}}
+                        <label>Mật khẩu mới</label>
+                        <input type="password"
+                            name="new_password"
+                            class="form-control mb-3"
+                            required>
 
-            {{-- XÁC NHẬN --}}
-            <label>Xác nhận mật khẩu mới</label>
-            <input type="password"
-                name="new_password_confirmation"
-                class="form-control mb-3"
-                required>
+                        {{-- XÁC NHẬN --}}
+                        <label>Xác nhận mật khẩu mới</label>
+                        <input type="password"
+                            name="new_password_confirmation"
+                            class="form-control mb-3"
+                            required>
 
-            <button class="btn-save">Đổi mật khẩu</button> 
-        </form>
-
-    </div>
-</div>
-
-
+                        <button class="btn-save">Đổi mật khẩu</button> 
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -317,10 +313,6 @@ body > section > .container > .row > .col-sm-9.padding-right{
     display: block !important;
     
 }
-
-/* ===============================
-   FORM ĐỔI MẬT KHẨU
-================================ */
 
 #tab-password .profile-box {
     max-width: 720px;

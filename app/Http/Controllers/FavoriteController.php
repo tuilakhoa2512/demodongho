@@ -73,7 +73,6 @@ class FavoriteController extends Controller
             return redirect('/login-checkout')
                 ->with('error', 'Bạn cần đăng nhập để yêu thích sản phẩm!');
         }
-
         //  ĐÃ LOGIN
         $favorite = Favorite::where('user_id', $user_id)
             ->where('product_id', $product_id)

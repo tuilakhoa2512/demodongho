@@ -61,7 +61,7 @@
 <script>
 document.querySelector("input[name='brand_product_name']").addEventListener("keyup", function() {
     let name = this.value;
-    
+
     // tạo slug
     let slug = name.toLowerCase() //chuyển từ chũ cái thành chữ thường
     // replace xử lý các ký tự có dấu Việt Nam và thay thế chúng bằng ký tự không dấu tương ứng.

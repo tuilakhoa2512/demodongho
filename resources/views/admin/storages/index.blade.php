@@ -68,10 +68,7 @@
 
       <div class="col-sm-3">
         <div class="input-group">
-          <input type="text" class="input-sm form-control" placeholder="Tìm theo mã lô / nhà cung cấp...">
-          <span class="input-group-btn">
-            <button class="btn btn-sm btn-default" type="button">Tìm</button>
-          </span>
+        
         </div>
       </div>
     </div>

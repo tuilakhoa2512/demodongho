@@ -158,7 +158,14 @@ private function detectGender(string $message): ?string
             ->where('status', 1)
             ->select('id', 'name')
             ->get();
-            
+
+            // LẤY DANH SÁCH STRAP MATERIAL TỪ DATABASE (ĐỘNG)
+            $allStraps = DB::table('products')
+            ->whereNotNull('strap_material')
+            ->select('strap_material')
+            ->distinct()
+            ->pluck('strap_material')
+            ->toArray();
 
         $normalizedUser = $this->normalizeText($userMessage);
         foreach ($allBrands as $brand) {
@@ -190,85 +197,71 @@ private function detectGender(string $message): ?string
             $context['price_max']  = null; 
             $hasValidFilter = true;
         }
-        //Dây đeo
-         
-        $hasStrap = false;
-        
-        if (str_contains($userMessage, 'nhựa')) {
-            // $query->where('strap_material', 'kim loại');
-            $context['strap'] = 'nhựa';
-            $hasValidFilter = true;
-            $hasStrap = true;
-            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
-        session()->forget('ai_filter');
-        }
-        else if (str_contains($userMessage, 'thép không gỉ')) {
-            // $query->where('strap_material', 'kim loại');
-            $context['strap'] = 'thép không gỉ';
-            $hasValidFilter = true;
-            $hasStrap = true;
-            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
-        session()->forget('ai_filter');
-        }
-        else if (str_contains($userMessage, 'da')) {
-            // $query->where('strap_material', 'da');
-            $context['strap'] = 'da';
-            $hasValidFilter = true;
-            $hasStrap = true;
-            // CLEAR CONTEXT SAU KHI ĐÃ CHỌN XONG
-        session()->forget('ai_filter');
+        // DÂY ĐEO – LỌC ĐỘNG THEO DATABASE
+        $normalizedUser = $this->normalizeText($userMessage);
+
+        foreach ($allStraps as $strap) {
+
+            $normalizedStrap = $this->normalizeText($strap);
+
+            if (str_contains($normalizedUser, $normalizedStrap)) {
+
+                $context['strap'] = $strap;
+                $hasValidFilter   = true;
+
+                // khi user đã chọn strap thì không cần hỏi lại
+                session()->forget('ai_filter');
+
+                break;
+            }
         }
         
-        // =====================
-// LỌC GIÁ – CHUẨN
-// =====================
+        // ----- GIÁ TRÊN (triệu / tr) -----
+        if (preg_match('/(trên|>)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
 
-// ----- GIÁ TRÊN (triệu / tr) -----
-if (preg_match('/(trên|>)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
+            $minPrice = ((int)$m[2]) * 1_000_000;
 
-    $minPrice = ((int)$m[2]) * 1_000_000;
+            // RESET FILTER CŨ
+            $context['strap']  = null;
+            $context['brand']  = null;
+            $context['price_min'] = $minPrice;
+            $context['price_max'] = null;
 
-    // RESET FILTER CŨ
-    $context['strap']  = null;
-    $context['brand']  = null;
-    $context['price_min'] = $minPrice;
-    $context['price_max'] = null;
+            $hasValidFilter = true;
+        }
 
-    $hasValidFilter = true;
-}
+        // ----- GIÁ DƯỚI (triệu / tr) -----
+        if (preg_match('/(dưới|<)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
 
-// ----- GIÁ DƯỚI (triệu / tr) -----
-if (preg_match('/(dưới|<)\s*(\d+)\s*(triệu|tr)/u', $userMessage, $m)) {
+            $maxPrice = ((int)$m[2]) * 1_000_000;
 
-    $maxPrice = ((int)$m[2]) * 1_000_000;
+            // RESET FILTER CŨ
+            $context['strap']  = null;
+            $context['brand']  = null;
 
-    // RESET FILTER CŨ
-    $context['strap']  = null;
-    $context['brand']  = null;
+            $context['price_max'] = $maxPrice;
+            $context['price_min'] = null;
 
-    $context['price_max'] = $maxPrice;
-    $context['price_min'] = null;
+            $hasValidFilter = true;
+        }
 
-    $hasValidFilter = true;
-}
+        // ----- GIÁ NHẬP TRỰC TIẾP (4000000) -----
+        if (preg_match('/(trên|>)?\s*(\d{7,})/u', $userMessage, $m)) {
 
-// ----- GIÁ NHẬP TRỰC TIẾP (4000000) -----
-if (preg_match('/(trên|>)?\s*(\d{7,})/u', $userMessage, $m)) {
+            $price = isset($m[2]) ? (int)$m[2] : (int)$m[1];
 
-    $price = isset($m[2]) ? (int)$m[2] : (int)$m[1];
+            if ($price >= 1_000_000) {
 
-    if ($price >= 1_000_000) {
+                // RESET FILTER CŨ
+                $context['strap']  = null;
+                $context['brand']  = null;
 
-        // RESET FILTER CŨ
-        $context['strap']  = null;
-        $context['brand']  = null;
+                $context['price_min'] = $price;
+                $context['price_max'] = null;
 
-        $context['price_min'] = $price;
-        $context['price_max'] = null;
-
-        $hasValidFilter = true;
-    }
-}
+                $hasValidFilter = true;
+            }
+        }
 
         $resetKeywords = [
             'reset', 'bỏ lọc',
@@ -317,9 +310,8 @@ if (preg_match('/(trên|>)?\s*(\d{7,})/u', $userMessage, $m)) {
         if ($context['price_max']) {
             $query->where('price', '<=', $context['price_max']);
         }        
-        // ===============================
+
 // CASE: chỉ nhập "đồng hồ nam / nữ"
-// ===============================
 if (
     $context['gender']
     && !$context['strap']
@@ -359,8 +351,12 @@ if (
         ]
     ]);
 
-    $reply = "Shop có đồng hồ " . ($context['gender'] === 'male' ? 'nam' : 'nữ') . " 👍  
-👉 Bạn thích loại dây nào (dây da, dây nhựa, thép không gỉ)?";
+    $strapListText = implode(', ', $allStraps);
+    $reply = "Shop có đồng hồ " 
+        . ($context['gender'] === 'male' ? 'nam' : 'nữ')
+        . " 👍  
+    👉 Bạn thích loại dây nào ($strapListText)?";
+    
 
     AIChatMessage::create([
         'session_id' => $sessionId,
@@ -376,8 +372,6 @@ if (
     ]);
 }
 
-
-
  //XỬ LÝ TRẢ LỜI TIẾP THEO (dựa trên context cũ)
  
 $sessionFilter = session('ai_filter');
@@ -391,7 +385,6 @@ if ($sessionFilter && !$gender) {
     }
 }
 
-      
  //Xác định user có ý định hỏi hãng hay không
 
 $askForBrand = false;
@@ -402,9 +395,6 @@ if (
 ) {
     $askForBrand = true;
 }
-
-
- // PHÁT HIỆN KEYWORD KHÔNG TỒN TẠI TRONG DB
 
 // Danh sách tên brand (lowercase)
 $brandNames = $allBrands
@@ -419,7 +409,6 @@ $words = preg_split('/\s+/', $userMessage);
 $invalidBrand = null;
 
  //Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại)
- 
 $ignoreKeywords = [
     'da',  'nhựa', 'thép', 'không', 'gỉ',
     'sản', 'pham', 'phẩm', 'san',
@@ -444,7 +433,6 @@ if ($askForBrand) {
 }
 
  // TRẢ VỀ SỚM NẾU HÃNG KHÔNG TỒN TẠI
-
 if ($invalidBrand) {
     $reply = "Xin lỗi 😥 shop hiện **không có sản phẩm hiệu \"$invalidBrand\"**.";
 
@@ -500,7 +488,6 @@ if (!isset($productsForUI)) {
         $followUpQuestion = null;
 
          // KHÔNG CÓ SẢN PHẨM
-
         if ($products->isEmpty()) {
             $reply = 'Hiện shop chưa có sản phẩm phù hợp với yêu cầu của bạn.';
 

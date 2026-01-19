@@ -164,7 +164,6 @@ style="position:fixed; bottom:0; left:300px; right:300px;
 
         </div>
     </div>
-
 </div>
 @endif
 

@@ -9,21 +9,15 @@ use Illuminate\Support\Facades\Session;
 
 class AdminStaffController extends BaseAdminController
 {
-    /**
-     * Trang index (nếu có)
-     */
+
+    //Trang index (nếu có)
     public function index()
     {
         $this->allowRoles([1]); // chỉ Admin Coder
         return view('admin.nhansu.index');
     }
 
-    /**
-     * ===============================
-     * KIỂM TRA QUYỀN XEM DANH SÁCH
-     * role: 1,3,4
-     * ===============================
-     */
+ //KIỂM TRA QUYỀN XEM DANH SÁCHrole: 1,3,4
     private function checkPermission()
     {
         if (!Session::has('admin_id')) {
@@ -41,12 +35,9 @@ class AdminStaffController extends BaseAdminController
         return null;
     }
 
-    /**
-     * ===============================
-     * DANH SÁCH NHÂN SỰ
-     * role_id = 1,3,4,5
-     * ===============================
-     */
+ 
+     //DANH SÁCH NHÂN SỰ role_id = 1,3,4,5
+  
     public function all_staff_user(Request $request)
     {
         if ($resp = $this->checkPermission()) {
@@ -73,12 +64,9 @@ class AdminStaffController extends BaseAdminController
         return view('admin.staff.all_staff_user', compact('staffs', 'filterStatus'));
     }
 
-    /**
-     * ===============================
-     * KIỂM TRA QUYỀN ĐÌNH CHỈ
-     * role: 1,3
-     * ===============================
-     */
+
+     //KIỂM TRA QUYỀN ĐÌNH CHỈ role: 1,3
+
     private function allowSuspendStaff()
     {
         if (!Session::has('admin_id')) {
@@ -96,11 +84,8 @@ class AdminStaffController extends BaseAdminController
         return null;
     }
 
-    /**
-     * ===============================
-     * ĐÌNH CHỈ NHÂN SỰ
-     * ===============================
-     */
+  
+    //ĐÌNH CHỈ NHÂN SỰ
     public function unactive_staff($id)
     {
         if ($resp = $this->allowSuspendStaff()) {
@@ -137,11 +122,8 @@ class AdminStaffController extends BaseAdminController
             ->with('success', 'Đã đình chỉ nhân sự');
     }
 
-    /**
-     * ===============================
-     * KÍCH HOẠT NHÂN SỰ
-     * ===============================
-     */
+ 
+      //KÍCH HOẠT NHÂN SỰ
     public function active_staff($id)
     {
         if ($resp = $this->allowSuspendStaff()) {
@@ -170,12 +152,9 @@ class AdminStaffController extends BaseAdminController
             ->with('success', 'Đã kích hoạt nhân sự');
     }
 
-    /**
-     * ===============================
-     * CẬP NHẬT PHÂN QUYỀN
-     * CHỈ ADMIN CODER
-     * ===============================
-     */
+ 
+   
+      //CẬP NHẬT PHÂN QUYỀN CHỈ ADMIN CODER
     public function update_staff_role(Request $request, $id)
     {
         if ((int) Session::get('admin_role_id') !== 1) {

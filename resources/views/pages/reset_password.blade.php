@@ -64,10 +64,6 @@
 @endsection
 
 <style>
-/* ===============================
-   RESET PASSWORD FORM
-================================ */
-
 .reset-form {
     background: #fff;
     border: 1px solid #ddd;

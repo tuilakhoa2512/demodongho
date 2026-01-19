@@ -17,16 +17,15 @@
     <div class="row" style="padding: 10px 15px;">
         <div class="col-sm-4">
             <form method="GET" action="{{ route('admin.reviewuser.index') }}" class="form-inline">
-                <select name="status" class="form-control input-sm">
-                    <option value="">Lọc trạng thái (Tất cả)</option>
-                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>
-                        Hiển thị
-                    </option>
-                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>
-                        Ẩn
-                    </option>
-                </select>
-
+            <select name="status" class="form-control input-sm">
+                <option value="">Lọc trạng thái (Tất cả)</option>
+                <option value="1" {{ isset($filterStatus) && $filterStatus == 1 ? 'selected' : '' }}>
+                    Hiển thị
+                </option>
+                <option value="0" {{ isset($filterStatus) && $filterStatus == 0 ? 'selected' : '' }}>
+                    Ẩn
+                </option>
+            </select>
                 <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">
                     Áp dụng
                 </button>

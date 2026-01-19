@@ -82,9 +82,11 @@
                         <tbody>
                         @foreach($cart as $item)
                             @php
+                           
+
                                 // chuẩn hoá dữ liệu
                                 $id = (int) ($item['id'] ?? 0);
-                                $name = $item['name'] ?? 'Sản phẩm';
+                                $name = $item['name'] ?? 'Sản phẩm' ;
                                 $image = $item['image'] ?? asset('frontend/images/noimage.jpg');
 
                                 $basePrice  = (float) ($item['base_price'] ?? 0);
@@ -102,7 +104,11 @@
                                     : ($finalPrice * $qty);
                             @endphp
 
-                            <tr id="row-{{ $id }}">
+                            <tr id="row-{{ $id }}"> 
+                            
+                        
+                                 <!-- $loop->iteration -->
+                            
                                 <!-- <td style="text-align:center;">
                                     <a href="{{ url('/product/'.$id) }}" class="text-decoration-none">
                                         <img src="{{ $image }}" class="od-thumb" alt="product">
@@ -115,7 +121,7 @@
                                 </td>
 
                             
-                               <td class="col-name text-wrap" style="font-weight:800;">
+                               <td class="col-name text-wrap" style="font-weight:800;">                        
                                         {{ $name }}
                                 </td>
 

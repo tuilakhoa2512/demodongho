@@ -47,10 +47,7 @@
 
       <div class="col-sm-4">
         <div class="input-group">
-          <input type="text" class="input-sm form-control" placeholder="Tìm kiếm (chưa làm)">
-          <span class="input-group-btn">
-            <button class="btn btn-sm btn-default" type="button">Go!</button>
-          </span>
+          
         </div>
       </div>
     </div>

@@ -108,9 +108,8 @@ class AdminController extends Controller
                 ];
             }
         
-            // ===============================
+            
             // BIỂU ĐỒ SỐ ĐƠN HÀNG THEO THÁNG
-            // ===============================
             $orderRaw = DB::table('orders')
                 ->selectRaw('MONTH(created_at) as month, COUNT(*) as total')
                 ->whereYear('created_at', date('Y'))
@@ -137,9 +136,7 @@ class AdminController extends Controller
             ));
         }
     
-    // =========================
     // LOGOUT
-    // =========================
     public function logout()
     {
         Session::flush();

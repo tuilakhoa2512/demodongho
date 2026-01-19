@@ -18,10 +18,6 @@
         @endif
     </div>
 
-    {{-- ===== THÔNG BÁO ===== --}}
-
-    <!-- đã có parial -->
-
     {{-- ===== FILTER ===== --}}
     <div class="row" style="padding: 10px 15px;">
         <div class="col-sm-4">

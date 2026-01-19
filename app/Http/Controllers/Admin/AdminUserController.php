@@ -53,6 +53,29 @@ class AdminUserController extends BaseAdminController
         return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
     }
 
+    public function all_admin_user_fake(Request $request)
+    {
+        $this->allowRoles([1,3,4]);
+
+        $filterStatus = $request->get('status');
+
+        $query = DB::table('users')
+            ->where('role_id', 2); // chỉ khách hàng
+
+        if ($filterStatus === '1') {
+            $query->where('status', 1);
+        } elseif ($filterStatus === '0') {
+            $query->where('status', 0);
+        }
+
+        $users = $query
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->appends($request->query());
+
+        return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
+    }
+
     /**
      * =========================
      * FORM THÊM USER
@@ -231,16 +254,29 @@ class AdminUserController extends BaseAdminController
      * QUẢN LÝ REVIEW
      * =========================
      */
-    public function all_reviews_user()
+    public function all_reviews_user(Request $request)
     {
         $this->allowRoles([1,3,4]);
 
-        $reviews = Review::with(['user', 'product'])
-            ->orderByDesc('created_at')
-            ->paginate(5);
+        $filterStatus = $request->get('status');
 
-        return view('admin.reviews_user.index', compact('reviews'));
+        $query = Review::with(['user', 'product']);
+
+        //  lọc trạng thái
+        if ($filterStatus === '1') {
+            $query->where('status', 1);
+        } elseif ($filterStatus === '0') {
+            $query->where('status', 0);
+        }
+
+        $reviews = $query
+            ->orderByDesc('created_at')
+            ->paginate(5)
+            ->appends($request->query());
+
+        return view('admin.reviews_user.index', compact('reviews', 'filterStatus'));
     }
+
 
     public function toggle_review_status($id)
     {

@@ -250,6 +250,7 @@ Route::get(
 Route::get('/all-reviews-user', [AdminUserController::class, 'all_reviews_user'])->name('admin.reviewuser.index');
 //Quản lý user khách hàng
   Route::get('/all-admin-user', [AdminUserController::class, 'all_admin_user'])->name('admin.users.index');
+  Route::get('/all-admin-user-fake', [AdminUserController::class, 'all_admin_user_fake'])->name('admin.users.indexfake');
   // NHÂN SỰ
   Route::get('/all-staff-user', [AdminStaffController::class, 'all_staff_user'])->name('admin.staff.index');
   Route::get('/staff/unactive/{id}', [AdminStaffController::class, 'unactive_staff'])->name('admin.staff.unactive');

@@ -143,6 +143,22 @@ body {
                 </li>
                 @endif
 
+                @if (in_array($role, [1,3,4]))
+                <li class="sub-menu">
+                    <a href="javascript:;">
+                        <i class="fa fa-user"></i>
+                        <span>Quản Lý Người Dùng fake </span>
+                    </a>
+                    <ul class="sub">
+                        <li style="display: flex; justify-content: center;">
+                            <a href="{{ route('admin.users.indexfake') }}" style="width: 160px; text-align: left;">
+                                Tài Khoản Khách Hàng fake
+                            </a>
+                        </li>                                                     
+                    </ul>                  
+                </li>
+                @endif
+
 
                 @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
@@ -312,7 +328,7 @@ body {
                     </ul>
                 </li>
                 @endif
-
+                @if (in_array($role, [1,3,4]))
                 <li class="sub-menu">
                     <a href="javascript:;">	
                         <i class="fa fa-ticket"></i>
@@ -336,11 +352,9 @@ body {
 
                     </ul>
                 </li>
-
-
+                @endif
 
                 @if (in_array($role, [1,3,4]))
-
                 <li class="sub-menu">
                     <a href="javascript:;">
                         <i class=" fa fa-comments"></i>
@@ -355,10 +369,8 @@ body {
                     </ul>
                 </li>
                 @endif
-
-                
-                
-            </ul>            </div>
+            </ul> 
+        </div>
         <!-- sidebar menu end-->
     </div>
 </aside>

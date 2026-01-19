@@ -11,9 +11,7 @@ use Carbon\Carbon;
 
 class ReviewController extends Controller
 {
-    // ================================
     // LƯU ĐÁNH GIÁ
-    // ================================
     public function store(Request $request, $product_id)
     {
         $userId = session('id');
@@ -51,6 +49,7 @@ class ReviewController extends Controller
 
         // ===== KIỂM TRA THỜI GIAN (2 PHÚT - KHÔNG SỐ THẬP PHÂN) =====
         $completedAt    = Carbon::parse($orderDetail->order->updated_at);
+
         $secondsPassed  = $completedAt->diffInSeconds(now());
         $waitSeconds    = 2 * 60; // 2 phút
 
@@ -62,6 +61,18 @@ class ReviewController extends Controller
                 "Bạn cần đợi thêm {$remainMinutes} phút sau khi đơn hoàn thành để đánh giá."
             );
         }
+
+        // $completedAt = Carbon::parse($orderDetail->order->updated_at);
+        // $daysPassed = $completedAt->diffInDays(now());
+        // $waitDays = 2;
+        // if ($daysPassed < $waitDays) {
+        //     $remainDays = $waitDays - $daysPassed;
+        //     return back()->with(
+        //         'success',
+        //         "Bạn cần đợi thêm {$remainDays} ngày sau khi đơn hàng hoàn thành để đánh giá."
+        //     );
+        // }
+
 
         // ===== LỌC TỪ NGỮ TỤC TĨU =====
         $cleanComment = BadWordFilter::filter($request->comment);
@@ -80,9 +91,7 @@ class ReviewController extends Controller
         return back()->with('success', 'Đánh giá của bạn đã được gửi.');
     }
 
-    // ================================
     // LẤY REVIEW HIỂN THỊ
-    // ================================
     public function getReviews($product_id)
     {
         $reviews = Review::with('user')
@@ -101,9 +110,9 @@ class ReviewController extends Controller
         return view('product.reviews', compact('reviews', 'averageRating'));
     }
 
-    // ================================
+   
     // CHECK QUYỀN ĐÁNH GIÁ (DÙNG CHO BLADE)
-    // ================================
+
     public function canUserReview(int $userId, int $productId): array
     {
         $orderDetail = OrderDetail::where('product_id', $productId)
@@ -131,6 +140,15 @@ class ReviewController extends Controller
                 'remain_minutes'  => ceil((120 - $secondsPassed) / 60),
             ];
         }
+
+        // $daysPassed = $completedAt->diffInDays(now());
+        // if ($daysPassed < 2) {
+        //     return [
+        //         'can'          => false,
+        //         'reason'       => 'wait_2_days',
+        //         'remain_days'  => 2 - $daysPassed,
+        //     ];
+        // }
 
         return ['can' => true];
     }
