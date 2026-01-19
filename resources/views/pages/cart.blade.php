@@ -186,7 +186,6 @@
                         <strong id="sum-subtotal">{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
                     </div>
 
-                    {{-- ORDER PROMO + CODE (new system) --}}
                     <div class="sum-row sum-discount" style="color: red;">
                         <span>
                             Ưu đãi hóa đơn
