@@ -12,17 +12,14 @@ use App\Models\Cart;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /* Register any application services.*/
     public function register(): void
     {
         //
     }
 
-    /* Bootstrap any application services.*/
     public function boot(): void
     {
         Paginator::defaultView('vendor.pagination.number-only');
-        /*  SHARE CATEGORY & BRAND (CŨ)*/
 
         // Danh mục
         $categories = DB::table('categories')
@@ -36,13 +33,11 @@ class AppServiceProvider extends ServiceProvider
             ->get();
         View::share('brand', $brands);
 
-        /* GLOBAL APPLY PROMOTION (MỚI)*/
 
         View::composer('*', function ($view) {
 
             $data = $view->getData();
 
-            // Không có product / products thì bỏ qua
             if (!isset($data['product']) && !isset($data['products'])) {
                 return;
             }
@@ -72,11 +67,11 @@ class AppServiceProvider extends ServiceProvider
             $count = 0;
 
             if (Session::get('id')) {
-                // User đã login → lấy từ DB
+                // User đã login => lấy từ DB
                 $count = Cart::where('user_id', Session::get('id'))
                             ->sum('quantity');
             } else {
-                // Guest → lấy từ session
+                // khách => lấy từ session
                 $cart = Session::get('cart', []);
                 foreach ($cart as $item) {
                     $count += (int) ($item['quantity'] ?? 0);

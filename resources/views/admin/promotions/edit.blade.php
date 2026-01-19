@@ -2,7 +2,7 @@
 @section('admin_content')
 
 @php
-  $campaign = $campaign ?? $promotion ?? null; // fallback nếu bạn còn đặt tên biến cũ
+  $campaign = $campaign ?? $promotion ?? null; 
   $c = $campaign;
 
   $rules = $rules ?? ($c->rules ?? collect());
@@ -24,38 +24,13 @@
   }
 @endphp
 
-<style>
-  .promo-toolbar{
-    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    justify-content:center; margin: 10px 0 16px;
-  }
-  .promo-toolbar .btn{ min-width: 160px; }
-  .promo-toolbar form{ margin:0; }
 
-  .target-row{
-    display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
-  }
-  .target-row .form-group{
-    margin:0; min-height:72px; display:flex; flex-direction:column; justify-content:flex-end;
-  }
-  .target-row label{ margin-bottom:6px; font-weight:600; }
-  .target-row .btn{ height:34px; margin-top:24px; }
-  .target-hint{ margin-top:6px; color:#777; font-size:12px; }
-
-  .rule-card{
-    border:1px solid #eee; border-radius:8px; padding:12px 14px; margin-bottom:14px;
-  }
-  .rule-head{
-    display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    margin-bottom:10px;
-  }
-</style>
 
 <div class="row">
   <div class="col-lg-12">
     <section class="panel">
       <header class="panel-heading" style="color:#000; font-weight:600;">
-        Sửa Campaign: {{ $c->name }}
+        Sửa Chiến Dịch Ưu Đãi: {{ $c->name }}
         <span style="font-weight:400; color:#666; font-size:12px;">({{ $timeText }})</span>
       </header>
 
@@ -85,14 +60,20 @@
 
         {{-- A) UPDATE CAMPAIGN --}}
         <div class="alert alert-info">
-          <strong>A. Campaign (Chiến dịch)</strong><br>
-          Campaign chỉ chứa thông tin chiến dịch. Giảm giá/áp dụng nằm trong <strong>Rules</strong>.
+          <strong>A. Chiến Dịch Ưu Đãi (Campaign)</strong><br>
+          Campaign chỉ chứa thông tin chiến dịch. Giảm giá/áp dụng nằm trong <strong> Luật Áp Dụng (Rules)</strong>.
         </div>
+        
 
-        {{-- TOOLBAR ngoài form (tránh nested) --}}
+        <form id="campaign-update-form" method="POST" action="{{ route('admin.promotions.update', $c->id) }}" class="form-horizontal">
+          @csrf
+          @method('PUT')
+          @include('admin.promotions._campaign_form', ['campaign' => $c])
+        </form>
+
         <div class="promo-toolbar">
           <button type="submit" class="btn btn-primary" form="campaign-update-form">
-             Lưu Campaign
+             Lưu Chiến Dịch
           </button>
 
           <form action="{{ route('admin.promotions.toggle-status', $c->id) }}" method="POST">
@@ -108,30 +89,24 @@
           </a>
         </div>
 
-        <form id="campaign-update-form" method="POST" action="{{ route('admin.promotions.update', $c->id) }}" class="form-horizontal">
-          @csrf
-          @method('PUT')
-          @include('admin.promotions._campaign_form', ['campaign' => $c])
-        </form>
-
         <hr>
 
         {{-- B) RULES --}}
         <div class="alert alert-info">
-          <strong>B. Rules (Luật áp dụng)</strong><br>
-          Mỗi Rule có <code>scope=product</code> hoặc <code>scope=order</code>. Mỗi Rule sẽ gắn Targets; Codes chỉ dành cho scope=order.
+          <strong>B. Luật Áp Dụng (Rules)</strong><br>
+          Mỗi Rule có <code> Phạm Vi = Product</code> hoặc <code>Phạm Vi = Order</code>. Mỗi Rule sẽ gắn Mục Tiêu; Codes chỉ dành cho Phạm Vi = Order.
         </div>
 
         {{-- FORM TẠO RULE --}}
         <form method="POST" action="{{ route('admin.promotions.rules.store', $c->id) }}" class="form-horizontal">
           @csrf
           <div class="well" style="padding:12px 15px; margin-bottom:14px;">
-            <div style="font-weight:800; margin-bottom:8px;">+ Thêm Rule</div>
+            <div style="font-weight:800; margin-bottom:8px;">+ Thêm Luật Áp Dụng</div>
             @include('admin.promotions._rule_form', ['rule' => null])
             <div class="form-group" style="margin-top:10px;">
               <div class="col-lg-offset-3 col-lg-6">
                 <button type="submit" class="btn btn-primary">
-                  <i class="fa fa-plus"></i> Tạo Rule
+                  <i class="fa fa-plus"></i> Tạo Luật Áp Dụng
                 </button>
               </div>
             </div>
@@ -163,18 +138,18 @@
                 <div style="font-weight:800; font-size:15px;">
                   Rule #{{ $r->id }}: {{ $r->name }}
                 </div>
-                <div style="color:#666; font-size:12px; margin-top:2px;">
+                <div style="color: red; font-size:18px; margin-top:2px;">
                   <span class="label {{ $r->scope === 'product' ? 'label-info' : 'label-warning' }}">{{ $r->scope }}</span>
                   <span style="margin-left:6px;"><strong>{{ $discountText }}</strong></span>
-                  <span style="margin-left:8px;">Time: {{ $rTime }}</span>
+                  <span style="margin-left:8px;">Thời Gian: {{ $rTime }}</span>
                   @if(!is_null($r->min_order_subtotal))
-                    <span style="margin-left:8px;">Min subtotal: <strong>{{ number_format((int)$r->min_order_subtotal,0,',','.') }}</strong></span>
+                    <span style="margin-left:8px;">Giá Trị Tối Thiểu: <strong>{{ number_format((int)$r->min_order_subtotal,0,',','.') }}</strong></span>
                   @endif
                 </div>
               </div>
 
               <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                <span>Priority: <strong>{{ (int)($r->priority ?? 0) }}</strong></span>
+                <span>Độ Ưu Tiên: <strong>{{ (int)($r->priority ?? 0) }}</strong></span>
 
                 @if($r->status)
                   <span class="label label-success">Hiện</span>
@@ -216,26 +191,23 @@
             </div>
 
             {{-- TARGETS --}}
-            <div class="alert alert-info" style="margin:0 0 10px;">
-              <strong>Targets</strong> (Rule này áp cho: all/product/category/brand)
-            </div>
 
             <form method="POST" action="{{ route('admin.promotions.targets.store', ['id'=>$c->id, 'ruleId'=>$r->id]) }}">
               @csrf
 
               <div class="target-row">
                 <div class="form-group" style="min-width:220px;">
-                  <label>Target type *</label>
+                  <label>Loại Mục Tiêu *</label>
                   <select name="target_type" class="form-control target_type" data-rule="{{ $r->id }}" required>
-                    <option value="all">all (toàn shop)</option>
-                    <option value="product">product (theo sản phẩm)</option>
-                    <option value="category">category (theo danh mục)</option>
-                    <option value="brand">brand (theo thương hiệu)</option>
+                    <option value="all">Toàn Shop</option>
+                    <option value="product">Theo Sản Phẩm</option>
+                    <option value="category">Theo Loại Sản Phẩm</option>
+                    <option value="brand">Theo Thương Hiệu</option>
                   </select>
                 </div>
 
                 <div class="form-group" style="min-width:380px;">
-                  <label>Target *</label>
+                  <label>Mục Tiêu *</label>
 
                   <input type="text" class="form-control target_all_hint"
                          value="Toàn shop (không cần chọn)" disabled style="display:none;">
@@ -248,7 +220,7 @@
                   </select>
 
                   <select class="form-control target_id_category" style="display:none;">
-                    <option value="">-- Chọn danh mục --</option>
+                    <option value="">-- Chọn loại sản phẩm --</option>
                     @foreach($categories as $cat)
                       <option value="{{ $cat->id }}">{{ $cat->name }}</option>
                     @endforeach
@@ -273,7 +245,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                  <i class="fa fa-plus"></i> Thêm Target
+                  <i class="fa fa-plus"></i> Thêm Mục Tiêu
                 </button>
               </div>
 
@@ -287,11 +259,11 @@
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Type</th>
-                    <th>Target</th>
-                    <th>Target id</th>
-                    <th>Trạng thái</th>
-                    <th style="width:120px;">Thao tác</th>
+                    <th>Loại Mục Tiêu</th>
+                    <th>Mục Tiêu</th>
+                    <th>ID Mục Tiêu</th>
+                    <th>Trạng Thái</th>
+                    <th style="width:120px;">Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -333,7 +305,7 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="6" class="text-center">Chưa có target nào (Rule nên có ít nhất 1 target).</td>
+                      <td colspan="6" class="text-center">Chưa có Mục Tiêu nào (Rule nên có ít nhất 1 mục tiêu).</td>
                     </tr>
                   @endforelse
                 </tbody>
@@ -344,21 +316,21 @@
             @if($r->scope === 'order')
               <hr>
               <div class="alert alert-info" style="margin:0 0 10px;">
-                <strong>Codes</strong> (Mã giảm giá cho Rule scope=order)
+                <strong>Mã CODE</strong> (Mã giảm giá cho Luật có Phạm Vi = Order)
               </div>
 
               <form method="POST" action="{{ route('admin.promotions.codes.store', ['id'=>$c->id, 'ruleId'=>$r->id]) }}" class="form-horizontal">
                 @csrf
 
                 <div class="form-group">
-                  <label class="col-lg-3 control-label">Code *</label>
+                  <label class="col-lg-3 control-label">CODE *</label>
                   <div class="col-lg-3">
                     <input type="text" name="code" class="form-control" maxlength="50" required
                            value="{{ old('code') }}" placeholder="VD: TET2026">
                     <small class="text-muted">Nên viết HOA, không dấu, không khoảng trắng.</small>
                   </div>
 
-                  <label class="col-lg-2 control-label">Min subtotal</label>
+                  <label class="col-lg-2 control-label">Giá Trị Tối Thiểu</label>
                   <div class="col-lg-2">
                     <input type="number" name="min_subtotal" class="form-control" min="0" step="1"
                            value="{{ old('min_subtotal', 0) }}">
@@ -366,13 +338,13 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="col-lg-3 control-label">Max discount</label>
+                  <label class="col-lg-3 control-label">Giảm Giá Tối Đa</label>
                   <div class="col-lg-3">
                     <input type="number" name="max_discount" class="form-control" min="0" step="1"
                            value="{{ old('max_discount') }}" placeholder="(optional)">
                   </div>
 
-                  <label class="col-lg-2 control-label">Max uses</label>
+                  <label class="col-lg-2 control-label">Số Lần Dùng Code</label>
                   <div class="col-lg-2">
                     <input type="number" name="max_uses" class="form-control" min="0" step="1"
                            value="{{ old('max_uses') }}" placeholder="(optional)">
@@ -380,13 +352,13 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="col-lg-3 control-label">Max uses / user</label>
+                  <label class="col-lg-3 control-label">Số Lần Dùng Code / User</label>
                   <div class="col-lg-3">
                     <input type="number" name="max_uses_per_user" class="form-control" min="0" step="1"
                            value="{{ old('max_uses_per_user') }}" placeholder="(optional)">
                   </div>
 
-                  <label class="col-lg-2 control-label">Trạng thái</label>
+                  <label class="col-lg-2 control-label">Trạng Thái</label>
                   <div class="col-lg-2">
                     <select name="status" class="form-control">
                       <option value="1" selected>Hiện</option>
@@ -396,19 +368,19 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="col-lg-3 control-label">Hiệu lực code</label>
+                  <label class="col-lg-3 control-label">Hiệu Lực Code</label>
                   <div class="col-lg-3">
                     <input type="datetime-local" name="start_at" class="form-control" value="{{ old('start_at') }}">
-                    <small class="text-muted">Bắt đầu (optional)</small>
+                    <small class="text-muted">Bắt Đầu</small>
                   </div>
                   <div class="col-lg-3">
                     <input type="datetime-local" name="end_at" class="form-control" value="{{ old('end_at') }}">
-                    <small class="text-muted">Kết thúc (optional)</small>
+                    <small class="text-muted">Kết Thúc</small>
                   </div>
 
                   <div class="col-lg-3">
                     <button type="submit" class="btn btn-primary" style="margin-top:0;">
-                      <i class="fa fa-plus"></i> Thêm Code
+                      <i class="fa fa-plus"></i> Thêm CODE
                     </button>
                   </div>
                 </div>
@@ -420,13 +392,13 @@
                     <tr>
                       <th>ID</th>
                       <th>Code</th>
-                      <th>Min subtotal</th>
-                      <th>Max discount</th>
-                      <th>Max uses</th>
-                      <th>Max / user</th>
-                      <th>Thời gian</th>
-                      <th>Trạng thái</th>
-                      <th style="width:120px;">Thao tác</th>
+                      <th>Giá Trị Tối Thiểu</th>
+                      <th>Giảm Giá Tối Đa</th>
+                      <th>Số Lần Dùng Code</th>
+                      <th>Số Lần Dùng Code / User</th>
+                      <th>Thời Gian</th>
+                      <th>Trạng Thái</th>
+                      <th style="width:120px;">Thao Tác</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -479,11 +451,11 @@
 
         @empty
           <div class="alert alert-warning">
-            Campaign này chưa có rule nào. Hãy tạo ít nhất 1 rule để hệ thống áp dụng ưu đãi.
+            Chiến dịch ưu đãi này chưa có Luật nào. Hãy tạo ít nhất 1 Luật để hệ thống áp dụng ưu đãi.
           </div>
         @endforelse
 
-        {{-- JS xử lý dropdown target cho nhiều rule (không trùng id) --}}
+        {{-- JS xử lý dropdown target cho nhiều rule --}}
         <script>
         document.addEventListener('DOMContentLoaded', function () {
           document.querySelectorAll('.rule-card').forEach(function(card){
@@ -548,5 +520,32 @@
     </section>
   </div>
 </div>
+
+<style>
+  .promo-toolbar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    justify-content:center; margin: 10px 0 16px;
+  }
+  .promo-toolbar .btn{ min-width: 160px; }
+  .promo-toolbar form{ margin:0; }
+
+  .target-row{
+    display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
+  }
+  .target-row .form-group{
+    margin:0; min-height:72px; display:flex; flex-direction:column; justify-content:flex-end;
+  }
+  .target-row label{ margin-bottom:6px; font-weight:600; }
+  .target-row .btn{ height:34px; margin-top:24px; }
+  .target-hint{ margin-top:6px; color:#777; font-size:12px; }
+
+  .rule-card{
+    border:1px solid #eee; border-radius:8px; padding:12px 14px; margin-bottom:14px;
+  }
+  .rule-head{
+    display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    margin-bottom:10px;
+  }
+</style>
 
 @endsection

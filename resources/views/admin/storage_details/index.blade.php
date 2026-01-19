@@ -4,12 +4,10 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
 
-    {{-- TIÊU ĐỀ --}}
     <div class="panel-heading" style="color:#000; font-weight:600;">
       Quản lý sản phẩm trong lô: {{ $storage->batch_code }}
     </div>
 
-    {{-- THÔNG BÁO THÀNH CÔNG (SweetAlert) --}}
     @if (session('success'))
       <script>
           Swal.fire({
@@ -21,7 +19,6 @@
       </script>
     @endif
 
-    {{-- THÔNG TIN LÔ HÀNG --}}
     <div style="margin: 15px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 4px; background: #f9f9f9;">
       <h4 style="margin-top:0; font-weight:600; text-align:center">THÔNG TIN LÔ HÀNG</h4> <br>
 
@@ -60,7 +57,6 @@
       </div>
     </div>
 
-    {{-- NÚT THÊM & QUAY LẠI --}}
     <div style="margin: 0 15px 15px 15px;">
       <a href="{{ route('admin.storage-details.create', $storage->id) }}" class="btn btn-primary btn-sm">
         + Thêm sản phẩm vào lô này
@@ -70,15 +66,8 @@
       </a>
     </div>
 
-    {{-- CĂN GIỮA BẢNG --}}
-    <style>
-        table td, table th {
-            text-align: center !important;
-            vertical-align: middle !important;
-        }
-    </style>
+   
 
-    {{-- BẢNG SẢN PHẨM TRONG LÔ --}}
     <div class="table-responsive">
       <table class="table table-striped b-t b-light">
         <thead>
@@ -96,7 +85,6 @@
         <tbody>
           @forelse ($details as $detail)
             @php
-              // 2 cột mới: lấy từ query buildIndexQuery()
               $sellingQty = isset($detail->selling_qty) ? (int)$detail->selling_qty : null;
               $soldQty    = isset($detail->sold_qty) ? (int)$detail->sold_qty : null;
             @endphp
@@ -104,23 +92,18 @@
             <tr>
               <td>{{ $detail->id }}</td>
 
-              {{-- Tên sản phẩm trong lô --}}
               <td>{{ $detail->product_name }}</td>
 
-              {{-- Số lượng nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
 
-              {{-- SL đang bán --}}
               <td>
                 {{ $sellingQty !== null ? number_format($sellingQty) : '—' }}
               </td>
 
-              {{-- SL đã bán --}}
               <td>
                 {{ $soldQty !== null ? number_format($soldQty) : '—' }}
               </td>
 
-              {{-- Trạng thái kho --}}
               <td>
                 @if($detail->stock_status === 'pending')
                   <span class="label label-warning">Chờ bán</span>
@@ -135,7 +118,6 @@
                 @endif
               </td>
 
-              {{-- Hiển thị --}}
               <td>
                 @if($detail->status)
                   <span class="label label-success">Hiện</span>
@@ -144,17 +126,14 @@
                 @endif
               </td>
 
-              {{-- THAO TÁC --}}
               <td>
 
-                {{-- Sửa dòng kho --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
                    title="Sửa"
                    style="margin-right:6px;">
                   <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Ẩn / Hiện dòng kho --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -171,14 +150,12 @@
                   </button>
                 </form>
 
-                {{-- Xem lại lô (trang hiện tại) --}}
                 <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
                    title="Xem lại lô"
                    style="margin-right:6px;">
                   <i class="fa fa-archive text-primary" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Icon dẫn tới sản phẩm đã đăng bán từ dòng kho này --}}
                 @if($detail->product)
                   <a href="{{ route('admin.products.show', $detail->product->id) }}"
                      title="Xem sản phẩm đã đăng bán">
@@ -203,7 +180,6 @@
       </table>
     </div>
 
-    {{-- PHÂN TRANG --}}
     <footer class="panel-footer">
       <div class="row">
         <div class="col-sm-5 text-center">
@@ -221,5 +197,12 @@
 
   </div>
 </div>
+
+ <style>
+        table td, table th {
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+    </style>
 
 @endsection

@@ -19,7 +19,7 @@ class AdminSeeder extends Seeder
                 'Store Staff',
                 'Storage Staff',
             ])
-            ->pluck('id', 'name'); // ['Admin' => 1, ...]
+            ->pluck('id', 'name'); 
 
         if ($roles->isEmpty()) {
             return;

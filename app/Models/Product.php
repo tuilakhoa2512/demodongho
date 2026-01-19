@@ -8,15 +8,10 @@ class Product extends Model
 {
     protected $table = 'products';
 
-    /**
-     * ✅ appends cho URL ảnh (giữ nguyên cho view/front-end)
-     */
+   
     protected $appends = ['main_image_url', 'hover_image_url'];
 
-    /**
-     * Mass assignment
-     * - discounted_price: legacy (tạm giữ nếu DB/form còn), KHÔNG dùng làm logic ưu đãi mới
-     */
+   
     protected $fillable = [
         'name',
         'description',
@@ -41,7 +36,6 @@ class Product extends Model
         'status'    => 'integer',
     ];
 
-    /* ================== RELATIONSHIPS ================== */
 
     public function brand()
     {
@@ -65,7 +59,6 @@ class Product extends Model
         return $this->hasOne(ProductImage::class, 'product_id', 'id');
     }
 
-    /* ================== IMAGE ACCESSORS ================== */
 
     // Nếu nơi khác đang gọi $product->image_1 / image_2 thì giữ lại
     public function getImage1Attribute()
@@ -108,13 +101,5 @@ class Product extends Model
         return $this->main_image_url;
     }
 
-    /* ================== PROMOTION (NEW SYSTEM) ==================
-     *
-     * ✅ KHÔNG đặt logic promotion trong Model để tránh query ngầm khó debug.
-     * ✅ Khi cần giá sau ưu đãi:
-     *    $pack = app(\App\Services\PromotionService::class)->calcProductFinalPrice($product);
-     *    $finalPrice = $pack['final_price'];
-     *
-     * ❌ Không còn quan hệ / accessor của hệ cũ.
-     */
+  
 }

@@ -12,9 +12,8 @@ class StorageDetailController extends Controller
 {
 
     
-     // Subquery: tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
+     //tổng số lượng đã bán theo product_id (chỉ tính các đơn KHÔNG bị hủy)
    
-
     private function soldQtySubQuery()
     {
         return DB::table('order_details as od')
@@ -26,7 +25,7 @@ class StorageDetailController extends Controller
     }
 
     
-     // Query chung cho index + các list theo stock_status
+  
      
 
     private function buildIndexQuery(Request $request, ?string $onlyStockStatus = null)
@@ -37,9 +36,7 @@ class StorageDetailController extends Controller
 
         $query = StorageDetail::query()
             ->with(['storage', 'product']) // để dùng optional($detail->storage)->batch_code và $detail->product
-            // join product theo khóa đúng: products.storage_detail_id = storage_details.id
             ->leftJoin('products as p', 'p.storage_detail_id', '=', 'storage_details.id')
-            // join sold subquery theo product_id
             ->leftJoinSub($soldSub, 'sold', function ($join) {
                 $join->on('sold.product_id', '=', 'p.id');
             })
@@ -108,8 +105,8 @@ class StorageDetailController extends Controller
             'product_name' => [
                 'required',
                 'string',
-                'max:255',
-                'regex:/^[\p{L}0-9\s\-]+$/u'
+                'max:255'
+                
             ],
             'import_quantity' => [
                 'required',
@@ -160,12 +157,19 @@ class StorageDetailController extends Controller
                 ->with('error', 'Sản phẩm đã bán hết, không thể chỉnh sửa số lượng nhập.');
         }
 
-        // sl đang bán + đã bán
-        $sellingQty = (int) ($detail->selling_qty ?? 0);
-        $soldQty    = (int) ($detail->sold_qty ?? 0);
+       
+        $soldQty = 0;
 
-        // bắt buộc >= tổng đã phân bổ
-        $minImport  = max(1, $sellingQty + $soldQty);
+        if ($detail->product) {
+            $soldQty = (int) DB::table('order_details as od')
+                ->join('orders as o', 'o.id', '=', 'od.order_id')
+                ->where('od.product_id', $detail->product->id)
+                ->whereIn('o.status', ['pending', 'confirmed', 'shipping', 'success'])
+                ->sum('od.quantity');
+        }
+
+        // import phải >= sold
+        $minImport = max(1, $soldQty);
 
         // giới hạn max
         $maxImport = 10000;
@@ -175,7 +179,6 @@ class StorageDetailController extends Controller
                 'required',
                 'string',
                 'max:255',
-                // 'regex:/^[\p{L}0-9\s\-]+$/u.'
             ],
             'import_quantity' => [
                 'required',
@@ -189,10 +192,8 @@ class StorageDetailController extends Controller
                 'max:300'
             ],
         ];
-        
+
         $messages = [
-            'product_name.regex' =>
-                'Tên sản phẩm chỉ được chứa chữ cái, số và dấu gạch ngang',
             'import_quantity.min' =>
                 'Số lượng nhập phải ≥ ' . $minImport,
             'import_quantity.max' =>
@@ -201,29 +202,44 @@ class StorageDetailController extends Controller
 
         $request->validate($rules, $messages);
 
-        //  UPDATE STORAGE DETAIL 
+    
         $detail->update([
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
             'note'            => $request->note,
         ]);
 
-        //  SYNC LẠI PRODUCT (NẾU ĐÃ ĐƯỢC ĐĂNG BÁN) 
+        
+         // selling = import - sold
+         
         if ($detail->product) {
 
-            $newSellingQty = max(0, (int)$request->import_quantity - $soldQty);
-
             $product = $detail->product;
+
+            $newSellingQty = max(0, (int)$request->import_quantity - $soldQty);
             $product->quantity = $newSellingQty;
 
             if ($newSellingQty <= 0) {
                 // hết hàng
                 $product->quantity = 0;
                 $product->stock_status = 'sold_out';
-                $product->status = 0; // ẩn
+                $product->status = 0;
 
                 $detail->stock_status = 'sold_out';
+            } else {
+                if ($detail->status == 1) {
+                    // kho đang hiện => cho bán
+                    $product->stock_status = 'selling';
+                    $product->status = 1;
+                    $detail->stock_status = 'selling';
+                } else {
+                    // kho đang ẩn => product luôn phải stopped
+                    $product->stock_status = 'stopped';
+                    $product->status = 0;
+                    $detail->stock_status = 'stopped';
+                }
             }
+
 
             $product->save();
             $detail->save();
@@ -236,28 +252,23 @@ class StorageDetailController extends Controller
 
 
 
+
     public function toggleStatus($id)
     {
         $detail  = StorageDetail::with('product')->findOrFail($id);
         $product = $detail->product;
 
-        /**
-         *  NẾU SẢN PHẨM ĐÃ SOLD OUT → KHÔNG CHO TOGGLE
-         * (vì sold_out là trạng thái khóa)
-         */
-        if ($product && (int)$product->quantity <= 0) {
+       
+        if ($detail->stock_status === 'sold_out') {
             return redirect()
                 ->back()
                 ->with('error', 'Sản phẩm đã bán hết, không thể thay đổi trạng thái kho.');
         }
 
-        // toggle Ẩn / Hiện kho
+        // toggle trạng thái kho
         $detail->status = $detail->status ? 0 : 1;
 
-        /**
-         * KHO BỊ ẨN
-         * → Ẩn sản phẩm
-         */
+        //kho bị ẩn
         if ($detail->status == 0) {
 
             $detail->stock_status = 'stopped';
@@ -269,23 +280,23 @@ class StorageDetailController extends Controller
             }
 
         }
-        /**
-         * KHO ĐƯỢC HIỆN
-         * → chỉ hiện nếu còn hàng
-         */
+       
+        // kho được hiện
         else {
 
             if ($product) {
+
                 if ((int)$product->quantity > 0) {
                     $detail->stock_status = 'selling';
                     $product->status = 1;
                     $product->stock_status = 'selling';
                     $product->save();
                 } else {
-                    // phòng thủ (trường hợp hiếm)
                     $detail->stock_status = 'sold_out';
                 }
+
             } else {
+                // chưa tạo product
                 $detail->stock_status = 'pending';
             }
         }
@@ -298,7 +309,6 @@ class StorageDetailController extends Controller
     }
 
 
-    //LIST THEO STOCK_STATUS (dùng chung query builder để có selling_qty/sold_qty)
 
     public function listPending(Request $request)
     {

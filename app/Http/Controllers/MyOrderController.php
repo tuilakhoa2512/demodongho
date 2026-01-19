@@ -15,7 +15,6 @@ class MyOrderController extends Controller
         'canceled'  => 'Đã Hủy',
     ];
 
-    // GET /my-orders
     public function index()
     {
         $userId = (int) Session::get('id');
@@ -23,7 +22,7 @@ class MyOrderController extends Controller
             return redirect('/login-checkout')->with('error', 'Vui lòng đăng nhập để xem đơn hàng.');
         }
 
-        // Lấy redemption mới nhất theo order_id (để tránh join ra nhiều dòng)
+        // Lấy redemption mới nhất theo order_id 
         $latestRedemption = DB::table('promotion_redemptions')
             ->selectRaw('MAX(id) as id, order_id')
             ->groupBy('order_id');
@@ -50,7 +49,7 @@ class MyOrderController extends Controller
         ]);
     }
 
-    // GET /my-orders/{order_code}
+    
     public function show(string $order_code)
     {
         $userId = (int) Session::get('id');
@@ -125,7 +124,6 @@ class MyOrderController extends Controller
         ]);
         $order->area_text = !empty($areaParts) ? implode(' - ', $areaParts) : null;
 
-        // gắn thêm để blade dùng nếu muốn
         $order->subtotal = $subtotal;
         $order->promo_discount = $promoDiscount;
         $order->grand_total = $grandTotal;

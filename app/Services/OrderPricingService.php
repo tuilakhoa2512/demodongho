@@ -40,7 +40,6 @@ class OrderPricingService
         $subtotal = (int) round($subtotal);
         $productIds = array_values(array_unique($productIds));
 
-        // 2) Lấy product để match targets (category/brand/product/all)
         $productsMap = collect();
         if (!empty($productIds)) {
             $productsMap = Product::query()
@@ -56,9 +55,8 @@ class OrderPricingService
             if ($p) $cartProducts[] = $p;
         }
 
-        // 3) ✅ Dùng API public của PromotionService (không gọi protected)
+        // Dùng API public của PromotionService (không gọi protected)
         // PromotionService::calcOrderDiscount sẽ tự:
-        // - validate code (nếu có)
         // - auto apply rule order (nếu không có code)
         // - tính discount_amount + final_total
         $res = $this->promotionService->calcOrderDiscount(
@@ -70,8 +68,8 @@ class OrderPricingService
 
         return [
             'subtotal'        => $subtotal,
-            'order_promotion' => $res['rule'] ?? null,       // PromotionRule|null
-            'promotion_code'  => $res['code'] ?? null,       // PromotionCode|null
+            'order_promotion' => $res['rule'] ?? null,       
+            'promotion_code'  => $res['code'] ?? null,       
             'discount_amount' => (int)($res['discount_amount'] ?? 0),
             'total'           => (int)($res['final_total'] ?? $subtotal),
             'ok'              => (bool)($res['ok'] ?? true),

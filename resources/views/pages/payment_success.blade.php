@@ -10,7 +10,6 @@
     $isVNPay = ($method === 'VNPAY');
     $isCanceled = ($status === 'canceled');
 
-    // Map trạng thái hiển thị cho khách
     $statusLabels = [
         'pending'   => 'Đợi Xác Nhận',
         'confirmed' => 'Đã Xác Nhận',
@@ -21,7 +20,6 @@
 
     $statusText = $statusLabels[$status] ?? $status;
 
-    // Tiêu đề theo trạng thái + phương thức
     if ($isCanceled) {
         $pageTitle = $isVNPay
             ? 'Thanh toán VNPay không thành công'
@@ -32,14 +30,11 @@
             : 'Đặt hàng thành công';
     }
 
-    // Hiển thị phương thức thanh toán
     $methodText = $isVNPay ? 'VNPay (Chuyển khoản)' : 'COD (Thanh toán khi nhận hàng)';
 
-    // Promo info (ưu tiên DB)
     $promoCode = $promoCode ?? ($order->promo_code ?? null);
     $promoName = $promoName ?? ($order->promo_campaign_name ?? null);
 
-    // Số tiền giảm
     $discountValue = (int)($discountValue ?? 0);
 
 @endphp
@@ -49,7 +44,6 @@
 
 <div class="pay-success-page">
 
-    {{-- Thông báo --}}
     @if(session('success'))
         <div class="pay-success-alert">
             {{ session('success') }}
@@ -129,7 +123,6 @@
                 <strong>{{ number_format($subtotal, 0, ',', '.') }} đ</strong>
             </div>
 
-            {{-- ✅ NEW: Ưu đãi hệ Promotion (đọc từ DB nếu có) --}}
             <div class="sum-row sum-discount">
                 <span>
                     Ưu đãi hóa đơn

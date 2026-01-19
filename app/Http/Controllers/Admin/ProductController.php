@@ -18,8 +18,7 @@ use App\Services\PromotionService;
 class ProductController extends Controller
 {
     /**
-     * ADMIN - danh sách sản phẩm
-     *  Không join ưu đãi cũ
+     * danh sách sản phẩm
      *  Giá final runtime từ PromotionService
      */
     public function index(PromotionService $promoService)
@@ -64,8 +63,7 @@ class ProductController extends Controller
     }
 
     /**
-     * ADMIN - xem chi tiết sản phẩm
-     *  Không join ưu đãi cũ
+     *  xem chi tiết sản phẩm
      *  Giá final runtime từ PromotionService
      */
     public function show($id, PromotionService $promoService)
@@ -110,9 +108,7 @@ class ProductController extends Controller
         return view('admin.products.show', compact('product', 'reviews', 'averageRating'));
     }
 
-    // =========================
-    // CRUD 
-    // =========================
+   
 
     public function create()
     {
@@ -139,8 +135,7 @@ class ProductController extends Controller
             'name' => [
                 'nullable',
                 'string',
-                'max:255',
-                'regex:/^[\p{L}0-9\s\-]+$/u'
+                'max:255'
             ],
 
             'description' => ['nullable', 'string', 'max:2000'],
@@ -251,8 +246,7 @@ class ProductController extends Controller
             'name' => [
                 'required',
                 'string',
-                'max:255',
-                'regex:/^[\p{L}0-9\s\-]+$/u'
+                'max:255' 
             ],
         
             'description' => [
@@ -320,9 +314,27 @@ class ProductController extends Controller
         ]);
 
         if ($product->storageDetail) {
-            $product->storageDetail->stock_status = $product->stock_status;
-            $product->storageDetail->save();
+
+        $detail = $product->storageDetail;
+
+        //  nếu kho đang ẩn => product bắt buộc phải stopped
+        if ((int)$detail->status !== 1) {
+
+            $product->stock_status = 'stopped';
+            $product->status = 0;
+            $product->save();
+
+            $detail->stock_status = 'stopped';
+            $detail->save();
+
+        } else {
+
+            // kho đang hiện => sync theo product
+            $detail->stock_status = $product->stock_status;
+            $detail->save();
         }
+    }
+
 
         $folder = "products/{$product->id}";
         $images = $product->productImage;
@@ -353,18 +365,22 @@ class ProductController extends Controller
         $product = Product::with('storageDetail')->findOrFail($id);
         $detail  = $product->storageDetail;
 
-        /**
-         * ❌ KHÔNG CHO HIỆN LẠI KHI ĐÃ HẾT HÀNG
-         */
+         //  kho đang ẩn => không cho hiện product
+        if ($detail && (int)$detail->status !== 1) {
+            return redirect()
+                ->back()
+                ->with('error', 'Kho đang bị ẩn, không thể hiển thị sản phẩm.');
+        }
+
+        
+         // ko cho hiện lại khi hết hàng
         if ((int)$product->quantity <= 0) {
             return redirect()
                 ->back()
                 ->with('error', 'Sản phẩm đã hết hàng, không thể hiển thị lại.');
         }
 
-        /**
-         * ĐANG HIỆN => ẨN
-         */
+        // hiện => ẩn
         if ((int)$product->status === 1) {
 
             $product->status = 0;
@@ -381,9 +397,7 @@ class ProductController extends Controller
                 ->with('success', 'Đã ẩn sản phẩm và ngừng bán.');
         }
 
-        /**
-         * ĐANG ẨN =>  HIỆN (CHỈ KHI CÒN HÀNG)
-         */
+        // ẩn => (khi còn hàng)
         $product->status = 1;
         $product->stock_status = 'selling';
         $product->save();

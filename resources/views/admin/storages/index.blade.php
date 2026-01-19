@@ -24,11 +24,7 @@
         </script>
         @endif
 
-    <!-- @if (session('success'))
-      <div class="alert alert-success" style="margin: 15px;">
-        {{ session('success') }}
-      </div>
-    @endif -->
+  
 
     @if (session('error'))
       <div class="alert alert-danger" style="margin: 15px;">
@@ -123,13 +119,11 @@
               </td>
 
               <td>
-                {{-- Sửa lô hàng --}}
                 <a href="{{ route('admin.storages.edit', $storage->id) }}"
                    class="active styling-edit" title="Sửa lô hàng">
                   <i class="fa fa-pencil-square-o text-success text-active" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Ẩn / hiện lô hàng (không xóa cứng nữa) --}}
                 <form action="{{ route('admin.storages.toggle-status', $storage->id) }}"
                       method="POST"
                       style="display:inline-block; margin:0 4px;">
@@ -146,7 +140,6 @@
                   </button>
                 </form>
 
-                {{-- Xem chi tiết kho theo lô --}}
                 <a href="{{ route('admin.storage-details.by-storage', $storage->id) }}"
                    title="Xem sản phẩm trong lô này">
                   <i class="fa fa-archive text-primary" style="font-size:18px;"></i>

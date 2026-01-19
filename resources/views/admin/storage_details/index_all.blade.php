@@ -4,7 +4,6 @@
 <div class="table-agile-info">
   <div class="panel panel-default">
 
-    {{-- Tiêu đề --}}
     <div class="panel-heading" style="color:#000; font-weight:600;">
       @isset($currentStatus)
           @if($currentStatus == 'pending')      Hàng Chưa Bán Trong Kho
@@ -17,19 +16,16 @@
       @endisset
     </div>
 
-    {{-- Toast thông báo thành công --}}
     @if(session('success'))
       <div class="alert alert-success" style="margin:15px;">
         {{ session('success') }}
       </div>
     @endif
 
-    {{-- Hàng lọc theo lô hàng --}}
     <div class="row w3-res-tb" style="padding: 0 15px; margin-top: 15px;">
       <div class="col-sm-5 m-b-xs">
         <form method="GET" action="{{ route('admin.storage-details.index') }}" class="form-inline">
 
-          {{-- Dropdown chọn lô --}}
           <select name="storage_id" class="input-sm form-control w-sm inline v-middle">
             <option value="">Lọc theo lô (Tất cả)</option>
             @foreach($storages as $st)
@@ -40,7 +36,6 @@
             @endforeach
           </select>
 
-          {{-- Nút áp dụng --}}
           <button type="submit" class="btn btn-sm btn-default" style="margin-left:5px;">
             Áp dụng
           </button>
@@ -51,14 +46,8 @@
       <div class="col-sm-4"></div>
     </div>
 
-    {{-- Bảng danh sách kho --}}
     <div class="table-responsive" style="margin-top:10px;">
-      <style>
-          table td, table th {
-              text-align: center !important;
-              vertical-align: middle !important;
-          }
-      </style>
+      
 
       <table class="table table-striped b-t b-light">
         <thead>
@@ -85,22 +74,16 @@
             <tr>
               <td>{{ $detail->id }}</td>
 
-              {{-- Hiển thị mã lô --}}
               <td>{{ optional($detail->storage)->batch_code ?? '—' }}</td>
 
-              {{-- Tên sản phẩm trong lô --}}
               <td>{{ $detail->product_name }}</td>
 
-              {{-- SL nhập --}}
               <td>{{ number_format($detail->import_quantity) }}</td>
 
-              {{-- SL đang bán (tồn hiện tại của product) --}}
               <td>{{ number_format($sellingQty) }}</td>
 
-              {{-- SL đã bán (tính từ order_details + orders.status != canceled) --}}
               <td>{{ number_format($soldQty) }}</td>
 
-              {{-- Nhãn trạng thái kho --}}
               <td>
                 @if($detail->stock_status === 'pending')
                   <span class="label label-warning">Chờ bán</span>
@@ -115,7 +98,6 @@
                 @endif
               </td>
 
-              {{-- Ẩn/hiện --}}
               <td>
                 @if($detail->status)
                   <span class="label label-success">Hiện</span>
@@ -124,16 +106,13 @@
                 @endif
               </td>
 
-              {{-- Các nút thao tác --}}
               <td>
-                {{-- Sửa dòng kho --}}
                 <a href="{{ route('admin.storage-details.edit', $detail->id) }}"
                    title="Sửa"
                    style="margin-right:6px;">
                   <i class="fa fa-pencil-square-o text-success" style="font-size:18px;"></i>
                 </a>
 
-                {{-- Ẩn / Hiện dòng kho --}}
                 <form action="{{ route('admin.storage-details.toggle-status', $detail->id) }}"
                       method="POST"
                       style="display:inline-block; margin-right:6px;">
@@ -150,7 +129,6 @@
                   </button>
                 </form>
 
-                {{-- Xem lô chứa dòng kho này --}}
                 @if($detail->storage)
                   <a href="{{ route('admin.storage-details.by-storage', $detail->storage->id) }}"
                      title="Xem lô"
@@ -159,7 +137,6 @@
                   </a>
                 @endif
 
-                {{-- Icon dẫn tới sản phẩm đã đăng bán --}}
                 @if($detail->product)
                   <a href="{{ route('admin.products.show', $detail->product->id) }}"
                      title="Xem sản phẩm đã đăng bán">
@@ -201,5 +178,12 @@
 
   </div>
 </div>
+
+<style>
+          table td, table th {
+              text-align: center !important;
+              vertical-align: middle !important;
+          }
+      </style>
 
 @endsection

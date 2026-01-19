@@ -38,41 +38,30 @@ class PromotionRule extends Model
         'end_at'               => 'datetime',
     ];
 
-    /* ===================== RELATIONSHIPS ===================== */
 
-    /**
-     * Rule thuộc về 1 Campaign
-     */
     public function campaign()
     {
         return $this->belongsTo(PromotionCampaign::class, 'campaign_id');
     }
 
-    /**
-     * Rule có nhiều Target
-     */
+    
     public function targets()
     {
         return $this->hasMany(PromotionTarget::class, 'rule_id');
     }
 
-    /**
-     * Rule có nhiều Code
-     */
+    
     public function codes()
     {
         return $this->hasMany(PromotionCode::class, 'rule_id');
     }
 
-    /**
-     * Log đã dùng rule
-     */
+    
     public function redemptions()
     {
         return $this->hasMany(PromotionRedemption::class, 'rule_id');
     }
 
-    /* ===================== HELPER ===================== */
 
     public function isProductScope(): bool
     {

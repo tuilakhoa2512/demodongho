@@ -12,7 +12,6 @@
 
 @php
     $email = $user->email ?? Session::get('email');
-
     // Ví dụ: khoaneios2002@gmail.com thành kho***@gmail.com
     if ($email) {
         [$name, $domain] = explode('@', $email);
@@ -28,6 +27,7 @@
 
 <div class="container">
     <div class="row">
+
 
         {{-- MENU BÊN TRÁI --}}
         <div class="col-md-3">

@@ -15,7 +15,6 @@ class Order extends Model
         'payment_method',
         'total_price',
 
-        // ===== receiver fields =====
         'receiver_name',
         'receiver_email',
         'receiver_phone',
@@ -34,7 +33,6 @@ class Order extends Model
         'ward_id'       => 'integer',
     ];
 
-    // ===================== Relationships =====================
 
     public function details()
     {
@@ -46,32 +44,21 @@ class Order extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    /**
-     * ✅ NEW promotion system:
-     * 1 đơn hàng thường có 0 hoặc 1 redemption (ghi nhận ưu đãi đã áp dụng)
-     * Bảng: promotion_redemptions
-     * FK theo DB của bạn: order_id
-     */
+   
     public function promotionRedemption()
     {
         return $this->hasOne(PromotionRedemption::class, 'order_id', 'id');
     }
 
-    // ===================== Helpers (optional) =====================
+ 
 
-    /**
-     * Số tiền giảm hóa đơn (snapshot) theo hệ mới.
-     * Nếu chưa có redemption => 0.
-     */
+    
     public function getBillDiscountAmountAttribute(): int
     {
         return (int) ($this->promotionRedemption?->discount_amount ?? 0);
     }
 
-    /**
-     * Tổng trước giảm (subtotal) nếu redemption có lưu subtotal.
-     * Nếu chưa có => fallback từ order_details.
-     */
+    
     public function getSubtotalAmountAttribute(): int
     {
         $sub = $this->promotionRedemption?->subtotal;
@@ -85,11 +72,7 @@ class Order extends Model
         return (int) $sum;
     }
 
-    /**
-     * Tổng sau giảm:
-     * Ưu tiên total_price (đã chốt lúc đặt).
-     * Nếu thiếu total_price thì tự tính: subtotal - discount.
-     */
+   
     public function getGrandTotalAttribute(): int
     {
         if (!is_null($this->total_price)) {

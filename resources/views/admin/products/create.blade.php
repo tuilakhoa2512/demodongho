@@ -14,7 +14,6 @@
                 enctype="multipart/form-data">
             @csrf
 
-            {{-- Chọn sản phẩm trong kho (StorageDetail) --}}
             <div class="form-group">
               <label for="storage_detail_id">
                 Chọn sản phẩm trong kho <span class="text-danger">*</span>
@@ -42,7 +41,6 @@
               </small>
             </div>
 
-            {{-- Số lượng dùng để bán (readonly, auto-fill từ kho) --}}
             <div class="form-group">
               <label for="quantity_display">Số lượng dùng để bán</label>
 
@@ -53,7 +51,6 @@
                      readonly
                      placeholder="Hãy chọn sản phẩm trong kho trước">
 
-              {{-- Giá trị thật gửi lên server --}}
               <input type="hidden"
                      name="quantity"
                      id="quantity_real"
@@ -64,7 +61,6 @@
               </small>
             </div>
 
-            {{-- Thương hiệu --}}
             <div class="form-group">
               <label for="brand_id">Thương hiệu <span class="text-danger">*</span></label>
               <select name="brand_id" id="brand_id" class="form-control" required>
@@ -78,7 +74,6 @@
               </select>
             </div>
 
-            {{-- Loại đồng hồ --}}
             <div class="form-group">
               <label for="category_id">Loại đồng hồ <span class="text-danger">*</span></label>
               <select name="category_id" id="category_id" class="form-control" required>
@@ -92,7 +87,6 @@
               </select>
             </div>
 
-            {{-- Tên sản phẩm --}}
             <div class="form-group">
               <label for="name">Tên sản phẩm hiển thị</label>
               <input type="text"
@@ -103,7 +97,6 @@
                      placeholder="Nếu để trống sẽ dùng tên trong kho">
             </div>
 
-            {{-- Mô tả --}}
             <div class="form-group">
               <label for="description">Mô tả</label>
               <textarea name="description"
@@ -113,7 +106,6 @@
                         placeholder="Mô tả chi tiết sản phẩm...">{{ old('description') }}</textarea>
             </div>
 
-            {{-- Chất liệu dây --}}
             <div class="form-group">
               <label for="strap_material">Chất liệu dây</label>
               <input type="text"
@@ -124,7 +116,6 @@
                      placeholder="VD: Thép không gỉ, Da, Cao su...">
             </div>
 
-            {{-- Kích thước mặt (mm) --}}
             <div class="form-group">
               <label for="dial_size">Kích thước mặt (mm)</label>
               <input type="number"
@@ -138,7 +129,6 @@
                      placeholder="VD: 40, 40.5">
             </div>
 
-            {{-- Giới tính --}}
             <div class="form-group">
               <label for="gender">Giới tính</label>
               <select name="gender" id="gender" class="form-control">
@@ -148,7 +138,6 @@
               </select>
             </div>
 
-            {{-- Giá bán --}}
             <div class="form-group">
               <label for="price">Giá bán (VNĐ) <span class="text-danger">*</span></label>
               <input type="number"
@@ -162,7 +151,6 @@
                      required>
             </div>
 
-            {{-- Ảnh sản phẩm --}}
             <div class="form-group">
               <label>Ảnh sản phẩm (tối đa 4 ảnh)</label>
               <div style="margin-bottom:5px;">
@@ -194,7 +182,6 @@
   </div>
 </div>
 
-{{-- JS: tự đổ số lượng + tên sản phẩm theo kho --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const selectDetail    = document.getElementById('storage_detail_id');
@@ -202,7 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const quantityReal    = document.getElementById('quantity_real');
     const nameInput       = document.getElementById('name');
 
-    // admin đã sửa tên hay chưa
     let nameTouched = false;
 
     // Nếu có old('name') => coi như đã sửa (validate fail quay lại)
@@ -212,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (nameInput) {
         nameInput.addEventListener('input', function () {
-            // nếu user xóa trống -> cho phép auto-fill lại theo kho
+            // nếu xóa trống => cho phép auto-fill lại theo kho
             nameTouched = (this.value.trim() !== '');
         });
     }
@@ -233,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const opt = getSelectedOption();
         const storageName = opt ? (opt.dataset.name ?? '').trim() : '';
 
-        // chỉ auto-fill khi admin chưa gõ tay
+        // chỉ auto-fill khi chưa gõ tay
         if (!nameTouched && storageName) {
             nameInput.value = storageName;
         }

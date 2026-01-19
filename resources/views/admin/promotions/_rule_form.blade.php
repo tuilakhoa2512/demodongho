@@ -1,7 +1,7 @@
 {{-- admin/promotions/_rule_form.blade.php --}}
 
 <div class="form-group">
-  <label class="col-lg-3 control-label">Tên rule *</label>
+  <label class="col-lg-3 control-label">Tên Luật Áp Dụng *</label>
   <div class="col-lg-6">
     <input type="text" name="name" class="form-control" required maxlength="120"
            value="{{ old('name', $rule->name ?? '') }}"
@@ -10,7 +10,7 @@
 </div>
 
 <div class="form-group">
-  <label class="col-lg-3 control-label">Scope *</label>
+  <label class="col-lg-3 control-label">Phạm Vi *</label>
   <div class="col-lg-3">
     @php $sc = old('scope', $rule->scope ?? 'product'); @endphp
     <select name="scope" class="form-control" required>
@@ -20,7 +20,7 @@
     <small class="text-muted">product = giảm theo SP, order = giảm hóa đơn</small>
   </div>
 
-  <label class="col-lg-2 control-label">Trạng thái</label>
+  <label class="col-lg-2 control-label">Trạng Thái</label>
   <div class="col-lg-2">
     @php $st = (string)old('status', (string)($rule->status ?? 1)); @endphp
     <select name="status" class="form-control">
@@ -35,8 +35,8 @@
   <div class="col-lg-3">
     @php $dt = old('discount_type', $rule->discount_type ?? 'percent'); @endphp
     <select name="discount_type" class="form-control" required>
-      <option value="percent" {{ $dt === 'percent' ? 'selected' : '' }}>percent (%)</option>
-      <option value="fixed"   {{ $dt === 'fixed' ? 'selected' : '' }}>fixed (đ)</option>
+      <option value="percent" {{ $dt === 'percent' ? 'selected' : '' }}>Theo phần trăm (%)</option>
+      <option value="fixed"   {{ $dt === 'fixed' ? 'selected' : '' }}>Giá chính xác (đ)</option>
     </select>
   </div>
   <div class="col-lg-3">
@@ -47,39 +47,39 @@
 </div>
 
 <div class="form-group">
-  <label class="col-lg-3 control-label">Max discount</label>
+  <label class="col-lg-3 control-label">Giá Giảm Tối Đa</label>
   <div class="col-lg-3">
     <input type="number" name="max_discount_amount" class="form-control" min="0" step="1"
            value="{{ old('max_discount_amount', $rule->max_discount_amount ?? '') }}"
            placeholder="(optional)">
-    <small class="text-muted">Giới hạn tiền giảm tối đa (rule-level)</small>
+    <small class="text-muted">Giới hạn tiền giảm tối đa</small>
   </div>
 
-  <label class="col-lg-2 control-label">Min subtotal (order)</label>
+  <label class="col-lg-2 control-label">Giá Trị Tối Thiểu (Order)</label>
   <div class="col-lg-2">
     <input type="number" name="min_order_subtotal" class="form-control" min="0" step="1"
            value="{{ old('min_order_subtotal', $rule->min_order_subtotal ?? '') }}"
            placeholder="(optional)">
-    <small class="text-muted">Chỉ dùng khi scope=order</small>
+    <small class="text-muted">Chỉ nhập khi Phạm Vi = Order</small>
   </div>
 </div>
 
 <div class="form-group">
-  <label class="col-lg-3 control-label">Thời gian rule</label>
+  <label class="col-lg-3 control-label">Thời Gian Luật</label>
   <div class="col-lg-3">
     <input type="datetime-local" name="start_at" class="form-control"
            value="{{ old('start_at', isset($rule->start_at) && $rule->start_at ? \Carbon\Carbon::parse($rule->start_at)->format('Y-m-d\TH:i') : '') }}">
-    <small class="text-muted">Bắt đầu (optional)</small>
+    <small class="text-muted">Bắt Đầu</small>
   </div>
   <div class="col-lg-3">
     <input type="datetime-local" name="end_at" class="form-control"
            value="{{ old('end_at', isset($rule->end_at) && $rule->end_at ? \Carbon\Carbon::parse($rule->end_at)->format('Y-m-d\TH:i') : '') }}">
-    <small class="text-muted">Kết thúc (optional)</small>
+    <small class="text-muted">Kết Thúc</small>
   </div>
 </div>
 
 <div class="form-group">
-  <label class="col-lg-3 control-label">Priority rule</label>
+  <label class="col-lg-3 control-label">Độ Ưu Tiên</label>
   <div class="col-lg-2">
     <input type="number" name="priority" class="form-control" min="0" step="1"
            value="{{ old('priority', (int)($rule->priority ?? 0)) }}">

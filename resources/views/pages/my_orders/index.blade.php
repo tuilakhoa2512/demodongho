@@ -10,7 +10,6 @@
         'canceled'  => 'Đã hủy',
     ];
 
-    // Badge class theo trạng thái
     function statusBadgeClass($st) {
         return match($st) {
             'confirmed' => 'badge-confirmed',
@@ -108,7 +107,6 @@
                             </td>
 
                             <td style="text-align:center;">
-                                {{-- Không gọi route theo yêu cầu --}}
                                 <a class="btn btn-xs btn-detail"
                                    href="{{ URL::to('/my-orders/' . $code) }}">
                                     Chi tiết
@@ -148,7 +146,6 @@ body > section > .container > .row > .col-sm-9.padding-right{
     }
 }
 
-/* ====== CSS hiện tại của bạn ====== */
 /* Chống tràn layout */
 .order-card, .order-card * { max-width: 100%; box-sizing: border-box; }
 .text-wrap{ word-break: break-word; white-space: normal; }

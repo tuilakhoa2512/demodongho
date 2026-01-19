@@ -35,7 +35,6 @@ class PromotionRedemption extends Model
         'final_total'     => 'integer',
     ];
 
-    /* ===================== RELATIONSHIPS ===================== */
 
     public function campaign()
     {
@@ -52,7 +51,6 @@ class PromotionRedemption extends Model
         return $this->belongsTo(PromotionCode::class, 'code_id');
     }
 
-    // nếu bạn muốn
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

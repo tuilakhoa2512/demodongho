@@ -23,9 +23,7 @@ class PaymentController extends Controller
         protected OrderPricingService $orderPricingService
     ) {}
 
-    /**
-     * GET /payment
-     */
+  
     public function show(Request $request)
     {
         $userId = (int) Session::get('id');
@@ -53,7 +51,7 @@ class PaymentController extends Controller
                 ->get();
         }
 
-        // ✅ promo code: ưu tiên query -> session
+        //  promo code: ưu tiên query -> session
         $promoCode = trim((string)$request->get('promo_code', ''));
         if ($promoCode === '') {
             $promoCode = trim((string) Session::get('promo_code', ''));
@@ -91,13 +89,12 @@ class PaymentController extends Controller
             $qty = max(1, (int)$qty);
             $qty = min($qty, $maxQty);
 
-            // ✅ NEW: product final price by PromotionService
+            // product final price by PromotionService
             $basePrice = (float) $product->price;
 
             $pack = $this->promotionService->calcProductFinalPrice($product);
             $finalPrice = (float)($pack['final_price'] ?? $basePrice);
 
-            // ✅ FIX: calcProductFinalPrice không có key 'promotion'
             $hasSale = !empty($pack['rule']) && $finalPrice < $basePrice;
 
             $lineTotal = $finalPrice * $qty;
@@ -121,7 +118,7 @@ class PaymentController extends Controller
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống hoặc sản phẩm không hợp lệ.');
         }
 
-        // ✅ NEW: quote order promotion + code
+        // quote order promotion + code
         $pricingItems = [];
         foreach ($cart as $row) {
             $pricingItems[] = [
@@ -160,9 +157,7 @@ class PaymentController extends Controller
 
     }
 
-    /**
-     * POST /payment/place
-     */
+   
     public function placeOrder(Request $request)
     {
         $userId = (int) Session::get('id');
@@ -186,11 +181,10 @@ class PaymentController extends Controller
 
         $promoCode = trim((string)$request->input('promo_code', ''));
 
-        // giữ lại để hiển thị nếu redirect
         if (!empty($quote['promotion_code'])) {
             Session::put('promo_code', $promoCode); // chỉ lưu khi code hợp lệ
         } else {
-            Session::forget('promo_code'); // code sai → xóa session
+            Session::forget('promo_code'); // code sai => xóa session
         }
 
 
@@ -224,7 +218,7 @@ class PaymentController extends Controller
 
             $basePrice = (float)$p->price;
 
-            // ✅ NEW: product final price
+            // product final price
             $pack = $this->promotionService->calcProductFinalPrice($p);
             $finalPrice = (float)($pack['final_price'] ?? $basePrice);
 
@@ -244,7 +238,7 @@ class PaymentController extends Controller
             return redirect()->route('cart.index')->with('success', 'Giỏ hàng đang trống hoặc sản phẩm không hợp lệ.');
         }
 
-        // ✅ Quote order promo/code again
+    
         $pricingItems = [];
         foreach ($items as $it) {
             $pricingItems[] = [
@@ -256,8 +250,8 @@ class PaymentController extends Controller
 
         $quote = $this->orderPricingService->quote($pricingItems, $userId, $promoCode !== '' ? $promoCode : null);
 
-        $orderPromotion = $quote['order_promotion'] ?? null; // tùy bạn đang trả về Rule hay gì
-        $promotionCode  = $quote['promotion_code'] ?? null;  // PromotionCode|null
+        $orderPromotion = $quote['order_promotion'] ?? null; 
+        $promotionCode  = $quote['promotion_code'] ?? null; 
         $discountAmount = (int)($quote['discount_amount'] ?? 0);
         $grandTotal     = (int)($quote['total'] ?? max(0, $subtotal - $discountAmount));
 
@@ -266,21 +260,19 @@ class PaymentController extends Controller
         DB::beginTransaction();
         try {
 
-        // ===== TẠO MÃ ĐƠN: UnK-YYYYMM-DD0001 =====
+        // tạo mã đơn
 
-        $ym = now()->format('Ym'); // YYYYMM
-        $d  = now()->format('d');  // DD
+        $ym = now()->format('Ym');
+        $d  = now()->format('d');  
 
         $prefix = "UnK-{$ym}-{$d}";
 
-        // tìm đơn cuối cùng trong ngày
         $lastOrderToday = Order::where('order_code', 'like', $prefix . '%')
             ->orderByDesc('id')
             ->lockForUpdate()
             ->first();
 
         if ($lastOrderToday) {
-            // lấy 4 số cuối
             $lastNumber = (int) substr($lastOrderToday->order_code, -4);
             $nextNumber = $lastNumber + 1;
         } else {
@@ -289,7 +281,6 @@ class PaymentController extends Controller
 
         $orderCode = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-            // 1) Create Order (KHÔNG thêm cột)
             $order = Order::create([
                 'order_code' => $orderCode,
                 'user_id' => $userId,
@@ -306,7 +297,6 @@ class PaymentController extends Controller
                 'ward_id' => $request->ward_id,
             ]);
 
-            // 2) Create OrderDetails
             foreach ($items as $it) {
                 OrderDetail::create([
                     'order_id'   => $order->id,
@@ -316,17 +306,12 @@ class PaymentController extends Controller
                 ]);
             }
 
-            /**
-             * ✅ GHI promotion_redemptions THEO ĐÚNG SCHEMA (không thêm cột DB)
-             * - Ghi cho cả auto promotion và code promotion (nếu có giảm)
-             * - COD: used_at=now(), status='applied'
-             * - VNPAY: used_at=null, status='pending' (VNPay success sẽ update used_at)
-             */
+          
             if ($discountAmount > 0) {
                 $ruleId = data_get($orderPromotion, 'id');              // nếu order_promotion là Rule
-                $campaignId = data_get($orderPromotion, 'campaign_id'); // nếu có
+                $campaignId = data_get($orderPromotion, 'campaign_id'); 
 
-                $codeId = data_get($promotionCode, 'id');               // PromotionCode id
+                $codeId = data_get($promotionCode, 'id');            
 
                 PromotionRedemption::create([
                     'campaign_id'     => $campaignId ? (int)$campaignId : 0,
@@ -346,7 +331,6 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // COD: trừ kho + auto update trạng thái + clear cart
             if ($request->payment_method === 'COD') {
 
                 foreach ($items as $it) {
@@ -364,7 +348,7 @@ class PaymentController extends Controller
                     // Trừ kho
                     $product->quantity -= $it['quantity'];
 
-                    // ✅ HẾT HÀNG → sold_out + ẩn
+                    //  HẾT HÀNG => sold_out + ẩn
                     if ($product->quantity <= 0) {
                         $product->quantity = 0;
                         $product->stock_status = 'sold_out';
@@ -398,9 +382,7 @@ class PaymentController extends Controller
         }
     }
 
-    /**
-     * GET /payment/success/{order_code}
-     */
+
     public function success($order_code)
     {
         $userId = (int) Session::get('id');
@@ -432,7 +414,7 @@ class PaymentController extends Controller
             $subtotal += ((float)$it->price * (int)$it->quantity);
         }
 
-        // ✅ lấy giảm từ promotion_redemptions (vì orders không có cột)
+        // lấy giảm từ promotion_redemptions (vì orders không có cột)
         $discountValue = (int) DB::table('promotion_redemptions')
             ->where('order_id', $order->id)
             ->value('discount_amount');
@@ -448,7 +430,8 @@ class PaymentController extends Controller
         ));
     }
 
-    // ===================== HÀM PHỤ (giữ nguyên) =====================
+ 
+    //phụ
 
     private function customerId(): ?int
     {
@@ -541,7 +524,7 @@ class PaymentController extends Controller
 
         $promoCode = trim((string)$request->input('promo_code', ''));
 
-        // Rebuild cart y hệt show()
+     
         $raw = $this->getRawCart();
         if (empty($raw)) {
             return response()->json([
@@ -591,7 +574,6 @@ class PaymentController extends Controller
             ]);
         }
 
-        // Quote order promo/code (scope=order)
         $quote = $this->orderPricingService->quote($pricingItems, $userId, $promoCode !== '' ? $promoCode : null);
 
         if (!empty($quote['order_promotion']) && ((int)$quote['discount_amount'] > 0)) {

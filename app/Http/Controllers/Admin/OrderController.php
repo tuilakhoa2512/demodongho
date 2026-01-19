@@ -200,7 +200,7 @@
             $currentStatus  = (string) $order->status;
             $paymentMethod = strtolower((string) $order->payment_method);
 
-            // ❌ VNPAY không được quay về pending
+            // VNPAY không quay về pending
             if (
                 str_contains($paymentMethod, 'vnpay') &&
                 $currentStatus !== 'pending' &&
@@ -213,7 +213,7 @@
                 );
             }
 
-            // ❌ Đơn đã hủy thì không cho đổi
+            //  Đơn đã hủy thì không cho đổi
             if ($currentStatus === 'canceled') {
                 DB::rollBack();
                 return redirect()->back()->with(
@@ -222,15 +222,13 @@
                 );
             }
 
-            // ❌ Trạng thái không đổi
+            //  Trạng thái không đổi
             if ($currentStatus === $newStatus) {
                 DB::rollBack();
                 return redirect()->back()->with('success', 'Trạng thái không thay đổi.');
             }
 
-            // =========================
-            // HỦY ĐƠN → HOÀN KHO
-            // =========================
+            // HỦY ĐƠN => HOÀN KHO
             if ($newStatus === 'canceled') {
 
                 $details = DB::table('order_details')
@@ -241,7 +239,7 @@
                     $qty = (int) $d->quantity;
                     if ($qty <= 0) continue;
 
-                    // 1️⃣ Hoàn tồn kho
+                    //  Hoàn tồn kho
                     DB::table('products')
                         ->where('id', (int) $d->product_id)
                         ->increment('quantity', $qty);
@@ -252,7 +250,7 @@
 
                     if ($product && (int) $product->quantity > 0) {
 
-                        // 2️⃣ Mở lại sản phẩm
+                        //  Mở lại sản phẩm
                         DB::table('products')
                             ->where('id', $product->id)
                             ->update([
@@ -260,7 +258,7 @@
                                 'status'       => 1,
                             ]);
 
-                        // 3️⃣ Sync kho (không mở kho đã stopped)
+                        //  Sync kho (không mở kho đã stopped)
                         if (!empty($product->storage_detail_id)) {
                             DB::table('storage_details')
                                 ->where('id', $product->storage_detail_id)
@@ -272,7 +270,7 @@
                     }
                 }
 
-                // 4️⃣ Hoàn promotion
+                // Hoàn promotion
                 DB::table('promotion_redemptions')
                     ->where('order_id', $order->id)
                     ->update([
@@ -281,9 +279,7 @@
                     ]);
             }
 
-            // =========================
             // CẬP NHẬT TRẠNG THÁI
-            // =========================
             DB::table('orders')
                 ->where('id', $order->id)
                 ->update([

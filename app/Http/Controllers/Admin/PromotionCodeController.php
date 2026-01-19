@@ -18,7 +18,7 @@ class PromotionCodeController extends Controller
             ->where('id', (int)$ruleId)
             ->firstOrFail();
 
-        // Codes: chỉ hợp lý cho rule scope=order
+        // Codes: chỉ cho rule scope=order
         if ($rule->scope !== 'order') {
             return back()->with('error', 'Codes chỉ áp dụng cho rule scope=order.');
         }
