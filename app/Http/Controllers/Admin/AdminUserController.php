@@ -202,6 +202,7 @@ class AdminUserController extends BaseAdminController
                 'password'   => Hash::make($request->password),
                 'role_id'    => $targetRole,
                 'status'     => 1,
+                'created_by' => Session::get('admin_id'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
