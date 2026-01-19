@@ -34,13 +34,12 @@
         $rawStatus = $order->status ?? 'pending';
         $statusVi = $statusMap[$rawStatus] ?? $rawStatus;
 
-        // ✅ NEW: promo fields (từ MyOrderController đã join)
         $promoCode = $order->promo_code ?? null;
         $promoName = $order->promo_campaign_name ?? null;
 
-        // số tiền giảm (ưu tiên hệ mới)
+        // số tiền giảm 
         $promoDiscount = (int)($order->promo_discount_amount ?? 0);
-        // (nếu controller gắn thêm order->promo_discount thì cũng nhận)
+
         if ($promoDiscount <= 0 && isset($order->promo_discount)) {
             $promoDiscount = (int)$order->promo_discount;
         }
@@ -182,13 +181,11 @@
     </div>
 
     @php
-        // subtotal ưu tiên controller tính sẵn (order->subtotal) hoặc biến $subtotal, fallback calc
+        // subtotal ưu tiên controller tính sẵn (order=>subtotal) hoặc biến $subtotal, fallback calc
         $subtotalShow = isset($order->subtotal) ? (float)$order->subtotal : (isset($subtotal) ? (float)$subtotal : (float)$calcSubtotal);
 
-        // discount ưu tiên hệ mới: promotion_redemptions
         $discountShow = $promoDiscount;
 
-        // grand total ưu tiên order.total_price (đã chốt)
         $grandShow = (float)($order->total_price ?? max(0, $subtotalShow - $discountShow));
     @endphp
 

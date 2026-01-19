@@ -41,7 +41,6 @@ class StorageController extends Controller
                 'nullable',
                 'string',
                 'max:50',
-                'regex:/^[\p{L}\s]+$/u'
             ],
             'supplier_email' => [
                 'nullable',
@@ -99,7 +98,6 @@ class StorageController extends Controller
                 'nullable',
                 'string',
                 'max:30',
-                'regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/',
             ],
             'import_date'    => 'nullable|date',
             'note'           => 'nullable|string|max:200',
@@ -120,7 +118,7 @@ class StorageController extends Controller
             ->with('success', 'Cập nhật lô hàng thành công.');
     }
 
-    // Ẩn / hiện lô hàng bằng status
+   
     public function toggleStatus($id)
     {
         $storage = Storage::findOrFail($id);

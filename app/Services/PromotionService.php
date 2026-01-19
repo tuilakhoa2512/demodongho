@@ -10,10 +10,6 @@ use App\Models\PromotionRedemption;
 class PromotionService
 {
     /**
-     * ============================
-     * A) PRODUCT: Tính giá sau ưu đãi
-     * ============================
-     *
      * @param  object $product  (Eloquent Product) cần có: id, price, category_id, brand_id
      * @return array
      */
@@ -53,12 +49,7 @@ class PromotionService
         ];
     }
 
-    /**
-     * Tìm rule tốt nhất cho product theo:
-     * - campaign active + rule active + scope=product
-     * - target match (all/product/category/brand)
-     * - ưu tiên theo: campaign.priority desc, rule.priority desc, campaign.id desc, rule.id desc
-     */
+    
     protected function findBestRuleForProduct($product): ?array
     {
         $now = Carbon::now();
@@ -120,13 +111,7 @@ class PromotionService
         return [$bestRule->campaign, $bestRule];
     }
 
-    /**
-     * Match target cho product:
-     * - all
-     * - product: target_id = product.id
-     * - category: target_id = product.category_id
-     * - brand: target_id = product.brand_id
-     */
+   
     protected function ruleMatchesProductTargets(PromotionRule $rule, $product): bool
     {
         $targets = $rule->targets ?? collect();
@@ -148,9 +133,7 @@ class PromotionService
     }
 
     /**
-     * ============================
-     * B) ORDER: Tính giảm giá hóa đơn (+ code)
-     * ============================
+     * ORDER: Tính giảm giá hóa đơn (+ code)
      *
      * @param int $subtotal
      * @param array $cartProducts
@@ -163,7 +146,7 @@ class PromotionService
         $subtotal = max(0, (int)$subtotal);
         $now = Carbon::now();
 
-        // 1) Có code => validate code => lấy rule
+        //  Có code => validate code => lấy rule
         if (!empty($code)) {
             $codeRow = $this->validateAndGetCode($code, $subtotal, $userId, $now);
 
@@ -234,7 +217,7 @@ class PromotionService
             ];
         }
 
-        // 2) Không có code => auto apply rule order (chỉ lấy rule KHÔNG có codes active)
+        // Không có code => auto apply rule order (chỉ lấy rule KHÔNG có codes active)
         $best = $this->findBestAutoOrderRule($subtotal, $cartProducts, $now);
 
         if (!$best) {
@@ -272,10 +255,7 @@ class PromotionService
         ];
     }
 
-    /**
-     * Validate code (status/time/rule/campaign + min_subtotal + usage limits)
-     * Return PromotionCode|null
-     */
+   
     protected function validateAndGetCode(string $code, int $subtotal, ?int $userId, Carbon $now): ?PromotionCode
     {
         $code = trim(strtoupper($code));
@@ -310,7 +290,6 @@ class PromotionService
         $minSubtotal = (int)($codeRow->min_subtotal ?? 0);
         if ($subtotal < $minSubtotal) return null;
 
-        //  USAGE LIMITS — CHỈ ĐẾM applied
 
         // usage limits theo code: max_uses
         if (!is_null($codeRow->max_uses)) {
@@ -336,9 +315,7 @@ class PromotionService
         return $codeRow;
     }
 
-    /**
-     * Auto order rule: chỉ lấy rule order không có codes active
-     */
+   
     protected function findBestAutoOrderRule(int $subtotal, array $cartProducts, Carbon $now): ?array
     {
         $rules = PromotionRule::query()
@@ -412,12 +389,7 @@ class PromotionService
         return [$bestRule->campaign, $bestRule];
     }
 
-    /**
-     * Match target cho order rule:
-     * - Nếu targets có 'all' => true
-     * - Nếu có product/category/brand => chỉ cần giỏ có ÍT NHẤT 1 item match
-     * - Nếu rule không có target => false
-     */
+    
     protected function ruleMatchesOrderTargets(PromotionRule $rule, array $cartProducts): bool
     {
         $targets = $rule->targets ?? collect();
@@ -472,9 +444,7 @@ class PromotionService
         return PromotionRedemption::create($payload);
     }
 
-    /**
-     * Helpers
-     */
+    
     protected function isActiveWindow($startAt, $endAt, Carbon $now): bool
     {
         if (!empty($startAt) && Carbon::parse($startAt)->gt($now)) return false;

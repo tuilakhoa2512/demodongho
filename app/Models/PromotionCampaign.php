@@ -27,37 +27,28 @@ class PromotionCampaign extends Model
         'priority' => 'integer',
     ];
 
-    /* ===================== RELATIONSHIPS ===================== */
 
-    /**
-     * 1 Campaign có N Rule
-     */
+    
     public function rules()
     {
         return $this->hasMany(PromotionRule::class, 'campaign_id');
     }
 
-    /**
-     * Rule theo scope = product
-     */
+    
     public function productRules()
     {
         return $this->hasMany(PromotionRule::class, 'campaign_id')
             ->where('scope', 'product');
     }
 
-    /**
-     * Rule theo scope = order
-     */
+    
     public function orderRules()
     {
         return $this->hasMany(PromotionRule::class, 'campaign_id')
             ->where('scope', 'order');
     }
 
-    /**
-     * Campaign có nhiều redemption (log đã dùng)
-     */
+   
     public function redemptions()
     {
         return $this->hasMany(PromotionRedemption::class, 'campaign_id');

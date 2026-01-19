@@ -121,7 +121,8 @@
                 </div>
                 <div class="row">
             <div class="col-sm-12">
-    {{-- ================== REVIEW ================== --}}
+                
+    {{--  REVIEW  --}}
     @php
             $hasReviewed = false;
             if (session('id') && $reviews) {
@@ -136,7 +137,7 @@
                 Điểm Trung Bình: {{ $averageRating ?? 0 }}/5★
             </p>
 
-            {{-- ===== FORM ===== --}}
+            {{--  FORM  --}}
             @if($hasReviewed)
                 <div class="alert alert-info">
                     <i class="fa fa-info-circle"></i>
@@ -175,7 +176,7 @@
 
                     <strong>{{ $review->user->fullname ?? 'Khách' }}</strong>
 
-                    {{-- ⭐ SAO --}}
+                    
                     <div class="review-stars">
                         @for($i = 1; $i <= 5; $i++)
                             <i class="fa fa-star {{ $i <= $review->rating ? 'filled' : '' }}"></i>

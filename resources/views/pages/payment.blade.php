@@ -5,7 +5,6 @@
 
 <div class="payment-page">
 
-    {{-- ERROR / SUCCESS --}}
     @if(session('error'))
         <div class="pay-alert pay-alert-error">{{ session('error') }}</div>
     @endif
@@ -24,7 +23,6 @@
         @csrf
 
         <div class="row">
-            {{-- LEFT: SHIPPING INFO --}}
             <div class="col-sm-7">
                 <div class="pay-box">
                     <h3 class="pay-box-title" style="text-align:center;">Thông Tin Giao Hàng</h3>
@@ -102,7 +100,6 @@
 
                     <hr>
 
-                    {{-- PAYMENT METHOD --}}
                     <h3 class="pay-box-title" style="text-align:center;">Phương Thức Thanh Toán</h3>
                     <div class="form-group">
                         <select name="payment_method" id="payment_method" class="form-control" required>
@@ -117,12 +114,10 @@
                 </div>
             </div>
 
-            {{-- RIGHT: ORDER SUMMARY + PROMO CODE --}}
             <div class="col-sm-5">
                 <div class="pay-box">
                     <h3 class="pay-box-title" style="text-align:center;">Đơn Hàng Của Bạn</h3>
 
-                    {{-- PROMO CODE (moved to right) --}}
                     <div class="promo-wrap">
                         <label style="font-weight:800; margin-bottom:6px; display:block;">Mã giảm giá</label>
 
@@ -183,13 +178,11 @@
                             <span>
                                 Ưu đãi hóa đơn
 
-                                {{-- CAMPAIGN NAME --}}
                                 <span id="promo_campaign_name"
                                     style="color:#555; font-weight:800; {{ !empty($promoCampaignName ?? null) ? '' : 'display:none;' }}">
                                     - {{ $promoCampaignName ?? '' }}
                                 </span>
 
-                                {{-- CODE --}}
                                 <span id="applied_code"
                                     style="color:#555; font-weight:800; {{ !empty($promoCode ?? null) ? '' : 'display:none;' }}">
                                     (Code: {{ $promoCode ?? '' }})
@@ -214,12 +207,10 @@
                         </div>
                     </div>
 
-                    {{-- COD BUTTON --}}
                     <button type="submit" id="btn_place_order" class="btn pay-btn">
                         Xác Nhận Đặt Hàng
                     </button>
 
-                    {{-- VNPAY BUTTON --}}
                     <button type="submit" id="btn_vnpay" class="btn pay-btn" style="display:none;">
                         Thanh toán VNPay
                     </button>
@@ -233,7 +224,6 @@
     </form>
 </div>
 
-{{-- TOGGLE BUTTONS --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const select = document.getElementById('payment_method');

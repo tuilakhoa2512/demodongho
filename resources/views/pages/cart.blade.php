@@ -8,7 +8,6 @@
 
 <div class="cart-page">
 
-    {{-- ALERT --}}
     @if(session('success'))
         <div id="cart-alert"
              style="background:#e60012; color:#fff; padding:12px 16px; border-radius:8px;
@@ -28,7 +27,6 @@
         </script>
     @endif
 
-    {{-- EMPTY --}}
     <div id="cart-empty" style="{{ empty($cart) ? '' : 'display:none' }}">
         <div class="order-card">
             <div class="empty-box">
@@ -41,12 +39,10 @@
     </div>
 
         @php
-            // đảm bảo không null
             $subtotal       = (float) ($subtotal ?? 0);
             $discountAmount = (float) ($discountAmount ?? 0);
             $grandTotal     = (float) ($grandTotal ?? $subtotal);
 
-            // AUTO ORDER PROMO (PromotionRule -> Campaign)
             $campaignName = $orderRule?->campaign?->name;
 
             $count = is_countable($cart ?? null) ? count($cart) : 0;
@@ -80,8 +76,6 @@
                         @foreach($cart as $item)
                             @php
                            
-
-                                // chuẩn hoá dữ liệu
                                 $id = (int) ($item['id'] ?? 0);
                                 $name = $item['name'] ?? 'Sản phẩm' ;
                                 $image = $item['image'] ?? asset('frontend/images/noimage.jpg');
@@ -95,7 +89,6 @@
                                 $maxQty = max(1, (int)($item['max_qty'] ?? 1));
                                 $qty = max(1, min((int)($item['quantity'] ?? 1), $maxQty));
 
-                                // line_total ưu tiên controller tính sẵn, nhưng vẫn fallback tính lại cho chắc
                                 $lineTotal = isset($item['line_total'])
                                     ? (float)$item['line_total']
                                     : ($finalPrice * $qty);
@@ -140,7 +133,6 @@
                                     </div>
                                 </td>
 
-                                {{-- QTY --}}
                                 <td style="text-align:center;">
                                     <div class="qty-control" data-max="{{ $maxQty }}">
                                         <button type="button" class="qty-btn qty-minus">−</button>
@@ -159,12 +151,10 @@
                                     <div class="cart-stock-note">Tồn: {{ $maxQty }}</div>
                                 </td>
 
-                                {{-- LINE TOTAL --}}
                                 <td style="text-align:center;" class="text-red" id="line-total-{{ $id }}">
                                     {{ number_format($lineTotal, 0, ',', '.') }} đ
                                 </td>
 
-                                {{-- REMOVE --}}
                                 <td style="text-align:center;">
                                     <button type="button"
                                             class="btn-remove"
@@ -179,7 +169,6 @@
                     </table>
                 </div>
 
-                {{-- SUMMARY --}}
                 <div class="summary-box" style="margin-top:12px;">
                     <div class="sum-row">
                         <span>Tạm tính:</span>
@@ -212,13 +201,9 @@
 
                 </div>
 
-                {{-- ACTIONS --}}
                 <div class="cart-actions">
                     <a href="{{ url('/trang-chu') }}" class="btn btn-default btn-back">Tiếp tục mua sắm</a>
 
-                    <!-- <button type="submit" class="btn btn-warning btn-update">
-                        Cập nhật
-                    </button> -->
 
                     @if(Session::get('id'))
                         <a href="{{ url('/payment') }}" class="btn btn-danger btn-checkout">Thanh toán</a>
@@ -235,7 +220,7 @@
 <script>
 const csrf = "{{ csrf_token() }}";
 
-// ===== AJAX =====
+//  AJAX 
 
 function updateCartAjax(productId, qty) {
     fetch("{{ route('cart.update') }}", {
@@ -373,10 +358,8 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
 </script>
 
 <style>
-/* Page */
 .cart-page { padding: 10px 0 40px; }
 
-/* Đồng bộ style khung giống Lịch sử đơn hàng */
 .order-card, .order-card * { max-width: 100%; box-sizing: border-box; }
 .text-wrap{ word-break: break-word; white-space: normal; }
 .text-red{ color:#e60012; font-weight:900; }
@@ -400,7 +383,6 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
 
 .table-responsive{ overflow-x:auto; }
 
-/* Table giống my_orders */
 .myorder-table{ width:100%; margin-bottom:0; }
 .myorder-table thead th{
     background:#e60012;
@@ -520,7 +502,6 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
     border-color:#b80010 !important;
 }
 
-/* Nút xóa */
 .btn-remove{
     display:inline-flex;
     align-items:center;
@@ -556,7 +537,7 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
     background:#fff;
 }
 
-/* Mobile */
+
 @media (max-width: 767px){
     .order-header{ flex-direction:column; }
     .cart-actions{ justify-content:stretch; }

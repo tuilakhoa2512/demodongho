@@ -86,7 +86,6 @@
     margin-bottom: 20px;
 }
 
-/* Label nhỏ giống form mật khẩu */
 .reset-form label {
     font-size: 13px;
     font-weight: 600;

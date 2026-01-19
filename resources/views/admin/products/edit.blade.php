@@ -10,7 +10,6 @@
 
             <div class="panel-body">
                 <div class="position-center">
-                    {{-- Thông tin lô & kho (chỉ xem) --}}
                     @php
                         $storageDetail = optional($product->storageDetail);
                         $storage       = optional($storageDetail->storage);
@@ -34,7 +33,6 @@
                         @csrf
                         @method('PUT')
 
-                        {{-- Thương hiệu --}}
                         <div class="form-group">
                             <label for="brand_id">Thương hiệu <span class="text-danger">*</span></label>
                             <select name="brand_id" id="brand_id" class="form-control" required>
@@ -48,7 +46,6 @@
                             </select>
                         </div>
 
-                        {{-- Loại đồng hồ --}}
                         <div class="form-group">
                             <label for="category_id">Loại đồng hồ <span class="text-danger">*</span></label>
                             <select name="category_id" id="category_id" class="form-control" required>
@@ -62,7 +59,6 @@
                             </select>
                         </div>
 
-                        {{-- Tên sản phẩm --}}
                         <div class="form-group">
                             <label for="name">Tên sản phẩm hiển thị <span class="text-danger">*</span></label>
                             <input type="text"
@@ -73,7 +69,6 @@
                                    required>
                         </div>
 
-                        {{-- Mô tả --}}
                         <div class="form-group">
                             <label for="description">Mô tả</label>
                             <textarea name="description"
@@ -83,7 +78,6 @@
                                       placeholder="Mô tả chi tiết sản phẩm...">{{ old('description', $product->description) }}</textarea>
                         </div>
 
-                        {{-- Chất liệu dây --}}
                         <div class="form-group">
                             <label for="strap_material">Chất liệu dây</label>
                             <input type="text"
@@ -94,7 +88,6 @@
                                    placeholder="VD: Thép không gỉ, Da, Cao su...">
                         </div>
 
-                        {{-- Kích thước mặt (mm) --}}
                         <div class="form-group">
                             <label for="dial_size">Kích thước mặt (mm)</label>
                             <input type="number"
@@ -108,7 +101,6 @@
                                    placeholder="VD: 40, 40.5">
                         </div>
 
-                        {{-- Giới tính --}}
                         <div class="form-group">
                             <label for="gender">Giới tính</label>
                             <select name="gender" id="gender" class="form-control">
@@ -119,7 +111,6 @@
                             </select>
                         </div>
 
-                        {{-- Giá bán --}}
                         <div class="form-group">
                             <label for="price">Giá bán (VNĐ) <span class="text-danger">*</span></label>
                             <input type="number"
@@ -132,7 +123,6 @@
                                    required>
                         </div>
 
-                        {{-- Số lượng tồn kho (chỉ xem, không submit) --}}
                         <div class="form-group">
                             <label>Số lượng tồn kho hiện tại</label>
                             <input type="text"
@@ -145,7 +135,6 @@
                             </small>
                         </div>
 
-                        {{-- Trạng thái bán (stock_status) --}}
                         <div class="form-group">
                             <label for="stock_status">Trạng thái bán</label>
                             <select name="stock_status" id="stock_status" class="form-control">
@@ -167,7 +156,6 @@
                             </small>
                         </div>
 
-                        {{-- Ảnh sản phẩm --}}
                         <div class="form-group">
                             <label>Ảnh sản phẩm</label>
 
@@ -177,7 +165,6 @@
 
                             <div class="row">
 
-                                {{-- Ảnh 1 --}}
                                 <div class="col-sm-6" style="margin-bottom:15px;">
                                     <label>Ảnh 1 (chính)</label><br>
                                     @if($images && $images->image_1)
@@ -190,7 +177,6 @@
                                     <input type="file" name="image_1" class="form-control">
                                 </div>
 
-                                {{-- Ảnh 2 --}}
                                 <div class="col-sm-6" style="margin-bottom:15px;">
                                     <label>Ảnh 2 (hover)</label><br>
                                     @if($images && $images->image_2)
@@ -203,7 +189,6 @@
                                     <input type="file" name="image_2" class="form-control">
                                 </div>
 
-                                {{-- Ảnh 3 --}}
                                 <div class="col-sm-6" style="margin-bottom:15px;">
                                     <label>Ảnh 3 (phụ)</label><br>
                                     @if($images && $images->image_3)
@@ -216,7 +201,6 @@
                                     <input type="file" name="image_3" class="form-control">
                                 </div>
 
-                                {{-- Ảnh 4 --}}
                                 <div class="col-sm-6" style="margin-bottom:15px;">
                                     <label>Ảnh 4 (phụ)</label><br>
                                     @if($images && $images->image_4)
@@ -236,7 +220,6 @@
                         </div>
 
                         <button type="submit" class="btn btn-info">Lưu thay đổi</button>
-                        {{-- Nút quay lại: về trang chi tiết sản phẩm --}}
                         <a href="{{ route('admin.products.show', $product->id) }}" class="btn btn-default">
                             Quay lại
                         </a>

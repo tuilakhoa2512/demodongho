@@ -16,7 +16,6 @@
                         @csrf
                         @method('PUT')
 
-                        {{-- Mã lô hàng: chỉ hiển thị, không cho sửa --}}
                         <div class="form-group">
                             <label for="batch_code">Mã lô hàng</label>
                             <input type="text"
@@ -29,7 +28,6 @@
                             </small>
                         </div>
 
-                        {{-- Nhà cung cấp --}}
                         <div class="form-group">
                             <label for="supplier_name">Tên nhà cung cấp</label>
                             <input type="text"
@@ -41,7 +39,6 @@
                                    placeholder="Tên nhà cung cấp (tối đa 50 ký tự)">
                         </div>
 
-                        {{-- Email nhà cung cấp --}}
                         <div class="form-group">
                             <label for="supplier_email">Email nhà cung cấp</label>
                             <input type="email"
@@ -53,7 +50,6 @@
                                    placeholder="VD: tencongty@gmail.com">
                         </div>
 
-                        {{-- Ngày nhập --}}
                         <div class="form-group">
                             <label for="import_date">Ngày nhập hàng</label>
                             <input type="date"
@@ -66,7 +62,6 @@
                             </small>
                         </div>
 
-                        {{-- Ghi chú --}}
                         <div class="form-group">
                             <label for="note">Ghi chú</label>
                             <textarea name="note"

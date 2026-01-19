@@ -26,11 +26,7 @@ class CartController extends Controller
         $this->orderPricingService = $orderPricingService;
     }
 
-    /**
-     * =========================
-     * GIỎ HÀNG
-     * =========================
-     */
+   
     public function index()
     {
         $rawCart = $this->getRawCart(); // [product_id => qty]
@@ -56,7 +52,7 @@ class CartController extends Controller
         foreach ($rawCart as $pid => $qty) {
             $product = $products->get($pid);
 
-            // ❌ product không hợp lệ → remove
+            //  product không hợp lệ => remove
             if (
                 !$product ||
                 (int)$product->status !== 1 ||
@@ -70,12 +66,11 @@ class CartController extends Controller
             // ép qty theo tồn kho
             $qty = max(1, min((int)$qty, (int)$product->quantity));
 
-            // image
             $image = ($product->productImage && $product->productImage->image_1)
                 ? Storage::url($product->productImage->image_1)
                 : asset('frontend/images/noimage.jpg');
 
-            // ===== PRODUCT PROMO =====
+            //  PRODUCT PROMO 
             $basePrice = (float)$product->price;
 
             $pricePack = $this->promotionService->calcProductFinalPrice($product);
@@ -119,11 +114,10 @@ class CartController extends Controller
             ]);
         }
 
-        /**
-         * =========================
-         * ORDER PROMO + CODE
-         * =========================
-         */
+       
+         //ORDER PROMO + CODE
+
+         
         $promoCode = Session::get('promo_code');
 
         $pricingItems = [];
@@ -157,11 +151,7 @@ class CartController extends Controller
 
     }
 
-    /**
-     * =========================
-     * ADD TO CART
-     * =========================
-     */
+  
     public function add(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -202,11 +192,7 @@ class CartController extends Controller
         return back()->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
     }
 
-    /**
-     * =========================
-     * UPDATE CART
-     * =========================
-     */
+    
     public function update(Request $request)
     {
         $quantities = $request->input('quantities', []);
@@ -279,11 +265,7 @@ class CartController extends Controller
             ->with('success', 'Cập nhật giỏ hàng thành công!');
     }
 
-    /**
-     * =========================
-     * REMOVE ITEM
-     * =========================
-     */
+   
     public function remove(Request $request)
     {
        $this->removeByProductId((int)$request->input('product_id'));
@@ -308,9 +290,7 @@ class CartController extends Controller
         return $this->customerId() !== null;
     }
 
-    /**
-     * raw cart: [product_id => qty]
-     */
+  
     private function getRawCart(): array
     {
         if ($this->isCustomerLoggedIn()) {

@@ -8,7 +8,6 @@
       QUẢN LÝ ƯU ĐÃI (CAMPAIGNS)
     </div>
 
-    {{-- alerts --}}
     @if(session('success'))
       <script>
         Swal.fire({ title:"Thành công!", text:"{{ session('success') }}", icon:"success", confirmButtonText:"OK" });
@@ -20,7 +19,6 @@
       </script>
     @endif
 
-    {{-- Filters --}}
     <div class="row w3-res-tb" style="margin-bottom:10px;">
       <div class="col-sm-12">
         <form method="GET" action="{{ route('admin.promotions.index') }}" class="form-inline" style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -30,15 +28,7 @@
             <option value="0" {{ (string)($status ?? '') === '0' ? 'selected' : '' }}>Ẩn</option>
           </select>
 
-          <input type="text" name="q" class="form-control input-sm"
-                 placeholder="Tìm theo tên chiến dịch..."
-                 value="{{ $q ?? '' }}" style="min-width:260px;">
-
-          <button class="btn btn-sm btn-default" type="submit">Lọc</button>
-
-          <a href="{{ route('admin.promotions.create') }}" class="btn btn-sm btn-primary" style="margin-left:auto;">
-            <i class="fa fa-plus"></i> Thêm Chiến Dịch
-          </a>
+          
         </form>
       </div>
     </div>

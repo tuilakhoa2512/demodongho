@@ -8,7 +8,6 @@
       DANH SÁCH SẢN PHẨM
     </div>
 
-    {{-- Thông báo thành công --}}
     @if (session('success'))
       <script>
           Swal.fire({
@@ -20,7 +19,6 @@
       </script>
     @endif
 
-    {{-- Thông báo lỗi --}}
     @if (session('error'))
       <script>
           Swal.fire({
@@ -32,7 +30,6 @@
       </script>
     @endif
 
-    {{-- Hàng công cụ --}}
     <div class="row w3-res-tb">
       <div class="col-sm-5 m-b-xs">
         <select class="input-sm form-control w-sm inline v-middle">
@@ -54,12 +51,7 @@
 
     <div class="table-responsive">
 
-      <style>
-          table td, table th {
-              text-align: center !important;
-              vertical-align: middle !important;
-          }
-      </style>
+      
 
       <table class="table table-striped b-t b-light">
         <thead>
@@ -90,7 +82,6 @@
               $storageDetail = optional($product->storageDetail);
               $storage       = optional($storageDetail->storage);
 
-              // ✅ NEW promotion fields from controller (PromotionService)
               $hasPromo = !empty($product->promo_has_sale);
               $finalPrice = isset($product->final_price) ? (float)$product->final_price : (float)$product->price;
               $promoName = $product->promo_name ?? null;
@@ -128,7 +119,6 @@
                 </div>
               </td>
 
-              {{-- ✅ NEW: Ưu đãi (promotion) --}}
               <td>
                 @if($hasPromo)
                   <span class="label label-info">
@@ -142,7 +132,6 @@
                 @endif
               </td>
 
-              {{-- ✅ NEW: Giá sau ưu đãi --}}
               <td>
                 @if($hasPromo)
                   <strong style="color:#e60012;">
@@ -245,5 +234,12 @@
 
   </div>
 </div>
+
+<style>
+          table td, table th {
+              text-align: center !important;
+              vertical-align: middle !important;
+          }
+      </style>
 
 @endsection

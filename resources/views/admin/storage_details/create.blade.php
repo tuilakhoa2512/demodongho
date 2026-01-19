@@ -9,7 +9,6 @@
       </header>
       <div class="panel-body">
         <div class="position-center">
-          {{-- THÔNG TIN LÔ HIỆN TẠI --}}
           <div class="alert alert-info">
             <strong>Thông Tin Lô Hàng:</strong><br>
             Mã lô: <strong>{{ $storage->batch_code }}</strong><br>

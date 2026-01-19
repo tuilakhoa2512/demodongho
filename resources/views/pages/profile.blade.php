@@ -13,7 +13,6 @@
 @php
     $email = $user->email ?? Session::get('email');
 
-    // Ví dụ: khoaneios2002@gmail.com → kho***@gmail.com
     if ($email) {
         [$name, $domain] = explode('@', $email);
         $maskedEmail = substr($name, 0, 3) . str_repeat('*', max(strlen($name) - 3, 0)) . '@' . $domain;
@@ -29,7 +28,6 @@
 <div class="container">
     <div class="row">
 
-        {{-- MENU BÊN TRÁI (thay sidebar) --}}
         <div class="col-md-3">
             <div class="profile-menu">
                 <button class="btn-profile active" onclick="showTab('info', this)">

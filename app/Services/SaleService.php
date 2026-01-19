@@ -8,9 +8,9 @@ use Carbon\Carbon;
 
 class SaleService
 {
-    /**
-     * Trả về Query Builder các sản phẩm đang được áp dụng promotion product
-     */
+    
+     //Trả về Query Builder các sản phẩm đang được áp dụng promotion product
+    
     public function saleProductQuery()
     {
         $now = Carbon::now();

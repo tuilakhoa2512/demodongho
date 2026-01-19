@@ -23,17 +23,13 @@ class PromotionTarget extends Model
         'status'    => 'integer',
     ];
 
-    /* ===================== RELATIONSHIPS ===================== */
 
-    /**
-     * Target thuộc về 1 Rule
-     */
+    
     public function rule()
     {
         return $this->belongsTo(PromotionRule::class, 'rule_id');
     }
 
-    /* ===================== HELPER ===================== */
 
     public function isAll(): bool
     {

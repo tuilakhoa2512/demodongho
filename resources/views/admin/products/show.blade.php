@@ -6,7 +6,6 @@
     $storage       = optional($storageDetail->storage);
     $images        = $product->productImage;
 
-    //  NEW: ƯU ĐÃI (PromotionService gắn runtime từ controller)
     $hasPromo   = !empty($product->promo_has_sale);
     $promoName  = $product->promo_name ?? null;
     $promoLabel = $product->promo_label ?? null;
@@ -14,7 +13,7 @@
     // final_price luôn fallback về price để view không bị null
     $finalPrice = isset($product->final_price) ? (float)$product->final_price : (float)$product->price;
 
-    // Nếu muốn “chắc chắn” là có giảm thật mới hiện giá sau ưu đãi:
+    //  có giảm thật mới hiện giá sau ưu đãi
     $showFinalPrice = $hasPromo && ($finalPrice < (float)$product->price);
 @endphp
 
@@ -30,7 +29,6 @@
 
             <div class="panel-body">
 
-                {{-- ================== ẢNH ================== --}}
                 <h4 class="product-section-title">Ảnh sản phẩm</h4>
 
                 <div class="row" style="margin-bottom:20px;">
@@ -62,7 +60,6 @@
                     @endforeach
                 </div>
 
-                {{-- ================== THÔNG TIN + MÔ TẢ ================== --}}
                 <h4 class="product-section-title">Thông tin sản phẩm</h4>
 
                 <div class="row">
@@ -81,7 +78,6 @@
                                 <div>{{ number_format($product->price, 0, ',', '.') }} đ</div>
                             </div>
 
-                            {{-- NEW: Ưu đãi (promotion) --}}
                             <div class="info-row">
                                 <div class="info-label">Ưu đãi</div>
                                 <div>
@@ -98,7 +94,6 @@
                                 </div>
                             </div>
 
-                            {{-- NEW: Giá sau ưu đãi (đồng bộ với index) --}}
                             <div class="info-row">
                                 <div class="info-label">Giá sau ưu đãi</div>
                                 <div>
@@ -185,7 +180,6 @@
 
                 </div>
 
-                {{-- ================== KHO ================== --}}
                 <h4 class="product-section-title">Thông tin Lô / Kho</h4>
 
                 <div class="well" style="padding:12px 15px;">
@@ -208,7 +202,6 @@
                 </div>
 
 
-                {{-- ================== NÚT ================== --}}
                 <div style="margin-top:15px;">
                     <a href="{{ route('admin.products.edit', $product->id) }}" class="btn btn-primary">
                         <i class="fa fa-pencil"></i> Sửa sản phẩm

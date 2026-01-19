@@ -1,7 +1,6 @@
 @extends('pages.layout')
 @section('content')
 
-{{-- COMPARE BAR --}}
 @include('pages.partials.compare_bar')
 
 <div class="features_items">

@@ -28,7 +28,6 @@
       $receiverPhone = $order->receiver_phone ?? '—';
       $receiverAddr  = $order->receiver_address ?? '—';
 
-      // ✅ NEW promotion fields (hệ mới)
       $promoDiscount = (int)($order->promo_discount_amount ?? 0);
       $promoCode     = $order->promo_code ?? null;
       $promoCampaign = $order->promo_campaign_name ?? null;
@@ -43,7 +42,6 @@
           else $promoLabel = '-' . number_format((int)$promoValue, 0, ',', '.') . ' đ';
       }
 
-      // ✅ location text (ƯU TIÊN đã join sẵn từ controller: ward_name/district_name/province_name)
       $locationParts = array_filter([
         $order->ward_name ?? null,
         $order->district_name ?? null,
@@ -114,7 +112,6 @@
         </div>
       </div>
 
-      {{-- ✅ NEW: THÔNG TIN ƯU ĐÃI (HỆ MỚI) --}}
       <div class="box">
         <h4 style="margin-top:0;">Ưu Đãi Áp Dụng</h4>
         <br>

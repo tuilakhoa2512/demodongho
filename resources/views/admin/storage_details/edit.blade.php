@@ -2,20 +2,15 @@
 @section('admin_content')
 
 @php
-    /**
-     * ===== CÁC BIẾN HỖ TRỢ LOGIC =====
-     */
+    
     $isSoldOut = ($detail->stock_status === 'sold_out');
 
-    // SL đang bán + đã bán (được build từ controller index)
     $sellingQty = (int) ($detail->selling_qty ?? 0);
     $soldQty    = (int) ($detail->sold_qty ?? 0);
 
-    // Số lượng nhập tối thiểu không được < đã bán + đang bán
     $minImportQty = max(1, $sellingQty + $soldQty);
 
-    // (NẾU MUỐN) Giới hạn max số lượng nhập
-    // Nếu KHÔNG muốn giới hạn → set = null
+  
     $maxImportQty = 10000;
 @endphp
 
@@ -29,7 +24,6 @@
       <div class="panel-body">
         <div class="position-center">
 
-          {{-- ===== CẢNH BÁO KHI ĐÃ SOLD OUT ===== --}}
           @if($isSoldOut)
             <div class="alert alert-warning">
               <strong>Lưu ý:</strong>
@@ -41,7 +35,6 @@
             @csrf
             @method('PUT')
 
-            {{-- MÃ LÔ (CHỈ XEM) --}}
             <div class="form-group">
               <label>Mã lô hàng</label>
               <input type="text"
@@ -50,7 +43,6 @@
                      readonly>
             </div>
 
-            {{-- TÊN SẢN PHẨM TRONG LÔ --}}
             <div class="form-group">
               <label for="product_name">
                 Tên sản phẩm (trong lô)
@@ -67,7 +59,6 @@
                      required>
             </div>
 
-            {{-- SỐ LƯỢNG NHẬP --}}
             <div class="form-group">
               <label for="import_quantity">
                 Số lượng nhập
@@ -92,7 +83,6 @@
               </small>
             </div>
 
-            {{-- GHI CHÚ --}}
             <div class="form-group">
               <label for="note">Ghi chú</label>
               <textarea name="note"
@@ -103,7 +93,6 @@
                         {{ $isSoldOut ? 'disabled' : '' }}>{{ old('note', $detail->note) }}</textarea>
             </div>
 
-            {{-- NÚT HÀNH ĐỘNG --}}
             <button type="submit"
                     class="btn btn-info"
                     {{ $isSoldOut ? 'disabled' : '' }}>

@@ -33,19 +33,14 @@ class PromotionCode extends Model
         'end_at'              => 'datetime',
     ];
 
-    /* ===================== RELATIONSHIPS ===================== */
 
-    /**
-     * Code thuộc về 1 Rule
-     */
+    
     public function rule()
     {
         return $this->belongsTo(PromotionRule::class, 'rule_id');
     }
 
-    /**
-     * Log đã dùng code
-     */
+    
     public function redemptions()
     {
         return $this->hasMany(PromotionRedemption::class, 'code_id');

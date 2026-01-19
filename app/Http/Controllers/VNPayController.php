@@ -12,14 +12,11 @@ use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Cart;
 
-// ✅ NEW (promotion system)
 use App\Models\PromotionRedemption;
 
 class VNPayController extends Controller
 {
-    /**
-     * Tạo URL thanh toán VNPay
-     */
+    // tạo url vnpay
     public function create(Request $request, string $order_code)
     {
         $userId = (int) Session::get('id');
@@ -36,7 +33,7 @@ class VNPayController extends Controller
             return redirect()->route('payment.show')->with('error', 'Không tìm thấy đơn hàng để thanh toán VNPay.');
         }
 
-        // ✅ chống pay hộ
+        // chống pay hộ
         if ((int)$order->user_id !== $userId) {
             return redirect()->route('myorders.index')->with('error', 'Bạn không có quyền thanh toán đơn hàng này.');
         }
@@ -108,9 +105,9 @@ class VNPayController extends Controller
     }
 
     /**
-     * VNPay return
+     * VNPay trả về
      * - Success: trừ kho + clear cart + status=confirmed + set promotion_redemptions.used_at
-     * - Fail: status=canceled
+     * - Fail: status = canceled
      */
     public function vnpayReturn(Request $request)
     {
@@ -150,7 +147,7 @@ class VNPayController extends Controller
             return redirect('/my-orders')->with('error', 'Không tìm thấy đơn để cập nhật thanh toán.');
         }
 
-        // ✅ check amount khớp
+        //  check amount khớp
         $expectedAmount = (int) round(((float)$order->total_price) * 100);
         if ($vnpAmount > 0 && $vnpAmount !== $expectedAmount) {
             return redirect()
@@ -245,9 +242,9 @@ class VNPayController extends Controller
         }
     }
 
-    /**
-     * IPN (server-to-server) — tối thiểu
-     */
+    
+     // IPN (server-to-server) — tối thiểu
+     
     public function ipn(Request $request)
     {
         $vnp_HashSecret = config('vnpay.hash_secret');
@@ -288,7 +285,7 @@ class VNPayController extends Controller
 
         $isSuccess = ($respCode === "00" && $txnStatus === "00");
 
-        // Nếu đã xử lý rồi => OK
+        // Nếu đã xử lý rồi thì ok
         if ($order->status !== 'pending') {
             return response()->json(["RspCode" => "00", "Message" => "Confirm Success"]);
         }
