@@ -31,15 +31,23 @@
     @endif
 
     <div class="row w3-res-tb">
-      <div class="col-sm-5 m-b-xs">
-        <select class="input-sm form-control w-sm inline v-middle">
-          <option value="0">Thao tác</option>
-          <option value="1">Xóa đã chọn (chưa làm)</option>
-          <option value="2">Xuất Excel (chưa làm)</option>
-        </select>
-        <button class="btn btn-sm btn-default">Áp dụng</button>
-      </div>
+    <div class="col-sm-5 m-b-xs">
+          <form method="GET" action="{{ url()->current() }}" class="form-inline">
+              <select name="status" class="input-sm form-control w-sm inline v-middle">
+                  <option value="">Lọc trạng thái(Tất cả)</option>
+                  <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>
+                      Hiện
+                  </option>
+                  <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>
+                      Ẩn
+                  </option>
+              </select>
 
+              <button type="submit" class="btn btn-sm btn-default" style="margin-left:6px;">
+                  Lọc
+              </button>
+          </form>
+      </div>
       <div class="col-sm-3"></div>
 
       <div class="col-sm-4">
@@ -50,9 +58,6 @@
     </div>
 
     <div class="table-responsive">
-
-      
-
       <table class="table table-striped b-t b-light">
         <thead>
           <tr>

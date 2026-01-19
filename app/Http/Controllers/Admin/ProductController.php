@@ -23,15 +23,26 @@ class ProductController extends Controller
      */
     public function index(PromotionService $promoService)
     {
-        $products = Product::query()
+        $request = request();
+        $filterStatus = $request->query('status', '');
+
+        $query = Product::query()
             ->with([
                 'brand',
                 'category',
                 'storageDetail.storage',
                 'productImage',
             ])
-            ->orderByDesc('id')
-            ->paginate(5);
+            ->orderByDesc('id');
+
+        //lọc theo hiện/ẩn
+        if ($filterStatus !== '') {
+            $query->where('status', (int)$filterStatus);
+        }
+        $products = $query
+            ->paginate(5)
+            ->appends($request->query());
+
             
 
         foreach ($products as $p) {
@@ -59,7 +70,7 @@ class ProductController extends Controller
             $p->promo_discount_amount = (int)($pack['discount_amount'] ?? max(0, (int)$base - (int)$final));
         }
 
-        return view('admin.products.index', compact('products'));
+        return view('admin.products.index', compact('products','filterStatus'));
     }
 
     /**
