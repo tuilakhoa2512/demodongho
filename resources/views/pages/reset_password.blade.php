@@ -95,7 +95,6 @@
     display: block;
 }
 
-/* Input đồng bộ */
 .reset-form .form-control {
     height: 46px;
     border-radius: 6px;
@@ -106,7 +105,6 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Focus */
 .reset-form .form-control:focus {
     border-color: #D70018;
     box-shadow: 0 0 0 2px rgba(215, 0, 24, 0.12);
@@ -115,8 +113,8 @@
 /* Button */
 .reset-btn {
     display: block;
-    width: 260px;              /*  nút ngắn */
-    margin: 24px auto 0;       /*  căn giữa */
+    width: 260px;           
+    margin: 24px auto 0;      
     height: 46px;
 
     background-color: #D70018;
@@ -131,13 +129,13 @@
     transition: background-color 0.2s, transform 0.15s;
 }
 
-/* Hover */
+
 .reset-btn:hover {
     background-color: #b80015;
     transform: translateY(-1px);
 }
 
-/* Active */
+
 .reset-btn:active {
     transform: scale(0.97);
 }

@@ -135,7 +135,7 @@ function loadChatHistory() {
 
             container.innerHTML = '';
 
-            // CHƯA CÓ TIN NHẮN → HIỆN LỜI CHÀO
+            // CHƯA CÓ TIN NHẮN THÌ SẼ HIỆN LỜI CHÀO
             if (messages.length === 0) {
                 container.innerHTML = `
                     <div class="ai-bot">
@@ -211,13 +211,12 @@ function setupClearChatButton() {
     });
 }
 
-/* DOM READY */
 document.addEventListener('DOMContentLoaded', () => {
     loadChatHistory();
     setupClearChatButton();
 });
 
-/* Render product cards */
+/* Xuất ra hình cua sp */
 function renderProductCards(products, messageWrap) {
     if (!products || products.length === 0 || !messageWrap) return;
 

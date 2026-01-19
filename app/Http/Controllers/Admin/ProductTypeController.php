@@ -79,10 +79,10 @@ class ProductTypeController extends Controller
             $data['status'] = $request->product_type_status;
             $data['category_slug'] = $this->createSlug($request->product_type_name);
 
-        DB::table('categories')->insert($data);
-        session()->flash('message', 'Thêm loại sản phẩm thành công');
-        return Redirect::to('all-product-type');
-        }
+            DB::table('categories')->insert($data);
+            session()->flash('message', 'Thêm loại sản phẩm thành công');
+            return Redirect::to('all-product-type');
+            }
 
     private function createSlug($str)
     {
@@ -150,53 +150,53 @@ class ProductTypeController extends Controller
         return redirect()->route('admin.addproducttype')
         ->with('message', 'Cập nhật sản phẩm thành công.');
     }
-public function show_category_home(Request $request,$category_slug)
-{
-    $cate_pro = DB::table('categories')
-        ->where('status', '1')
-        ->orderBy('id', 'asc')
-        ->get();
+    public function show_category_home(Request $request,$category_slug)
+    {
+        $cate_pro = DB::table('categories')
+            ->where('status', '1')
+            ->orderBy('id', 'asc')
+            ->get();
 
-    $brand_pro = DB::table('brands')
-        ->where('status', '1')
-        ->orderBy('id', 'asc')
-        ->get();
+        $brand_pro = DB::table('brands')
+            ->where('status', '1')
+            ->orderBy('id', 'asc')
+            ->get();
 
-    // lấy category theo slug
-    $category = DB::table('categories')
-        ->where('category_slug', $category_slug)
-        ->where('status',1)
-        ->first();
+        // lấy category theo slug
+        $category = DB::table('categories')
+            ->where('category_slug', $category_slug)
+            ->where('status',1)
+            ->first();
 
-    if (!$category) {
-        abort(404);
+        if (!$category) {
+            abort(404);
+        }
+        // ===== QUERY GỐC (GIỮ NGUYÊN LOGIC) =====
+        $query = Product::with(['productImage','category','brand'])
+            ->where('category_id', $category->id)
+            ->where('status', 1)
+            ->where('stock_status', 'selling');
+
+        // ===== THÊM LỌC GIÁ (CHỈ KHI CÓ) =====
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', (float) $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', (float) $request->max_price);
+        }
+        // CHỈ DÙNG ELOQUENT + RELATION
+        $category_by_id = $query
+            ->orderByDesc('id')
+            ->paginate(6)
+            ->appends($request->query());
+
+        return view('pages.category.show_category')
+            ->with('category', $cate_pro)
+            ->with('brand', $brand_pro)
+            ->with('category_name', $category->name)
+            ->with('category_by_id', $category_by_id);
     }
-    // ===== QUERY GỐC (GIỮ NGUYÊN LOGIC) =====
-    $query = Product::with(['productImage','category','brand'])
-        ->where('category_id', $category->id)
-        ->where('status', 1)
-        ->where('stock_status', 'selling');
-
-    // ===== THÊM LỌC GIÁ (CHỈ KHI CÓ) =====
-    if ($request->filled('min_price')) {
-        $query->where('price', '>=', (float) $request->min_price);
-    }
-
-    if ($request->filled('max_price')) {
-        $query->where('price', '<=', (float) $request->max_price);
-    }
-    // CHỈ DÙNG ELOQUENT + RELATION
-    $category_by_id = $query
-        ->orderByDesc('id')
-        ->paginate(6)
-        ->appends($request->query());
-
-    return view('pages.category.show_category')
-        ->with('category', $cate_pro)
-        ->with('brand', $brand_pro)
-        ->with('category_name', $category->name)
-        ->with('category_by_id', $category_by_id);
-}
 
     // public function delete_product_type($id){
       

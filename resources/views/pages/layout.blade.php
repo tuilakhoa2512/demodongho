@@ -449,8 +449,8 @@ $(document).ready(function () {
             {{ request('max_price', 100000000) }}
         ],
 
-        tooltip: 'show',        //  HIỆN TOOLTIP
-        tooltip_split: true,    //  HIỆN 2 GIÁ (min & max)
+        tooltip: 'show',        //  hiện tooltip
+        tooltip_split: true,    //  hiện 2 giá (min & max)
 
         formatter: function (value) {
             // format tooltip sang VNĐ

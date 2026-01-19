@@ -11,7 +11,7 @@ use Carbon\Carbon;
 
 class ReviewController extends Controller
 {
-    // LƯU ĐÁNH GIÁ
+    // lưu đánh giá khách hàng
     public function store(Request $request, $product_id)
     {
         $userId = session('id');
@@ -47,7 +47,7 @@ class ReviewController extends Controller
             return back()->with('success', 'Bạn chỉ có thể đánh giá khi đơn hàng đã hoàn thành.');
         }
 
-        // ===== KIỂM TRA THỜI GIAN (2 PHÚT - KHÔNG SỐ THẬP PHÂN) =====
+        // ===== sau 2 phút mới dc đánh giá  =====
         $completedAt    = Carbon::parse($orderDetail->order->updated_at);
 
         $secondsPassed  = $completedAt->diffInSeconds(now());
@@ -74,7 +74,7 @@ class ReviewController extends Controller
         // }
 
 
-        // ===== LỌC TỪ NGỮ TỤC TĨU =====
+        // ===== lọc từ ngữ thô tục =====
         $cleanComment = BadWordFilter::filter($request->comment);
 
         // ===== LƯU REVIEW =====
@@ -84,14 +84,14 @@ class ReviewController extends Controller
                 'user_id'    => $userId,
                 'rating'     => (int) $request->rating,
                 'comment'    => $cleanComment,
-                'status'     => 1, // hiển thị
+                'status'     => 1,
             ]);
         });
 
         return back()->with('success', 'Đánh giá của bạn đã được gửi.');
     }
 
-    // LẤY REVIEW HIỂN THỊ
+
     public function getReviews($product_id)
     {
         $reviews = Review::with('user')
@@ -109,10 +109,8 @@ class ReviewController extends Controller
 
         return view('product.reviews', compact('reviews', 'averageRating'));
     }
-
-   
-    // CHECK QUYỀN ĐÁNH GIÁ (DÙNG CHO BLADE)
-
+    
+//check quyền đánh giá
     public function canUserReview(int $userId, int $productId): array
     {
         $orderDetail = OrderDetail::where('product_id', $productId)

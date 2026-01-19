@@ -1,13 +1,8 @@
-{{-- ===== SWEETALERT GLOBAL ===== --}}
-
 <script>
-    /**
-     * Hiển thị SweetAlert + xóa history state
-     * => tránh Back trình duyệt hiện lại popup
-     */
+    //hiển thị sweetalert và xóa lịch sử ,tránh back mà vẫn hiện pop up thông báo
     function showAlertOnce(options) {
         Swal.fire(Object.assign({
-            width: 600,                 //  TĂNG SIZE POPUP
+            width: 600,                 
             padding: '1.5rem',
             confirmButtonText: 'OK',
             confirmButtonColor: '#D70018'

@@ -52,15 +52,12 @@
     </div>
 </div>
 <style>
-    /* Ẩn sidebar chỉ ở trang Contact */
     .left-sidebar {
         display: none !important;
     }
     .col-sm-9.padding-right {
         width: 100% !important;
     }
-
-    /* FORM STYLE */
     .contact-wrapper {
         max-width: 800px;
         margin: 40px auto;

@@ -10,14 +10,14 @@ use Illuminate\Support\Facades\Session;
 class AdminStaffController extends BaseAdminController
 {
 
-    //Trang index (nếu có)
+    //Trang index
     public function index()
     {
         $this->allowRoles([1]); // chỉ Admin Coder
         return view('admin.nhansu.index');
     }
 
- //KIỂM TRA QUYỀN XEM DANH SÁCHrole: 1,3,4
+ //kiểm tra quyền role admin
     private function checkPermission()
     {
         if (!Session::has('admin_id')) {
@@ -35,7 +35,6 @@ class AdminStaffController extends BaseAdminController
         return null;
     }
 
- 
      //DANH SÁCH NHÂN SỰ role_id = 1,3,4,5
   
     public function all_staff_user(Request $request)

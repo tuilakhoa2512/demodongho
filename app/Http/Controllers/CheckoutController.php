@@ -350,8 +350,6 @@ public function callback_user_google()
         ->with('message', 'Đăng nhập Google <span style="color:red">'.$user->email.'</span> thành công!');
 }
 
-
-
 public function findOrCreateUser($googleUser, $provider)
 {
     //Tìm trong bảng social trước

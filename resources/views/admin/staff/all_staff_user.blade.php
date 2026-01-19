@@ -61,7 +61,7 @@
                         <td>{{ $staff->fullname }}</td>
                         <td>{{ $staff->email }}</td>
 
-                        {{-- ===== ROLE TEXT ===== --}}
+                        {{-- ===== ROLE ===== --}}
                         <td>
                             @switch($staff->role_id)
                                 @case(1) Admin Coder @break
@@ -71,7 +71,7 @@
                             @endswitch
                         </td>
 
-                        {{-- ===== UPDATE ROLE (CHỈ ROLE 1) ===== --}}
+                        {{-- ===== UPDATE ROLE VÀ CHỈ ĐC UPDATE KHI ROLE LÀ 1 ===== --}}
                         <td>
                             @if($currentAdminRole === 1 && $staff->id !== $currentAdminId)
                                 <form action="{{ route('admin.staff.updateRole', $staff->id) }}" method="POST">

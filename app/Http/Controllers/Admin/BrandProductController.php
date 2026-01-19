@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str; 
-
 session_start();
 
 class BrandProductController extends Controller
@@ -94,7 +93,7 @@ class BrandProductController extends Controller
         // Tạo slug từ tên
         $data['brand_slug'] = Str::slug($request->brand_product_name);
     
-        // Phòng trường hợp trùng slug hiếm
+        // Phòng trường hợp trùng slug
         $count = DB::table('brands')
             ->where('brand_slug', $data['brand_slug'])
             ->count();
@@ -157,7 +156,7 @@ class BrandProductController extends Controller
         // cập nhật slug khi đổi tên
         $newSlug = Str::slug($request->brand_product_name);
 
-        // Nếu slug bị trùng (ngoại trừ chính nó)
+        // Nếu slug bị trùng thì thêm 1 giá trị cho hết trùng
         $count = DB::table('brands')
                     ->where('brand_slug', $newSlug)
                     ->where('id', '!=', $id)
@@ -191,18 +190,18 @@ class BrandProductController extends Controller
 
     public function show_brand_home($brand_slug)
 {
-    // Lấy tất cả categories để render menu
+    // Lấy tất cả categories
     $cate_pro = DB::table('categories')
         ->where('status','1')
         ->orderBy('id', 'asc')
         ->get();
 
-    // Lấy tất cả brands để render menu
+    // Lấy tất cả brands
     $brand_pro = DB::table('brands')
         ->where('status','1')
         ->orderBy('id', 'asc')
         ->get();
-        // Lấy brand theo slug (thay vì id)
+        // Lấy brand theo slug
     $brand = DB::table('brands')->where('brand_slug', $brand_slug)->where('status', 1)->first();
 
     if (!$brand) {

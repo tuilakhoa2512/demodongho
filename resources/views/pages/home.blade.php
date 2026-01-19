@@ -60,6 +60,7 @@
 </div>
 
 
+@if(empty($is_search_page))
 <div class="recommended_items">
     <h2 class="title text-center">Sản Phẩm Đề Xuất</h2>
 
@@ -83,14 +84,12 @@
             @endforeach
         </div>
 
-        {{-- NÚT TRÁI --}}
         <a class="carousel-control left"
            href="#recommended-item-carousel"
            data-slide="prev">
             <i class="fa fa-angle-left"></i>
         </a>
 
-        {{-- NÚT PHẢI --}}
         <a class="carousel-control right"
            href="#recommended-item-carousel"
            data-slide="next">
@@ -99,8 +98,7 @@
 
     </div>
 </div>
-
-
+@endif
 
 @php
     $compare = session('compare', []);

@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-
 session_start();
 
 class UserController extends Controller
@@ -200,9 +199,7 @@ public function showChangePassword()
     ));
 }
 
-/**
- * Xử lý đổi mật khẩu
- */
+//Xử lý đổi mật khẩu
 public function changePassword(Request $request)
 {
     $request->validate([

@@ -11,7 +11,7 @@ use App\Models\AIChatMessage;
 
 class AIChatController extends Controller
 {
-     //Session ID (không dùng Auth)
+     //Session id
      
     private function sessionId()
     {
@@ -39,7 +39,7 @@ class AIChatController extends Controller
 }
 
 
-//Chuẩn hoá giới tính từ câu hỏi userOUTPUT CHỈ TRẢ: male | female | null
+//Chuẩn hoá giới tính từ câu hỏi của khách ,output chỉ trả: male | female | null
  
 private function detectGender(string $message): ?string
 {
@@ -68,7 +68,6 @@ private function detectGender(string $message): ?string
     return null;
 }
 
-
     private function limitMessages($sessionId, $limit = 50)
     {
         $count = AIChatMessage::where('session_id', $sessionId)->count();
@@ -80,7 +79,6 @@ private function detectGender(string $message): ?string
                 ->delete();
         }
     }
-
     
     //Load lịch sử chat
     public function history()
@@ -104,9 +102,7 @@ private function detectGender(string $message): ?string
         return response()->json($messages);
     }
 
-
     //Xoá lịch sử chat
-    
     public function clear()
     {
         AIChatMessage::where('session_id', $this->sessionId())->delete();
@@ -115,7 +111,6 @@ private function detectGender(string $message): ?string
         return response()->json(['status' => 'ok']);
     }
 
-    
     //Chat Gemini AI
     public function chat(Request $request)
     {     
@@ -141,25 +136,20 @@ private function detectGender(string $message): ?string
             'price_min' => null,
             'price_max' => null,
         ]);
-
         //lọc sản phẩm
         $productsForUI = [];
-
         $query = Product::where('status', 1);
-        
-        
         $hasValidFilter = false;
         $brandDetectedThisTurn = false;
 
 
-        
          //Lọc hãng tự động từ DB
         $allBrands = DB::table('brands')
             ->where('status', 1)
             ->select('id', 'name')
             ->get();
 
-            // LẤY DANH SÁCH STRAP MATERIAL TỪ DATABASE (ĐỘNG)
+            // LẤY DANH SÁCH STRAP MATERIAL TỪ DATABASE
             $allStraps = DB::table('products')
             ->whereNotNull('strap_material')
             ->select('strap_material')
@@ -197,7 +187,7 @@ private function detectGender(string $message): ?string
             $context['price_max']  = null; 
             $hasValidFilter = true;
         }
-        // DÂY ĐEO – LỌC ĐỘNG THEO DATABASE
+        // DÂY ĐEO, LỌC THEO DATABASE
         $normalizedUser = $this->normalizeText($userMessage);
 
         foreach ($allStraps as $strap) {
@@ -245,7 +235,7 @@ private function detectGender(string $message): ?string
             $hasValidFilter = true;
         }
 
-        // ----- GIÁ NHẬP TRỰC TIẾP (4000000) -----
+        // ----- GIÁ NHẬP TRỰC TIẾP -----
         if (preg_match('/(trên|>)?\s*(\d{7,})/u', $userMessage, $m)) {
 
             $price = isset($m[2]) ? (int)$m[2] : (int)$m[1];
@@ -344,7 +334,7 @@ if (
         ];
     }
 
-    // Lưu gender để hỏi tiếp bước dây
+    // Lưu gender để hỏi tiếp loại dây
     session([
         'ai_filter' => [
             'gender' => $context['gender']
@@ -372,8 +362,7 @@ if (
     ]);
 }
 
- //XỬ LÝ TRẢ LỜI TIẾP THEO (dựa trên context cũ)
- 
+ //xử lý trả lời tiếp theo dựa trên context cũ
 $sessionFilter = session('ai_filter');
 
 if ($sessionFilter && !$gender) {
@@ -386,7 +375,6 @@ if ($sessionFilter && !$gender) {
 }
 
  //Xác định user có ý định hỏi hãng hay không
-
 $askForBrand = false;
 
 if (
@@ -396,7 +384,7 @@ if (
     $askForBrand = true;
 }
 
-// Danh sách tên brand (lowercase)
+// Danh sách tên brand 
 $brandNames = $allBrands
 ->pluck('name')
 ->map(fn ($name) => mb_strtolower($name))
@@ -408,7 +396,7 @@ $words = preg_split('/\s+/', $userMessage);
 // Cờ kiểm tra user có yêu cầu hãng không tồn tại
 $invalidBrand = null;
 
- //Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại)
+ //Các keyword KHÔNG PHẢI brand (bỏ qua khi phát hiện brand không tồn tại
 $ignoreKeywords = [
     'da',  'nhựa', 'thép', 'không', 'gỉ',
     'sản', 'pham', 'phẩm', 'san',
@@ -432,7 +420,7 @@ if ($askForBrand) {
     }
 }
 
- // TRẢ VỀ SỚM NẾU HÃNG KHÔNG TỒN TẠI
+ // TRẢ VỀ NẾU HÃNG KHÔNG TỒN TẠI
 if ($invalidBrand) {
     $reply = "Xin lỗi 😥 shop hiện **không có sản phẩm hiệu \"$invalidBrand\"**.";
 
@@ -502,7 +490,7 @@ if (!isset($productsForUI)) {
         }
 
 
-         // CHUẨN BỊ DATA SẢN PHẨM CHO UI
+         // CHUẨN BỊ DATA SẢN PHẨM CHO giao diện trong box ai
         $productsForUI = [];
 
         foreach ($products as $p) {
@@ -511,7 +499,7 @@ if (!isset($productsForUI)) {
                 ->where('product_id', $p->id)
                 ->value('image_1');
 
-            // Fallback link nếu không có slug
+            // trả về link nếu không có slug
             $productLink = $p->slug
                 ? url('/product/' . $p->slug)
                 : url('/product/' . $p->id);
@@ -526,7 +514,7 @@ if (!isset($productsForUI)) {
         }
 
 
-         // CHUẨN BỊ PROMPT CHO GEMINI
+         // chuẩn bị câu hỏi cho geini
         $productText = '';
         foreach ($products as $p) {
         $productText .= "- {$p->name}, "
@@ -627,7 +615,6 @@ PROMPT;
 
         
          //Giới hạn message
-        
         $this->limitMessages($sessionId);
 
         //response cuối

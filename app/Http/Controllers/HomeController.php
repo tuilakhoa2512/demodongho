@@ -112,14 +112,14 @@ class HomeController extends Controller
 
         $search_product = $this->attachProductPromos($search_product, $promoService);
 
-        // FE search: trả về pages.home (tạm dùng chung layout)
         return view('pages.home', [
             'category'             => $cate_pro,
             'brand'                => $brand_pro,
-            'all_product'          => $search_product,       // dùng chung vòng lặp
-            'recommended_products' => collect(),             // hoặc bạn query lại nếu muốn
+            'all_product'          => $search_product,       
+            'recommended_products' => collect(),             
             'keywords'             => $keywords,
             'favorite_ids'         => $favorite_ids,
+            'is_search_page'       => true,
         ]);
     }
 
@@ -133,7 +133,7 @@ class HomeController extends Controller
         $brand_pro = DB::table('brands')->where('status', 1)->get();
 
         $applier = app(ProductPromotionApplier::class);
-        // NOTE: đang lọc theo price gốc (nhanh). Nếu muốn lọc theo final_price mình sẽ nâng cấp sau.
+       
         $all_product = Product::with(['productImage','category','brand'])
             ->where('status', 1)
             ->where('stock_status', 'selling')

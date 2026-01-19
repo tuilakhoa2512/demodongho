@@ -1,7 +1,7 @@
 @if ($paginator->hasPages())
     <ul class="pagination justify-content-center">
 
-        {{-- Previous --}}
+        {{-- Qua trái --}}
         @if ($paginator->onFirstPage())
             <li class="page-item disabled">
                 <span class="page-link">&lsaquo;</span>
@@ -14,7 +14,7 @@
             </li>
         @endif
 
-        {{-- Page Numbers --}}
+        {{-- Số trang --}}
         @foreach ($elements as $element)
 
             {{-- "..." --}}
@@ -24,7 +24,7 @@
                 </li>
             @endif
 
-            {{-- Array of links --}}
+           
             @if (is_array($element))
                 @foreach ($element as $page => $url)
                     @if ($page == $paginator->currentPage())
@@ -41,7 +41,7 @@
 
         @endforeach
 
-        {{-- Next --}}
+        {{-- trang kế --}}
         @if ($paginator->hasMorePages())
             <li class="page-item">
                 <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">

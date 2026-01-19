@@ -3,8 +3,6 @@
 
 <div class="container" style="margin-top:50px;">
     <div class="row">
-
-        <!-- CONTENT SAU SIDEBAR -->
         <div class="col-sm-12 col-md-9 col-lg-9">
 
             <div class="register-form">

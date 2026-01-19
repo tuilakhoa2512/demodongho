@@ -39,7 +39,7 @@
     <div class="clearfix"></div>
 </div>
 
-{{-- ====== COMPARE BAR GIỮ NGUYÊN ====== --}}
+{{-- ====== SO SÁNH ====== --}}
 @php
     $compare = session('compare', []);
     $sp1 = isset($compare['sp1']) ? \App\Models\Product::find($compare['sp1']) : null;

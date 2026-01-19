@@ -4,9 +4,7 @@ namespace App\Helpers;
 
 class BadWordFilter
 {
-    /**
-     * Danh sách từ cấm (có thể mở rộng)
-     */
+     //Danh sách từ cấm
     protected static array $badWords = [
         // ===== Tiếng Việt =====
         'địt','đụ','đéo','đéo mẹ','đcm','dcm','dm',
@@ -25,9 +23,8 @@ class BadWordFilter
         'fck','f*ck','sh!t','bi7ch','a$$hole','pu$$y','d1ck',
     ];
     
-    /**
-     * Lọc từ tục -> ***
-     */
+    
+    //Lọc  từ tục
     public static function filter(string $text): string
     {
         foreach (self::$badWords as $word) {

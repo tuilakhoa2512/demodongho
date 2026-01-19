@@ -13,7 +13,7 @@
 @php
     $email = $user->email ?? Session::get('email');
 
-    // Ví dụ: khoaneios2002@gmail.com → kho***@gmail.com
+    // Ví dụ: khoaneios2002@gmail.com thành kho***@gmail.com
     if ($email) {
         [$name, $domain] = explode('@', $email);
         $maskedEmail = substr($name, 0, 3) . str_repeat('*', max(strlen($name) - 3, 0)) . '@' . $domain;
@@ -29,7 +29,7 @@
 <div class="container">
     <div class="row">
 
-        {{-- MENU BÊN TRÁI (thay sidebar) --}}
+        {{-- MENU BÊN TRÁI --}}
         <div class="col-md-3">
             <div class="profile-menu">
                 <button class="btn-profile active" onclick="showTab('info', this)">
@@ -196,7 +196,6 @@
     </div>
 </div>
 
-{{-- CSS --}}
 <style>
 /* Ẩn sidebar cũ */
 .left-sidebar,.category-products,.brands_products,.price-range{
@@ -218,7 +217,7 @@
     background: #fff;
 }
 
-/* CHA */
+
 .profile-menu::before {
     content: "TÀI KHOẢN";
     display: block;
@@ -229,7 +228,6 @@
     text-transform: uppercase;
 }
 
-/* CON */
 .btn-profile {
     display: block;
     width: 100%;
@@ -309,7 +307,7 @@
 body > section > .container > .row > .col-sm-9.padding-right{
     width: 90% !important;
     float: none !important;        
-    margin: 0 auto !important;      /* căn giữa */
+    margin: 0 auto !important;      
     display: block !important;
     
 }
@@ -320,7 +318,6 @@ body > section > .container > .row > .col-sm-9.padding-right{
     padding: 32px 36px;
 }
 
-/* Label giống login */
 #tab-password label {
     font-size: 13px;
     font-weight: 600;
@@ -339,13 +336,13 @@ body > section > .container > .row > .col-sm-9.padding-right{
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Focus input */
+
 #tab-password .form-control:focus {
     border-color: #D70018;
     box-shadow: 0 0 0 2px rgba(215, 0, 24, 0.12);
 }
 
-/* Khoảng cách giữa các field */
+
 #tab-password .form-control + label,
 #tab-password label + .form-control {
     margin-top: 14px;
@@ -383,11 +380,7 @@ body > section > .container > .row > .col-sm-9.padding-right{
     margin-bottom: 20px;
 }
 
-/* ===============================
-   FORM THÔNG TIN CÁ NHÂN (TAB INFO)
-   label nhỏ giống TAB MẬT KHẨU
-================================ */
-
+/* form thông tin cá nhân */
 #tab-info label {
     font-size: 13px;
     font-weight: 600;
@@ -422,28 +415,24 @@ body > section > .container > .row > .col-sm-9.padding-right{
     height: 46px;
 }
 
-/* File input gọn */
 #tab-info input[type="file"].form-control {
     height: auto;
     padding: 6px;
 }
 
-/* Button cập nhật giống đổi mật khẩu */
+/* Button cập nhật */
 #tab-info .btn-save {
     margin-top: 20px;
     height: 48px;
     font-size: 15px;
     font-weight: 600;
 }
-/* ===============================
-   BUTTON NGẮN + CĂN GIỮA
-================================ */
 
 /* Nút trong tab đổi mật khẩu */
 #tab-password .btn-save {
-    width: 260px;          /* độ dài nút */
+    width: 260px;/* độ dài nút */
     max-width: 100%;
-    margin: 24px auto 0;   /* căn giữa */
+    margin: 24px auto 0;/* căn giữa */
     display: block;
 
     height: 46px;
@@ -459,7 +448,7 @@ body > section > .container > .row > .col-sm-9.padding-right{
 
 /* Nút trong tab thông tin cá nhân */
 #tab-info .btn-save {
-    width: 260px;          /* cùng kích thước */
+    width: 260px; 
     max-width: 100%;
     margin: 24px auto 0;
     display: block;

@@ -1,7 +1,3 @@
-<!-- ========================= -->
-<!-- AI CHATBOX (UI ONLY) -->
-<!-- ========================= -->
-
 <div id="ai-chat-wrapper">
 
     <!-- ICON MỞ CHAT -->
@@ -56,9 +52,6 @@
     </div>
 </div>
 
-<!-- ========================= -->
-<!-- CSS RIÊNG CHO CHATBOX -->
-<!-- ========================= -->
 <style>
 #ai-chat-wrapper {
     position: fixed;

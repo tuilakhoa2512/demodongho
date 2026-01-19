@@ -18,17 +18,13 @@ use Carbon\Carbon;
 use App\Models\User;
 class AdminController extends Controller
 {
-    // =========================
-    // FORM LOGIN ADMIN
-    // =========================
+    //Form login admin
     public function index()
     {
         return view('pages.admin_login');
     }
 
-    // =========================
-    // XỬ LÝ LOGIN ADMIN
-    // =========================
+    //Xử lý login admin
     public function dashboard(Request $request)
     {
         $request->validate([
@@ -55,9 +51,8 @@ class AdminController extends Controller
         return Redirect::to('/dashboard');
     }
 
-    // =========================
+    
     // DASHBOARD
-    // =========================
     // public function show_dashboard()
     // {
     //     if (!Session::has('admin_id')) {
@@ -73,7 +68,6 @@ class AdminController extends Controller
         }
     
         /* ================== THỐNG KÊ TRÊN ================== */
-    
         // Khách hàng (không tính nhân sự)
         $totalCustomers = DB::table('users')->count();
     
@@ -89,7 +83,6 @@ class AdminController extends Controller
         $totalReviews = DB::table('reviews')->count();
     
         /* ================== BIỂU ĐỒ ================== */
-    
         // Doanh thu theo tháng (chỉ đơn hoàn tất)
         $revenueRaw = DB::table('orders')
             ->selectRaw('MONTH(created_at) as month, SUM(total_price) as total')
@@ -142,8 +135,6 @@ class AdminController extends Controller
         Session::flush();
         return Redirect::to('/admin');
     }
-
-
 
 private function mergeGuestCartToDb(int $userId): void
 {

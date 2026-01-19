@@ -24,12 +24,7 @@ class AdminUserController extends BaseAdminController
     }
 }
 
-    /**
-     * =========================
-     * DANH SÁCH KHÁCH HÀNG
-     * Role: 1,3,4
-     * =========================
-     */
+    //Danh sách khách hàng (role 1,3,4 )
     public function all_admin_user(Request $request)
     {
         $this->allowRoles([1,3,4]);
@@ -37,7 +32,7 @@ class AdminUserController extends BaseAdminController
         $filterStatus = $request->get('status');
 
         $query = DB::table('users')
-            ->where('role_id', 2); // chỉ khách hàng
+            ->where('role_id', 2);
 
         if ($filterStatus === '1') {
             $query->where('status', 1);
@@ -60,7 +55,7 @@ class AdminUserController extends BaseAdminController
         $filterStatus = $request->get('status');
 
         $query = DB::table('users')
-            ->where('role_id', 2); // chỉ khách hàng
+            ->where('role_id', 2);
 
         if ($filterStatus === '1') {
             $query->where('status', 1);
@@ -76,12 +71,7 @@ class AdminUserController extends BaseAdminController
         return view('admin.users.all_admin_user', compact('users', 'filterStatus'));
     }
 
-    /**
-     * =========================
-     * FORM THÊM USER
-     * CHỈ ADMIN CODER
-     * =========================
-     */
+   //form thêm user
     public function add_admin_user()
     {
         $this->checkAdminCoder();
@@ -89,13 +79,7 @@ class AdminUserController extends BaseAdminController
         return view('admin.users.add_admin_user');
     }
 
-    /**
-     * =========================
-     * LƯU USER
-     * - role_id = 2 → users
-     * - role_id = 1,3,4,5 → nhansu
-     * =========================
-     */
+    //Lưu user role = 2 là khách hàng ,các role còn lại là admin
     public function store_admin_user(Request $request)
 {
     //  BẮT BUỘC đăng nhập
@@ -104,13 +88,7 @@ class AdminUserController extends BaseAdminController
     }
 
     $creatorRole = (int) Session::get('admin_role_id'); // role người tạo
-    $targetRole  = (int) $request->role_id;             // role sắp tạo
-
-    /**
-     * =========================
-     * VALIDATE DỮ LIỆU
-     * =========================
-     */
+    $targetRole  = (int) $request->role_id;
     $request->validate(
         [
             'fullname' => [
@@ -148,11 +126,7 @@ class AdminUserController extends BaseAdminController
         ]
     );
 
-    /**
-     * =========================
-     * RÀNG BUỘC PHÂN QUYỀN
-     * =========================
-     */
+    //validate phân quyền
 
     //  KHÁCH HÀNG KHÔNG ĐƯỢC TẠO BẤT KỲ AI
     if ($creatorRole === 2) {
@@ -164,7 +138,7 @@ class AdminUserController extends BaseAdminController
         abort(403, 'Bạn chỉ được tạo tài khoản khách hàng.');
     }
 
-    //  chỉ role 1,3 mới được tạo NHÂN SỰ
+    //  chỉ role 1,3 mới được tạo nhân sự
     if (in_array($targetRole, [1,3,4,5]) && !in_array($creatorRole, [1,3])) {
         abort(403, 'Chỉ Admin Coder hoặc Giám đốc mới được tạo tài khoản nhân sự.');
     }
@@ -173,11 +147,7 @@ class AdminUserController extends BaseAdminController
 
     try {
 
-        /**
-         * =========================
-         * TẠO KHÁCH HÀNG
-         * =========================
-         */
+       //Tạo khách hàng
         if ($targetRole === 2) {
             DB::table('users')->insert([
                 'fullname'   => $request->fullname,
@@ -190,11 +160,7 @@ class AdminUserController extends BaseAdminController
             ]);
         }
 
-        /**
-         * =========================
-         * TẠO NHÂN SỰ
-         * =========================
-         */
+        //Tạo nhân sự
         if (in_array($targetRole, [1,3,4,5])) {
             DB::table('nhansu')->insert([
                 'fullname'   => $request->fullname,
@@ -220,12 +186,7 @@ class AdminUserController extends BaseAdminController
     }
 }
 
-
-    /**
-     * =========================
-     * KHOÁ / MỞ KHÁCH HÀNG
-     * =========================
-     */
+    //Mở hoặc khóa khách hàng
     public function unactive_admin_user($id)
     {
         $this->allowRoles([1,3,4]);
@@ -250,11 +211,7 @@ class AdminUserController extends BaseAdminController
         return back()->with('message', 'Đã mở khoá khách hàng');
     }
 
-    /**
-     * =========================
-     * QUẢN LÝ REVIEW
-     * =========================
-     */
+    //quản lý review
     public function all_reviews_user(Request $request)
     {
         $this->allowRoles([1,3,4]);
