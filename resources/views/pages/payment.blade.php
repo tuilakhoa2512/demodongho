@@ -128,14 +128,21 @@
 
                         <div class="promo-row">
                             <input type="text"
-                                   name="promo_code"
-                                   id="promo_code"
-                                   class="form-control"
-                                   placeholder="VD: TET2026"
-                                   value="{{ old('promo_code', $promoCode ?? '') }}">
+                                name="promo_code"
+                                id="promo_code"
+                                class="form-control"
+                                placeholder="VD: TET2026"
+                                value="{{ old('promo_code', $promoCode ?? '') }}">
 
                             <button type="button" class="btn promo-btn" id="btn_apply_promo">
-                                Áp dụng
+                                Áp Dụng
+                            </button>
+
+                            <button type="button"
+                                    class="btn promo-btn"
+                                    id="btn_clear_promo"
+                                    style="display:none; background:#999; border-color:#999;">
+                                Gỡ Mã
                             </button>
                         </div>
 
@@ -175,16 +182,31 @@
                         <div class="sum-row sum-discount">
                             <span>
                                 Ưu đãi hóa đơn
-                                <span id="applied_code"
-                                      style="color:#555; font-weight:800; {{ !empty($appliedCode) ? '' : 'display:none;' }}">
-                                    (Code: {{ $appliedCode }})
+
+                                {{-- CAMPAIGN NAME --}}
+                                <span id="promo_campaign_name"
+                                    style="color:#555; font-weight:800; {{ !empty($promoCampaignName ?? null) ? '' : 'display:none;' }}">
+                                    - {{ $promoCampaignName ?? '' }}
                                 </span>
-                                <span id="bill_discount_name" style="color:#555; font-weight:800; {{ !empty($billDiscount) ? '' : 'display:none;' }}">
-                                    - {{ $billDiscount->name ?? '' }}
+
+                                {{-- CODE --}}
+                                <span id="applied_code"
+                                    style="color:#555; font-weight:800; {{ !empty($promoCode ?? null) ? '' : 'display:none;' }}">
+                                    (Code: {{ $promoCode ?? '' }})
                                 </span>
                             </span>
-                            <strong id="discount_text">-{{ number_format($billDiscountAmount ?? 0, 0, ',', '.') }} đ</strong>
+
+                            <strong id="discount_text">
+                                @if(($discountAmount ?? 0) > 0)
+                                    -{{ number_format($discountAmount, 0, ',', '.') }} đ
+                                @else
+                                    0 đ
+                                @endif
+                            </strong>
                         </div>
+
+
+
 
                         <div class="sum-row sum-total">
                             <span>Tổng thanh toán</span>
@@ -237,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const btn = document.getElementById('btn_apply_promo');
+    const btnClear = document.getElementById('btn_clear_promo'); 
     const input = document.getElementById('promo_code');
     const feedback = document.getElementById('promo_feedback');
 
@@ -245,7 +268,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalText = document.getElementById('total_text');
 
     const appliedCode = document.getElementById('applied_code');
-    const billName = document.getElementById('bill_discount_name');
+    const promoCampaign = document.getElementById('promo_campaign_name');
+
+
 
     function fmtVND(n) {
         try { return (Number(n) || 0).toLocaleString('vi-VN') + ' đ'; }
@@ -287,23 +312,44 @@ document.addEventListener('DOMContentLoaded', function () {
             discountText.textContent = '-' + fmtVND(data.discount_amount);
             totalText.textContent = fmtVND(data.total);
 
-            // Update code label (only show when code exists + server says has_code)
-            if (data.promo_code && data.has_code) {
+            // ===== LABEL LOGIC =====
+
+            // có CODE hợp lệ
+            if (data.has_code && data.promo_code) {
+
+                // show code
                 appliedCode.style.display = 'inline';
                 appliedCode.textContent = '(Code: ' + data.promo_code + ')';
-            } else {
+
+                // hide auto promo
+                promoCampaign.style.display = 'none';
+                promoCampaign.textContent = '';
+
+                // show clear button
+                btnClear.style.display = 'inline';
+
+            }
+            // KHÔNG có code → auto promo
+            else {
+
+                // hide code
                 appliedCode.style.display = 'none';
                 appliedCode.textContent = '';
+
+                // hide clear button
+                btnClear.style.display = 'none';
+
+                // show auto promo if exists
+                if (data.promo_name) {
+                    promoCampaign.style.display = 'inline';
+                    promoCampaign.textContent = '- ' + data.promo_name;
+                } else {
+                    promoCampaign.style.display = 'none';
+                    promoCampaign.textContent = '';
+                }
             }
 
-            // Optional: promo name (if server returns)
-            if (data.promo_name) {
-                billName.style.display = 'inline';
-                billName.textContent = '- ' + data.promo_name;
-            } else {
-                billName.style.display = 'none';
-                billName.textContent = '';
-            }
+
 
             showMsg(true, data.message || 'Đã cập nhật ưu đãi.');
 
@@ -315,7 +361,66 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    async function clearPromo() {
+
+        // 1. clear input
+        input.value = '';
+
+        try {
+            const res = await fetch("{{ route('payment.applyPromo') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ promo_code: '' }) // ✅ GỬI CODE RỖNG
+            });
+
+            const data = await res.json().catch(() => null);
+
+            if (!res.ok || !data) {
+                showMsg(false, 'Không thể gỡ mã lúc này.');
+                return;
+            }
+
+            // 2. update money UI (auto promo)
+            subtotalText.textContent = fmtVND(data.subtotal);
+
+            discountText.textContent =
+                data.discount_amount > 0
+                    ? '-' + fmtVND(data.discount_amount)
+                    : '0 đ';
+
+            totalText.textContent = fmtVND(data.total);
+
+            // hide code
+            appliedCode.style.display = 'none';
+            appliedCode.textContent = '';
+
+            // show auto promo again
+            if (data.promo_name) {
+                promoCampaign.style.display = 'inline';
+                promoCampaign.textContent = '- ' + data.promo_name;
+            } else {
+                promoCampaign.style.display = 'none';
+                promoCampaign.textContent = '';
+            }
+
+
+            // 5. hide clear button
+            btnClear.style.display = 'none';
+
+            showMsg(true, 'Đã gỡ mã, áp dụng ưu đãi tự động (nếu có).');
+
+        } catch (e) {
+            showMsg(false, 'Lỗi mạng hoặc server.');
+        }
+    }
+
+
     btn.addEventListener('click', applyPromo);
+    btnClear.addEventListener('click', clearPromo);
 
     // Enter to apply
     input.addEventListener('keydown', function(e){

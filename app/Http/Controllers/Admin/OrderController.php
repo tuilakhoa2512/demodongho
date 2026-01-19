@@ -212,6 +212,9 @@ class OrderController extends Controller
 
             if ($newStatus === 'canceled') {
 
+                // =========================
+                // 1) HOÀN LẠI TỒN KHO
+                // =========================
                 $details = DB::table('order_details')
                     ->where('order_id', $order->id)
                     ->get(['product_id', 'quantity']);
@@ -220,19 +223,19 @@ class OrderController extends Controller
                     $qty = (int)($d->quantity ?? 0);
                     if ($qty <= 0) continue;
 
-                    // 1️⃣ Hoàn lại tồn kho
+                    // hoàn lại tồn kho
                     DB::table('products')
                         ->where('id', (int)$d->product_id)
                         ->increment('quantity', $qty);
 
-                    // 2️⃣ Lấy lại product sau khi hoàn kho
+                    // lấy lại product sau khi hoàn kho
                     $product = DB::table('products')
                         ->where('id', (int)$d->product_id)
                         ->first();
 
                     if ($product && (int)$product->quantity > 0) {
 
-                        // 3️⃣ Mở lại sản phẩm
+                        // mở lại sản phẩm (chỉ khi còn hàng)
                         DB::table('products')
                             ->where('id', (int)$product->id)
                             ->update([
@@ -240,10 +243,12 @@ class OrderController extends Controller
                                 'status'       => 1,
                             ]);
 
-                        // 4️⃣ Đồng bộ lại kho (KHÔNG đụng status kho)
+                        // ❗ KHÔNG mở lại lô kho đã đóng
+                        // chỉ sync nếu storage_detail đang selling
                         if (!empty($product->storage_detail_id)) {
                             DB::table('storage_details')
                                 ->where('id', (int)$product->storage_detail_id)
+                                ->where('stock_status', 'selling')
                                 ->update([
                                     'stock_status' => 'selling',
                                 ]);
@@ -251,10 +256,16 @@ class OrderController extends Controller
                     }
                 }
 
-                // (optional) hủy redemption nếu muốn
-                // DB::table('promotion_redemptions')->where('order_id', $order->id)->update(['status' => 'canceled']);
+                // =========================
+                // 2) HOÀN LẠI LƯỢT PROMO
+                // =========================
+                DB::table('promotion_redemptions')
+                    ->where('order_id', $order->id)
+                    ->update([
+                        'status'  => 'canceled',
+                        'used_at' => null,
+                    ]);
             }
-
 
             DB::table('orders')
                 ->where('id', $order->id)
@@ -270,4 +281,5 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Lỗi cập nhật trạng thái: ' . $e->getMessage());
         }
     }
+
 }

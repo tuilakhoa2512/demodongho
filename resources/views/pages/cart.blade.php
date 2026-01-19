@@ -42,15 +42,12 @@
 
         @php
             // đảm bảo không null
-            $subtotal = (float) ($subtotal ?? 0);
-            $billDiscountAmount = (float) ($billDiscountAmount ?? 0);
-            $grandTotal = (float) ($grandTotal ?? $subtotal);
+            $subtotal       = (float) ($subtotal ?? 0);
+            $discountAmount = (float) ($discountAmount ?? 0);
+            $grandTotal     = (float) ($grandTotal ?? $subtotal);
 
-            // billDiscount là Promotion|null (order scope)
-            $orderPromoName = $billDiscount ? ($billDiscount->name ?? null) : null;
-
-            // promoCode từ session
-            $promoCode = $promoCode ?? null;
+            // AUTO ORDER PROMO (PromotionRule -> Campaign)
+            $campaignName = $orderRule?->campaign?->name;
 
             $count = is_countable($cart ?? null) ? count($cart) : 0;
         @endphp
@@ -184,26 +181,24 @@
                     </div>
 
                     {{-- ORDER PROMO + CODE (new system) --}}
-                    <div class="sum-row discount">
+                    <div class="sum-row sum-discount" style="color: red;">
                         <span>
                             Ưu đãi hóa đơn
-                            @if(!empty($promoCode))
-                                <span style="color:#555; font-weight:800;">(Code: {{ $promoCode }})</span>
-                            @endif
-
-                            @if(!empty($orderPromoName))
-                                <span style="color:#555; font-weight:800;">- {{ $orderPromoName }}</span>
-                            @endif
+                            <span id="auto_promo_name"
+                                style="color:#555; font-weight:800; {{ !empty($campaignName) ? '' : 'display:none;' }}">
+                                - {{ $campaignName }}
+                            </span>
                         </span>
 
-                        <strong id="sum-discount">
-                            @if($billDiscountAmount > 0)
-                                -{{ number_format($billDiscountAmount, 0, ',', '.') }} đ
+                        <strong id="discount_text">
+                            @if($discountAmount > 0)
+                                -{{ number_format($discountAmount, 0, ',', '.') }} đ
                             @else
                                 0 đ
                             @endif
                         </strong>
                     </div>
+
 
                     <div class="sum-row total">
                         <span>Tổng Thanh Toán:</span>
@@ -314,13 +309,26 @@ function renderCart(data) {
     document.getElementById('sum-subtotal').innerText =
         new Intl.NumberFormat('vi-VN').format(data.subtotal) + ' đ';
 
-    document.getElementById('sum-discount').innerText =
-        data.billDiscountAmount > 0
-            ? '-' + new Intl.NumberFormat('vi-VN').format(data.billDiscountAmount) + ' đ'
+    document.getElementById('discount_text').innerText =
+        data.discountAmount > 0
+            ? '-' + new Intl.NumberFormat('vi-VN').format(data.discountAmount) + ' đ'
             : '0 đ';
 
     document.getElementById('sum-total').innerText =
         new Intl.NumberFormat('vi-VN').format(data.total) + ' đ';
+
+    // ===== AUTO PROMO LABEL =====
+    const promoLabel = document.getElementById('auto_promo_name');
+
+    if (data.campaign_name) {
+        promoLabel.style.display = 'inline';
+        promoLabel.innerText = '- ' + data.campaign_name;
+    } else {
+        promoLabel.style.display = 'none';
+        promoLabel.innerText = '';
+    }
+
+
 }
 
 
