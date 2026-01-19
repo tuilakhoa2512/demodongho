@@ -133,23 +133,31 @@ class PaymentController extends Controller
 
         $quote = $this->orderPricingService->quote($pricingItems, $userId, $promoCode !== '' ? $promoCode : null);
 
-        $billDiscount = $quote['order_promotion'] ?? null;
-        $billDiscountAmount = (int)($quote['discount_amount'] ?? 0);
-        $grandTotal = (int)($quote['total'] ?? $subtotal);
+        
+       $orderPromotion = $quote['order_promotion'] ?? null; // PromotionRule|null
+        $promotionCode  = $quote['promotion_code'] ?? null;  // PromotionCode|null
 
-        return view('pages.payment', compact(
+        $discountAmount = (int)($quote['discount_amount'] ?? 0);
+        $grandTotal     = (int)($quote['total'] ?? $subtotal);
+
+        // tên campaign để show
+        $promoCampaignName = $orderPromotion?->name;
+
+
+
+       return view('pages.payment', compact(
             'user',
             'provinces',
             'districts',
             'wards',
             'cart',
             'subtotal',
-            'billDiscount',
-            'billDiscountAmount',
+            'discountAmount',
             'grandTotal',
-            'quote',
-            'promoCode'
+            'promoCode',
+            'promoCampaignName'
         ));
+
     }
 
     /**
@@ -173,15 +181,18 @@ class PaymentController extends Controller
             'ward_id'          => 'nullable|integer',
 
             'payment_method'   => 'required|in:COD,VNPAY',
-
-            // ✅ NEW
             'promo_code'       => 'nullable|string|max:50',
         ]);
 
         $promoCode = trim((string)$request->input('promo_code', ''));
 
         // giữ lại để hiển thị nếu redirect
-        Session::put('promo_code', $promoCode);
+        if (!empty($quote['promotion_code'])) {
+            Session::put('promo_code', $promoCode); // chỉ lưu khi code hợp lệ
+        } else {
+            Session::forget('promo_code'); // code sai → xóa session
+        }
+
 
         $raw = $this->getRawCart();
         if (empty($raw)) {
@@ -583,24 +594,39 @@ class PaymentController extends Controller
         // Quote order promo/code (scope=order)
         $quote = $this->orderPricingService->quote($pricingItems, $userId, $promoCode !== '' ? $promoCode : null);
 
-        // Lưu promo_code vào session để show() render lại đúng (tùy bạn)
-        Session::put('promo_code', $promoCode);
+        if (!empty($quote['order_promotion']) && ((int)$quote['discount_amount'] > 0)) {
+            Session::put('promo_code', $promoCode);
+        } else {
+            Session::forget('promo_code');
+        }
+
+        $discountAmount = (int) ($quote['discount_amount'] ?? 0);
+
+        $hasAppliedPromo =
+            !empty($quote['order_promotion']) &&
+            $discountAmount > 0;
+
+
 
         return response()->json([
             'ok' => true,
-            'message' => ($promoCode !== '' && !empty($quote['promotion_code']))
-                ? 'Áp dụng mã thành công.'
-                : (($promoCode !== '') ? 'Mã không hợp lệ / không đủ điều kiện (đã chuyển sang ưu đãi tự động nếu có).' : 'Đã tính ưu đãi tự động.'),
+            'message' => $hasAppliedPromo
+                        ? 'Áp dụng mã thành công.'
+                        : (($promoCode !== '')
+                            ? 'Mã không đủ điều kiện áp dụng cho đơn hàng này.'
+                            : 'Đã tính ưu đãi tự động.'),
 
             'promo_code' => $promoCode,
             'subtotal' => (int)($quote['subtotal'] ?? (int)$subtotal),
             'discount_amount' => (int)($quote['discount_amount'] ?? 0),
             'total' => (int)($quote['total'] ?? (int)$subtotal),
 
-            // optional: để hiện tên ưu đãi
-            'has_code' => !empty($quote['promotion_code']),
-            'has_promo' => !empty($quote['order_promotion']),
-            'promo_name' => !empty($quote['order_promotion']) ? ($quote['order_promotion']->name ?? null) : null,
+            'has_code' => $hasAppliedPromo,
+
+            'promo_name' => $hasAppliedPromo
+                ? ($quote['order_promotion']->name ?? null)
+                : null,
+
         ]);
     }
 

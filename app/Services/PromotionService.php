@@ -310,11 +310,15 @@ class PromotionService
         $minSubtotal = (int)($codeRow->min_subtotal ?? 0);
         if ($subtotal < $minSubtotal) return null;
 
+        //  USAGE LIMITS — CHỈ ĐẾM applied
+
         // usage limits theo code: max_uses
         if (!is_null($codeRow->max_uses)) {
             $used = PromotionRedemption::query()
                 ->where('code_id', $codeRow->id)
+                ->where('status', 'applied')   // ✅ chỉ đếm đã dùng thật
                 ->count();
+
             if ($used >= (int)$codeRow->max_uses) return null;
         }
 
@@ -323,7 +327,9 @@ class PromotionService
             $usedUser = PromotionRedemption::query()
                 ->where('code_id', $codeRow->id)
                 ->where('user_id', (int)$userId)
+                ->where('status', 'applied')   // ✅ chỉ đếm đã dùng thật
                 ->count();
+
             if ($usedUser >= (int)$codeRow->max_uses_per_user) return null;
         }
 
@@ -375,8 +381,6 @@ class PromotionService
         foreach ($rules as $rule) {
             if (!$rule->campaign) continue;
 
-            // nếu rule có codes active => không auto apply
-            if (!empty($rule->codes) && $rule->codes->count() > 0) continue;
 
             // min order subtotal theo rule
             if (!is_null($rule->min_order_subtotal) && $subtotal < (int)$rule->min_order_subtotal) continue;
@@ -445,10 +449,7 @@ class PromotionService
     }
 
     /**
-     * ============================
      * C) REDEMPTION: ghi log dùng ưu đãi
-     * ============================
-     *
      * Gọi khi tạo order thành công.
      *
      * @param array $data keys:
@@ -472,9 +473,7 @@ class PromotionService
     }
 
     /**
-     * ============================
      * Helpers
-     * ============================
      */
     protected function isActiveWindow($startAt, $endAt, Carbon $now): bool
     {
@@ -491,7 +490,7 @@ class PromotionService
         return '-' . number_format((int)$value, 0, ',', '.') . ' đ';
     }
 
-// ✅ đổi sang public để service khác gọi được
+//  đổi sang public để service khác gọi được
     public function calcDiscountAmount(int $amount, string $discountType, int $discountValue, $maxDiscountAmount = null): int
     {
         $amount = max(0, (int)$amount);

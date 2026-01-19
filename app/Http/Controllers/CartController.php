@@ -86,7 +86,8 @@ class CartController extends Controller
             $pricePack = $this->promotionService->calcProductFinalPrice($product);
 
             $finalPrice = (float)($pricePack['final_price'] ?? $basePrice);
-            $hasSale    = !empty($pricePack['promotion']);
+            $hasSale = !empty($pricePack['rule']);
+
 
             $lineTotal = $finalPrice * $qty;
             $subtotal += $lineTotal;
@@ -142,25 +143,23 @@ class CartController extends Controller
         $quote = $this->orderPricingService->quote(
             $pricingItems,
             $this->customerId() ?? 0,
-            $promoCode
+            null 
         );
 
         // giữ biến cũ cho view
-        $billDiscount        = $quote['order_promotion'] ?? null;
-        $billDiscountAmount  = (float)($quote['discount_amount'] ?? 0);
-        $grandTotal          = (float)($quote['total'] ?? $subtotal);
-        $total               = $grandTotal;
+        $orderRule      = $quote['order_promotion'] ?? null; // PromotionRule|null
+        $discountAmount = (float)($quote['discount_amount'] ?? 0);
+        $grandTotal     = (float)($quote['total'] ?? $subtotal);
+
 
         return view('pages.cart', compact(
             'cart',
             'subtotal',
-            'billDiscount',
-            'billDiscountAmount',
-            'grandTotal',
-            'total',
-            'quote',
-            'promoCode'
+            'orderRule',
+            'discountAmount',
+            'grandTotal'
         ));
+
     }
 
     /**
@@ -445,14 +444,20 @@ class CartController extends Controller
             $count += (int) $row['quantity'];
         }
 
+        $orderRule = $quote['order_promotion'] ?? null;
+        $campaignName = $orderRule?->campaign?->name;
+
         return [
             'cart' => $cart,
             'count' => $count,
             'subtotal' => $subtotal,
-            'billDiscountAmount' => (float)($quote['discount_amount'] ?? 0),
+
+            'discountAmount' => (float)($quote['discount_amount'] ?? 0),
             'grandTotal' => (float)($quote['total'] ?? $subtotal),
             'total' => (float)($quote['total'] ?? $subtotal),
-        ];
+
+            'campaign_name' => $campaignName,
+];
     }
 
 }

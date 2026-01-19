@@ -153,19 +153,21 @@ class StorageDetailController extends Controller
         $detail  = StorageDetail::with(['storage', 'product'])->findOrFail($id);
         $storage = $detail->storage;
 
-        // chặn sửa khi sold out
+        // ko sửa khi sold out
         if ($detail->stock_status === 'sold_out') {
             return redirect()
                 ->back()
                 ->with('error', 'Sản phẩm đã bán hết, không thể chỉnh sửa số lượng nhập.');
         }
 
-        //tính sl đang + đã bán
+        // sl đang bán + đã bán
         $sellingQty = (int) ($detail->selling_qty ?? 0);
         $soldQty    = (int) ($detail->sold_qty ?? 0);
+
+        // bắt buộc >= tổng đã phân bổ
         $minImport  = max(1, $sellingQty + $soldQty);
 
-        // giới hạn max sl
+        // giới hạn max
         $maxImport = 10000;
 
         $rules = [
@@ -173,7 +175,7 @@ class StorageDetailController extends Controller
                 'required',
                 'string',
                 'max:255',
-                'regex:/^[\p{L}0-9\s\-]+$/u'
+                // 'regex:/^[\p{L}0-9\s\-]+$/u.'
             ],
             'import_quantity' => [
                 'required',
@@ -199,16 +201,39 @@ class StorageDetailController extends Controller
 
         $request->validate($rules, $messages);
 
+        //  UPDATE STORAGE DETAIL 
         $detail->update([
             'product_name'    => $request->product_name,
             'import_quantity' => $request->import_quantity,
             'note'            => $request->note,
         ]);
 
+        //  SYNC LẠI PRODUCT (NẾU ĐÃ ĐƯỢC ĐĂNG BÁN) 
+        if ($detail->product) {
+
+            $newSellingQty = max(0, (int)$request->import_quantity - $soldQty);
+
+            $product = $detail->product;
+            $product->quantity = $newSellingQty;
+
+            if ($newSellingQty <= 0) {
+                // hết hàng
+                $product->quantity = 0;
+                $product->stock_status = 'sold_out';
+                $product->status = 0; // ẩn
+
+                $detail->stock_status = 'sold_out';
+            }
+
+            $product->save();
+            $detail->save();
+        }
+
         return redirect()
             ->route('admin.storage-details.by-storage', $storage->id)
             ->with('success', 'Cập nhật sản phẩm trong kho thành công.');
     }
+
 
 
     public function toggleStatus($id)
@@ -217,7 +242,7 @@ class StorageDetailController extends Controller
         $product = $detail->product;
 
         /**
-         * ❌ NẾU SẢN PHẨM ĐÃ SOLD OUT → KHÔNG CHO TOGGLE
+         *  NẾU SẢN PHẨM ĐÃ SOLD OUT → KHÔNG CHO TOGGLE
          * (vì sold_out là trạng thái khóa)
          */
         if ($product && (int)$product->quantity <= 0) {
