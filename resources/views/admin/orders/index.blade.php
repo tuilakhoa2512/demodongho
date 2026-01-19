@@ -49,7 +49,6 @@
             <th>Người nhận</th>
             <th>SĐT</th>
             <th>Thanh toán</th>
-            <th>gộp</th>
             <th>Tổng tiền</th>
             <th>Ngày đặt</th>
             <th style="width:120px;">Trạng thái</th>
@@ -90,36 +89,6 @@
               <td>{{ $receiverPhone }}</td>
 
               <td>{{ $o->payment_method ?? '—' }}</td>
-              <td><div style="text-item:center;display:flex;gap:10px;">
-                <form method="POST"
-                      action="{{ URL::to('/admin/orders/'.$o->order_code.'/status') }}"
-                      data-order="{{ $o->order_code }}"
-                      data-current="{{ $st }}"
-                      style="margin:0;">
-                  @csrf
-
-                  <select name="status"
-                          class="form-control input-sm order-status-select js-status-select">
-                    @foreach($statuses as $key => $label)
-                      <option value="{{ $key }}" {{ $st === $key ? 'selected' : '' }}>
-                        {{ $label }}
-                      </option>
-                    @endforeach
-                  </select>
-                </form>
-
-                @if($o->created_at)
-                  <div style="line-height:1.2;">
-                    <div>{{ \Carbon\Carbon::parse($o->created_at)->format('H:i') }}</div>
-                    <div style="font-size:12px; color:#777; font-weight: bold;">
-                      {{ \Carbon\Carbon::parse($o->created_at)->format('d/m/Y') }}
-                    </div>
-                  </div>
-                @else
-                  —
-                @endif
-              </td>
-              </div>
 
               <td style="color:#e60012; font-weight:800;">
                 {{ number_format((float)$o->total_price, 0, ',', '.') }} đ

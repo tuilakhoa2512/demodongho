@@ -39,14 +39,9 @@ class CartController extends Controller
             return view('pages.cart', [
                 'cart' => [],
                 'subtotal' => 0,
-                'billDiscount' => null,
-                'billDiscountAmount' => 0,
+                'discountAmount' => 0,
                 'grandTotal' => 0,
-                'total' => 0,
-
-                // NEW
-                'quote' => null,
-                'promoCode' => Session::get('promo_code'),
+                'orderRule' => null,
             ]);
         }
 
@@ -374,10 +369,10 @@ class CartController extends Controller
                 'cart' => [],
                 'count' => 0,
                 'subtotal' => 0,
-                'billDiscountAmount' => 0,
+                'discountAmount' => 0,
                 'grandTotal' => 0,
-                'total' => 0,
             ];
+
         }
 
         $products = Product::with('productImage')
@@ -394,7 +389,6 @@ class CartController extends Controller
 
             $qty = max(1, min((int)$qty, (int)$product->quantity));
 
-            // ✅ SYNC LẠI CART
             $this->syncQty((int)$pid, (int)$qty);
 
             $basePrice = (float)$product->price;
@@ -454,7 +448,6 @@ class CartController extends Controller
 
             'discountAmount' => (float)($quote['discount_amount'] ?? 0),
             'grandTotal' => (float)($quote['total'] ?? $subtotal),
-            'total' => (float)($quote['total'] ?? $subtotal),
 
             'campaign_name' => $campaignName,
 ];
